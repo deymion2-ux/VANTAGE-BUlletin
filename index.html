@@ -202,7 +202,7 @@
                 </div>
 
                 <div class="flex items-center gap-2 lg:gap-3">
-                    <!-- SPRACHAUSWAHL DROPDOWN (INKLUSIVE TSCHECHISCH 🇨ℤ) -->
+                    <!-- SPRACHAUSWAHL DROPDOWN (INKLUSIVE TSCHECHISCH 🇨🇿) -->
                     <select
                         id="language-select"
                         onchange="changeLanguage(this.value)"
@@ -247,14 +247,14 @@
                                 <div>
                                     <h2 class="font-semibold text-[var(--vantage-text-main)] tracking-[1px] uppercase text-sm lg:text-base flex items-center gap-2">
                                         <span data-i18n="bulletinBoard">BULLETIN BOARD</span> 
-                                        <span id="sync-status" class="text-[10px] uppercase tracking-[1px] text-amber-500 font-semibold bg-[var(--vantage-bg)] px-2 py-0.5 rounded-sm border border-[var(--vantage-border)]">SharePoint Sync: Bereit (Warte auf Admin-Freigabe)</span>
+                                        <span id="sync-status" class="text-[10px] uppercase tracking-[1px] text-emerald-600 font-semibold bg-[var(--vantage-bg)] px-2 py-0.5 rounded-sm border border-[var(--vantage-border)]">SharePoint Sync: Bereit (Ohne Admin-Zwang)</span>
                                     </h2>
                                     <p class="text-[11px] lg:text-xs text-[var(--vantage-text-muted)]" data-i18n="bulletinSub">Vantage News & Outlook Kalender</p>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- TICKER OHNE FIKTIVE MELDUNGEN -->
+                        <!-- TICKER -->
                         <div class="w-full bg-[var(--vantage-dark-panel)] text-white rounded-sm px-3 py-2.5 flex items-center gap-3 overflow-hidden shadow-inner border border-[var(--vantage-border)]">
                             <span class="bg-[var(--vantage-gold)] text-white text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wider shrink-0 flex items-center gap-1 z-10">
                                 <i data-lucide="radio" class="w-3 h-3 animate-pulse"></i> NEWS
@@ -266,7 +266,7 @@
                             </div>
                         </div>
 
-                        <!-- KALENDER-SECTION (DYNAMISCH MIT OUTLOOK SYNCHRONISIERT) -->
+                        <!-- KALENDER-SECTION -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
                             <div class="p-4 rounded-sm bg-[var(--vantage-bg)] border border-[var(--vantage-border)]">
                                 <div class="flex items-center justify-between mb-2">
@@ -372,7 +372,6 @@
                             </div>
                         </div>
 
-                        <!-- AKTIONEN (TEAMS & OPTIONAL SHAREPOINT BUTTON) -->
                         <div class="flex items-center gap-2.5 w-full sm:w-auto flex-wrap" id="detail-action-buttons">
                             <!-- Wird dynamisch belegt -->
                         </div>
@@ -456,7 +455,7 @@
     <!-- JAVASCRIPT LOGIC -->
     <script>
         // =========================================================================
-        // MSAL.js CONFIGURATION & ENTRA ID INTEGRATION
+        // MSAL.js CONFIGURATION & ENTRA ID INTEGRATION (LIGHT MODE / NO ADMIN CONSENT)
         // =========================================================================
         const msalConfig = {
             auth: {
@@ -470,13 +469,12 @@
             }
         };
 
+        // HIER SIND DIE .ALL BERECHTIGUNGEN ENTFERNT, UM DEN ADMIN-ZWANG AUFZUEHEBEN:
         const loginRequest = {
             scopes: [
                 "User.Read",
-                "Sites.Read.All",
                 "Calendars.Read",
-                "Mail.Read",
-                "Team.ReadBasic.All"
+                "Mail.Read"
             ]
         };
 
@@ -485,6 +483,7 @@
 
         async function loginM365() {
             try {
+                // Bei lokalem Login im Browser am besten den Cache leeren / neuen Popup-Flow erzwingen
                 await msalInstance.loginPopup(loginRequest);
                 const accounts = msalInstance.getAllAccounts();
                 if (accounts.length > 0) {
@@ -520,37 +519,13 @@
             if (!token) return;
 
             const syncStatus = document.getElementById('sync-status');
-            syncStatus.textContent = "SharePoint Sync: Aktiv";
+            syncStatus.textContent = "SharePoint Sync: Aktiv (Benutzer-Modus)";
             syncStatus.className = "text-[10px] uppercase tracking-[1px] text-emerald-600 font-semibold bg-[var(--vantage-bg)] px-2 py-0.5 rounded-sm border border-[var(--vantage-border)]";
 
             await Promise.all([
-                fetchSharePointMapping(token),
                 fetchOutlookCalendar(token),
                 fetchOutlookMails(token)
             ]);
-        }
-
-        // Dynamischer Abruf der Teams-Channel-Mappings aus eurer SharePoint-Liste
-        async function fetchSharePointMapping(token) {
-            try {
-                const url = "https://graph.microsoft.com/v1.0/sites/vantageweiden.sharepoint.com:/sites/Testbetreuung2:/lists/TeamsChannelMapping/items?expand=fields";
-                const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data.value) {
-                        data.value.forEach(item => {
-                            const fields = item.fields;
-                            const dept = departmentsConfig.find(d => d.id === fields.DepartmentID);
-                            if (dept) {
-                                if (fields.TeamsWebUrl) dept.teamsWebUrl = fields.TeamsWebUrl;
-                                if (fields.TeamsProtocolUrl) dept.teamsProtocolUrl = fields.TeamsProtocolUrl;
-                            }
-                        });
-                    }
-                }
-            } catch (err) {
-                console.warn("SharePoint Mapping Abruf Hinweis:", err);
-            }
         }
 
         // Outlook Kalender Termine einlesen
@@ -617,9 +592,6 @@
 
         let currentLanguage = "de";
 
-        // =========================================================================
-        // SMART FALLBACK-FUNKTIONEN FÜR NATIVE APPS VS. WEB-APPS
-        // =========================================================================
         function openSmartTeams(teamsProtocolUrl, webFallbackUrl) {
             let hasFocus = true;
             const onBlur = () => { hasFocus = false; };
@@ -1061,10 +1033,7 @@
                 color: "gold",
                 icon: "camera",
                 borderColor: "hover:border-[var(--vantage-gold)]",
-                hasSharePointLink: true,
-                sharePointUrl: "https://vantageweiden.sharepoint.com/sites/Testbetreuung2/Lists/Testbetreuung/AllItems.aspx",
-                teamsProtocolUrl: "",
-                teamsWebUrl: "",
+                hasSharePointLink: false,
                 subcategories: [
                     { nameKey: "subFirmware", icon: "download-cloud" },
                     { nameKey: "subGroundglass", icon: "layout-template", isTool: true, toolType: "groundglass" },
@@ -1081,10 +1050,7 @@
                 color: "gold",
                 icon: "calendar-check",
                 borderColor: "hover:border-[var(--vantage-gold)]",
-                hasSharePointLink: true,
-                sharePointUrl: "https://vantageweiden.sharepoint.com/sites/Testbetreuung2/Lists/Testbetreuung/AllItems.aspx",
-                teamsProtocolUrl: "",
-                teamsWebUrl: "",
+                hasSharePointLink: false,
                 subcategories: [
                     { nameKey: "subWhoWithWhom", icon: "external-link", externalUrl: "WhoWithWhom-Tool.html" }
                 ]
@@ -1096,8 +1062,6 @@
                 color: "gold",
                 icon: "cpu",
                 borderColor: "hover:border-[var(--vantage-gold)]",
-                teamsProtocolUrl: "",
-                teamsWebUrl: "",
                 subcategories: []
             },
             {
@@ -1107,8 +1071,6 @@
                 color: "gold",
                 icon: "receipt",
                 borderColor: "hover:border-[var(--vantage-gold)]",
-                teamsProtocolUrl: "",
-                teamsWebUrl: "",
                 subcategories: []
             },
             {
@@ -1118,8 +1080,6 @@
                 color: "gold",
                 icon: "check-square",
                 borderColor: "hover:border-[var(--vantage-gold)]",
-                teamsProtocolUrl: "",
-                teamsWebUrl: "",
                 subcategories: []
             },
             {
@@ -1129,8 +1089,6 @@
                 color: "gold",
                 icon: "server",
                 borderColor: "hover:border-[var(--vantage-gold)]",
-                teamsProtocolUrl: "",
-                teamsWebUrl: "",
                 subcategories: [
                     { nameKey: "subSoftwareUpdates", icon: "shield" }
                 ]
@@ -1142,8 +1100,6 @@
                 color: "gold",
                 icon: "megaphone",
                 borderColor: "hover:border-[var(--vantage-gold)]",
-                teamsProtocolUrl: "",
-                teamsWebUrl: "",
                 subcategories: [
                     { nameKey: "subPhotoStation", icon: "image", externalUrl: "https://photostation.vantagefilm.com/photo/?launchApp=SYNO.Foto.Sharing.AppInstance&app_name=SYNO.Foto.AppInstance&photos_action=external_login&folderId=6&alias=photo#/signin" }
                 ]
@@ -1706,8 +1662,8 @@
 
             // MSAL Initialisierung beim Start prüfen
             try {
-                const response = await msalInstance.handleRedirectPromise();
-                currentUserAccount = response ? response.account : (msalInstance.getAllAccounts()[0] || null);
+                const response = mainAppInit();
+                currentUserAccount = msalInstance.getAllAccounts()[0] || null;
 
                 if (currentUserAccount) {
                     updateUserUI(currentUserAccount);
@@ -1717,6 +1673,10 @@
                 console.warn("MSAL Init Error:", err);
             }
         });
+
+        function mainAppInit() {
+            return msalInstance.handleRedirectPromise();
+        }
     </script>
 </body>
 </html>
