@@ -1,0 +1,1724 @@
+<!DOCTYPE html>
+<html lang="de" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VANTAGE Intranet V3.7.5</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Microsoft Authentication Library (MSAL.js v2) -->
+    <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        vantage: {
+                            bg: '#FFFFFF',
+                            panel: '#E6E6E6',
+                            border: '#D8D8D8',
+                            main: '#111111',
+                            muted: '#555555',
+                            dark: '#2B2B2B',
+                            gold: '#B8923B',
+                            'gold-dark': '#8D6A1E',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --vantage-bg: #FFFFFF;
+            --vantage-panel: #E6E6E6;
+            --vantage-border: #D8D8D8;
+            --vantage-text-main: #111111;
+            --vantage-text-muted: #555555;
+            --vantage-dark-panel: #2B2B2B;
+            --vantage-gold: #B8923B;
+            --vantage-gold-dark: #8D6A1E;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--vantage-bg);
+            color: var(--vantage-text-main);
+            letter-spacing: 0.2px;
+        }
+
+        .glow-green { box-shadow: 0 0 8px rgba(34, 197, 94, 0.4); }
+        .glow-red { box-shadow: 0 0 8px rgba(239, 68, 68, 0.4); }
+        .glow-yellow { box-shadow: 0 0 8px rgba(234, 179, 8, 0.4); }
+        
+        @keyframes ticker {
+            0% { transform: translate3d(100%, 0, 0); }
+            100% { transform: translate3d(-100%, 0, 0); }
+        }
+        .marquee-content {
+            display: inline-block;
+            white-space: nowrap;
+            animation: ticker 28s linear infinite;
+        }
+        .marquee-content:hover {
+            animation-play-state: paused;
+        }
+
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: var(--vantage-panel); }
+        ::-webkit-scrollbar-thumb { background: var(--vantage-border); border-radius: 2px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--vantage-text-muted); }
+
+        /* --- STRIKTE FINALE DRUCK-EINSTELLUNGEN DES MATTSCHEIBEN RECHNERS --- */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 15mm;
+            }
+
+            body * {
+                visibility: hidden !important;
+            }
+
+            #tool-view-container, #tool-view-container * {
+                visibility: visible !important;
+            }
+
+            #tool-view-container {
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .print-only {
+                display: block !important;
+            }
+
+            .print-template {
+                width: 160mm !important;
+                max-width: 160mm !important;
+                margin: 0 left !important;
+                padding: 0 !important;
+                font-family: Arial, sans-serif;
+                color: #000 !important;
+                box-sizing: border-box !important;
+            }
+
+            .print-template h1 {
+                font-size: 15pt;
+                margin-bottom: 0.2cm;
+                color: #000 !important;
+            }
+
+            .print-template p.sub {
+                font-size: 8.5pt;
+                color: #444 !important;
+                margin-bottom: 0.4cm;
+            }
+
+            .print-table {
+                width: 160mm !important;
+                border-collapse: collapse;
+                margin-bottom: 0.6cm;
+                font-size: 9pt;
+                table-layout: fixed !important;
+            }
+
+            .print-table th, .print-table td {
+                border: 1px solid #000 !important;
+                padding: 5px 8px;
+                text-align: left;
+                word-break: break-word;
+                color: #000 !important;
+            }
+
+            .print-table th {
+                background-color: #f0f0f0 !important;
+                width: 50%;
+            }
+
+            .preview-section-print {
+                display: flex !important;
+                flex-direction: row !important;
+                gap: 0.8cm !important;
+                margin-top: 0.3cm;
+                align-items: flex-start;
+                width: 160mm !important;
+            }
+
+            .scale-box {
+                border: 1px solid #888 !important;
+                padding: 0.3cm;
+                background-color: #ffffff !important;
+                border-radius: 2px;
+                box-sizing: border-box !important;
+            }
+
+            .scale-box h3 {
+                font-size: 9pt;
+                margin-bottom: 0.2cm;
+                text-transform: uppercase;
+                color: #000 !important;
+            }
+
+            .print-canvas-actual {
+                border: 1px solid #000 !important;
+                background-color: #ffffff !important;
+                display: block;
+            }
+
+            .hint-text {
+                font-size: 8pt;
+                color: #444 !important;
+                margin-top: 0.4cm;
+                width: 160mm !important;
+            }
+        }
+
+        .print-only {
+            display: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-[var(--vantage-bg)] text-[var(--vantage-text-main)] overflow-x-hidden">
+
+    <!-- OVERLAY FÜR MOBILE SIDEBAR BACKDROP -->
+    <div id="mobile-sidebar-backdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-black/60 z-40 hidden backdrop-blur-xs transition-opacity no-print"></div>
+
+    <!-- MAIN BODY WRAPPER (SIDEBAR + CONTENT) -->
+    <div class="flex-1 flex min-h-screen relative">
+
+        <!-- ========================================== -->
+        <!-- 1. LEFT SIDEBAR: NATIVE DESKTOP DEEP-LINKS -->
+        <!-- ========================================== -->
+        <aside id="sidebar" class="fixed top-0 left-0 w-56 border-r border-[var(--vantage-border)] bg-[var(--vantage-bg)] flex flex-col h-screen z-50 shadow-xl transition-transform duration-300 -translate-x-full shrink-0 no-print">
+            <div class="p-4 border-b border-[var(--vantage-border)] bg-white flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <div id="vantage-logo-icon" onclick="triggerEasterEggClick()" class="w-7 h-7 rounded-sm bg-[var(--vantage-dark-panel)] text-[var(--vantage-gold)] flex items-center justify-center font-bold text-sm shadow-sm cursor-pointer select-none" title="Dreifach-Klick für Secret Game!">
+                        V
+                    </div>
+                    <div>
+                        <h2 class="font-bold text-xs text-[var(--vantage-text-main)] leading-tight uppercase tracking-wide" data-i18n="teamsStatus">Teams Status</h2>
+                        <p class="text-[10px] text-[var(--vantage-text-muted)]" id="presence-count-label">60 Mitarbeiter</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-1">
+                    <button onclick="toggleDemoPresence()" title="Präsenzen für Demo simulieren" class="text-[var(--vantage-text-muted)] hover:text-[var(--vantage-gold)] p-1.5 rounded-sm hover:bg-[var(--vantage-panel)] transition">
+                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                    </button>
+                    <button onclick="toggleMobileSidebar()" class="text-[var(--vantage-text-muted)] hover:text-[var(--vantage-text-main)] p-1.5 rounded-sm hover:bg-[var(--vantage-panel)]">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-2.5 border-b border-[var(--vantage-border)] bg-[var(--vantage-panel)]">
+                <div class="relative">
+                    <i data-lucide="search" class="w-3.5 h-3.5 text-[var(--vantage-text-muted)] absolute left-2.5 top-2"></i>
+                    <input type="text" id="employee-search" oninput="filterEmployees()" data-i18n-placeholder="searchPlaceholder" placeholder="Mitarbeiter oder Ort..." 
+                        class="w-full pl-7 pr-2.5 py-1 text-xs bg-[var(--vantage-bg)] border border-[var(--vantage-border)] rounded-sm focus:outline-none focus:border-[var(--vantage-gold)] transition text-[var(--vantage-text-main)] placeholder-[var(--vantage-text-muted)]">
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-y-visible overflow-x-hidden p-2 space-y-1.5" id="sidebar-presence-list">
+                <!-- Dynamisch gefüllt -->
+            </div>
+
+            <div class="p-2.5 border-t border-[var(--vantage-border)] bg-[var(--vantage-panel)] text-[10px] text-[var(--vantage-text-muted)] flex items-center justify-around font-medium uppercase tracking-wider">
+                <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Online</span>
+                <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Busy</span>
+                <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Away</span>
+                <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span> Off</span>
+            </div>
+        </aside>
+
+        <!-- ========================================== -->
+        <!-- 2. MAIN CONTENT AREA                       -->
+        <!-- ========================================== -->
+        <div class="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto">
+
+            <!-- TOP HEADER BAR -->
+            <header class="border-b border-[var(--vantage-border)] bg-[var(--vantage-dark-panel)] px-4 lg:px-8 py-4 flex items-center justify-between shadow-md no-print">
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleMobileSidebar()" id="burger-menu-btn" class="p-2 rounded-sm bg-[var(--vantage-panel)] text-[var(--vantage-text-main)] hover:bg-[var(--vantage-border)] transition" data-i18n-title="burgerTooltip" title="Teams Status Leiste ein-/ausblenden">
+                        <i data-lucide="menu" class="w-5 h-5"></i>
+                    </button>
+
+                    <h1 class="font-light text-sm lg:text-base tracking-[2px] uppercase text-white flex items-center gap-3">
+                        VANTAGE <span class="hidden sm:inline-block text-[11px] font-semibold text-[var(--vantage-gold)] bg-transparent border border-[var(--vantage-gold)] px-3 py-0.5 rounded-sm tracking-[1.5px]" data-i18n="versionBadge">Intranet V3.7.5 🚀</span>
+                    </h1>
+                </div>
+
+                <div class="flex items-center gap-2 lg:gap-3">
+                    <!-- SPRACHAUSWAHL DROPDOWN -->
+                    <select
+                        id="language-select"
+                        onchange="changeLanguage(this.value)"
+                        class="text-xs bg-[var(--vantage-panel)] border border-[var(--vantage-border)] rounded-sm px-3 py-1.5 font-medium text-[var(--vantage-text-main)] focus:outline-none focus:border-[var(--vantage-gold)] cursor-pointer uppercase tracking-wide">
+                        <option value="de">🇩🇪 Deutsch</option>
+                        <option value="en">🇬🇧 English</option>
+                        <option value="fr">🇫🇷 Français</option>
+                        <option value="cs">🇨ℤ Čeština</option>
+                    </select>
+
+                    <div id="auth-container">
+                        <button id="login-btn" onclick="loginM365()" class="bg-[var(--vantage-gold)] hover:bg-[var(--vantage-gold-dark)] text-white px-3 py-1.5 rounded-sm text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 shadow-sm transition">
+                            <i data-lucide="log-in" class="w-3.5 h-3.5 text-white"></i> <span class="hidden sm:inline" data-i18n="login">M365 Anmelden</span>
+                        </button>
+                    </div>
+
+                    <button onclick="openNewChannelModal()" class="bg-[var(--vantage-panel)] hover:bg-[var(--vantage-border)] text-[var(--vantage-text-main)] border border-[var(--vantage-border)] px-3 py-1.5 rounded-sm text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 shadow-sm transition">
+                        <i data-lucide="plus-circle" class="w-3.5 h-3.5 text-[var(--vantage-gold)]"></i> <span class="hidden sm:inline" data-i18n="newChannel">Neuer Channel</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- MAIN VIEW CONTAINER -->
+            <div id="view-container" class="flex-1 flex flex-col">
+                <!-- VIEW 1: DASHBOARD MAIN -->
+                <main id="dashboard-view" class="p-4 lg:p-8 space-y-6 max-w-7xl w-full mx-auto flex-1 no-print">
+
+                    <!-- BULLETIN BOARD SECTION -->
+                    <section id="bulletin-board" class="bg-[var(--vantage-panel)] border border-[var(--vantage-border)] rounded-sm p-4 lg:p-6 shadow-sm relative overflow-hidden space-y-4">
+                        
+                        <!-- ÜBERSCHRIFT -->
+                        <div class="flex items-center justify-between pb-3 border-b border-[var(--vantage-border)]">
+                            <div class="flex items-center gap-3">
+                                <div class="p-2 bg-[var(--vantage-bg)] rounded-sm text-[var(--vantage-gold)] border border-[var(--vantage-border)] shrink-0">
+                                    <i data-lucide="megaphone" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <h2 class="font-semibold text-[var(--vantage-text-main)] tracking-[1px] uppercase text-sm lg:text-base flex items-center gap-2">
+                                        <span data-i18n="bulletinBoard">BULLETIN BOARD</span> 
+                                        <span class="text-[10px] uppercase tracking-[1px] text-[var(--vantage-text-muted)] font-semibold bg-[var(--vantage-bg)] px-2 py-0.5 rounded-sm border border-[var(--vantage-border)]" data-i18n="liveFeeds">Live Feeds</span>
+                                    </h2>
+                                    <p class="text-[11px] lg:text-xs text-[var(--vantage-text-muted)]" data-i18n="bulletinSub">Vantage News & Outlook Kalender</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TICKER ÜBER DIE VOLLE SPALTENBREITE -->
+                        <div class="w-full bg-[var(--vantage-dark-panel)] text-white rounded-sm px-3 py-2.5 flex items-center gap-3 overflow-hidden shadow-inner border border-[var(--vantage-border)]">
+                            <span class="bg-[var(--vantage-gold)] text-white text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wider shrink-0 flex items-center gap-1 z-10">
+                                <i data-lucide="radio" class="w-3 h-3 animate-pulse"></i> NEWS
+                            </span>
+                            <div class="flex-1 overflow-hidden relative h-4 flex items-center">
+                                <div class="marquee-content text-xs font-medium text-slate-200 flex items-center gap-8">
+                                    <span class="flex items-center gap-1.5"><i data-lucide="bell" class="w-3.5 h-3.5 text-[var(--vantage-gold)]"></i> NEW Updates for ARRI Alexa35 V6.2.0 & HI-5 V3.6.6</span>
+                                    <span class="text-slate-600">&bull;</span>
+                                    <span class="flex items-center gap-1.5"><i data-lucide="truck" class="w-3.5 h-3.5 text-emerald-400"></i> NEW Updates for TERADEK Bolt 6 / 4K V4.5.1</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- KALENDER-SECTION -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+                            <div class="p-4 rounded-sm bg-[var(--vantage-bg)] border border-[var(--vantage-border)]">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-[11px] font-bold text-[var(--vantage-text-muted)] uppercase tracking-wider flex items-center gap-1.5">
+                                        <i data-lucide="calendar" class="w-3.5 h-3.5 text-[var(--vantage-gold)]"></i> <span data-i18n="todayCalendar">Heute im Kalender</span>
+                                    </span>
+                                    <span class="text-[10px] text-[var(--vantage-gold-dark)] font-semibold bg-[var(--vantage-panel)] px-2 py-0.5 rounded-sm border border-[var(--vantage-border)] uppercase" data-i18n="outlookSync">Outlook Sync</span>
+                                </div>
+                                <div class="space-y-2 text-xs" id="today-calendar-events">
+                                    <div class="group relative flex items-center justify-between p-2.5 bg-[var(--vantage-panel)] rounded-sm border border-[var(--vantage-border)] hover:border-[var(--vantage-gold)] hover:shadow-xs transition cursor-pointer"
+                                         onclick="openSmartOutlook('https://outlook.office.com/calendar/')">
+                                        <div class="flex items-center gap-2 truncate mr-2">
+                                            <span class="w-2 h-2 rounded-full bg-[var(--vantage-gold)] shrink-0"></span>
+                                            <span class="font-medium text-[var(--vantage-text-main)] truncate">10:00 - Kamera-Test Produktion "CineBerlin"</span>
+                                        </div>
+                                        <span class="text-[10px] bg-[var(--vantage-bg)] text-[var(--vantage-text-muted)] px-2 py-0.5 rounded-sm font-medium shrink-0 border border-[var(--vantage-border)]">Berlin</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="p-4 rounded-sm bg-[var(--vantage-bg)] border border-[var(--vantage-border)]">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-[11px] font-bold text-[var(--vantage-text-muted)] uppercase tracking-wider flex items-center gap-1.5">
+                                        <i data-lucide="clock" class="w-3.5 h-3.5 text-[var(--vantage-gold)]"></i> <span data-i18n="upcomingCalendar">Vorschau nächste Tage</span>
+                                    </span>
+                                    <span class="text-[10px] text-[var(--vantage-text-muted)] uppercase tracking-wider" data-i18n="vantageCalendar">Vantage Kalender</span>
+                                </div>
+                                <div class="space-y-2 text-xs" id="upcoming-calendar-events">
+                                    <div class="group relative flex items-center justify-between p-2.5 bg-[var(--vantage-panel)] rounded-sm border border-[var(--vantage-border)] hover:border-[var(--vantage-gold)] hover:shadow-xs transition cursor-pointer"
+                                         onclick="openSmartOutlook('https://outlook.office.com/calendar/')">
+                                        <div class="flex items-center gap-2 truncate mr-2">
+                                            <span class="w-2 h-2 rounded-full bg-[var(--vantage-dark-panel)] shrink-0"></span>
+                                            <span class="font-medium text-[var(--vantage-text-main)] truncate">Morgen - HAWK Optik Wartungs-Meeting</span>
+                                        </div>
+                                        <span class="text-[10px] bg-[var(--vantage-bg)] text-[var(--vantage-text-main)] font-semibold px-2 py-0.5 rounded-sm border border-[var(--vantage-border)] shrink-0">Leipzig</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- SCHNELLZUGRIFFE -->
+                    <section class="bg-[var(--vantage-panel)] border border-[var(--vantage-border)] rounded-sm p-4 lg:p-6 shadow-sm">
+                        <div class="flex items-center justify-between mb-3.5">
+                            <h2 class="font-semibold text-[var(--vantage-text-main)] uppercase tracking-[1px] text-sm lg:text-base flex items-center gap-2">
+                                <i data-lucide="zap" class="w-4 h-4 text-[var(--vantage-gold)]"></i>
+                                <span data-i18n="quickAccess">Schnellzugriffe</span>
+                            </h2>
+                        </div>
+
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                            <button class="p-3 rounded-sm bg-[var(--vantage-bg)] border border-[var(--vantage-border)] hover:border-[var(--vantage-gold)] hover:bg-[var(--vantage-panel)] text-xs font-semibold uppercase tracking-wider transition active:scale-95 text-center text-[var(--vantage-text-main)]" data-i18n="qaCases">
+                                Leerkoffer
+                            </button>
+                            <button class="p-3 rounded-sm bg-[var(--vantage-bg)] border border-[var(--vantage-border)] hover:border-[var(--vantage-gold)] hover:bg-[var(--vantage-panel)] text-xs font-semibold uppercase tracking-wider transition active:scale-95 text-center text-[var(--vantage-text-main)]" data-i18n="qaWiki">
+                                Kamera Wiki
+                            </button>
+                            <button class="p-3 rounded-sm bg-[var(--vantage-bg)] border border-[var(--vantage-border)] hover:border-[var(--vantage-gold)] hover:bg-[var(--vantage-panel)] text-xs font-semibold uppercase tracking-wider transition active:scale-95 text-center text-[var(--vantage-text-main)]" data-i18n="qaOptics">
+                                Optik Service
+                            </button>
+                            <button class="p-3 rounded-sm bg-[var(--vantage-bg)] border border-[var(--vantage-border)] hover:border-[var(--vantage-gold)] hover:bg-[var(--vantage-panel)] text-xs font-semibold uppercase tracking-wider transition active:scale-95 text-center text-[var(--vantage-text-main)]" data-i18n="qaSupport">
+                                Support
+                            </button>
+                            <button class="p-3 rounded-sm bg-[var(--vantage-bg)] border border-[var(--vantage-border)] hover:border-[var(--vantage-gold)] hover:bg-[var(--vantage-panel)] text-xs font-semibold uppercase tracking-wider transition active:scale-95 text-center col-span-2 sm:col-span-1 text-[var(--vantage-text-main)]" data-i18n="qaDocs">
+                                Dokumente
+                            </button>
+                        </div>
+                    </section>
+
+                    <!-- DEPARTMENT HUBS NAVIGATION -->
+                    <section class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-xs font-bold uppercase tracking-[1.5px] text-[var(--vantage-text-muted)] flex items-center gap-2">
+                                <i data-lucide="grid" class="w-4 h-4 text-[var(--vantage-gold)]"></i> <span data-i18n="deptHeader">Fachbereiche & System-Channels</span>
+                            </h2>
+                        </div>
+
+                        <!-- DYNAMIC CONTAINER FOR DEPARTMENTS -->
+                        <div id="department-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
+                            <!-- Wird dynamisch über JavaScript generiert -->
+                        </div>
+                    </section>
+
+                </main>
+
+                <!-- VIEW 2: DETAIL VIEW -->
+                <div id="detail-view" class="hidden p-4 lg:p-8 space-y-6 max-w-6xl w-full mx-auto flex-1 flex flex-col">
+                    
+                    <!-- TWO-WAY NAVIGATION HEADER -->
+                    <div class="flex items-center justify-between bg-[var(--vantage-panel)] border border-[var(--vantage-border)] px-4 py-3 rounded-sm shadow-xs no-print">
+                        <div class="flex items-center gap-2">
+                            <button onclick="goBack()" class="px-3 py-1.5 bg-[var(--vantage-bg)] hover:bg-[var(--vantage-border)] border border-[var(--vantage-border)] text-[var(--vantage-text-main)] rounded-sm text-xs font-semibold uppercase tracking-wider transition flex items-center gap-1.5">
+                                <i data-lucide="arrow-left" class="w-3.5 h-3.5 text-[var(--vantage-gold)]"></i> <span class="hidden sm:inline" data-i18n="btnBack">Schritt zurück</span>
+                            </button>
+                            <button onclick="goHome()" class="px-3 py-1.5 bg-[var(--vantage-bg)] hover:bg-[var(--vantage-border)] border border-[var(--vantage-border)] text-[var(--vantage-text-main)] rounded-sm text-xs font-semibold uppercase tracking-wider transition flex items-center gap-1.5">
+                                <i data-lucide="home" class="w-3.5 h-3.5 text-[var(--vantage-gold)]"></i> <span class="hidden sm:inline" data-i18n="btnHome">Zum Dashboard</span>
+                            </button>
+                        </div>
+                        <div class="text-xs font-semibold text-[var(--vantage-text-muted)] uppercase tracking-wider truncate max-w-[150px] sm:max-w-none" id="breadcrumb-path">
+                            Department
+                        </div>
+                    </div>
+
+                    <!-- CHANNEL HEADER BANNER -->
+                    <div class="bg-[var(--vantage-panel)] border border-[var(--vantage-border)] rounded-sm p-5 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 no-print" id="detail-header-banner">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-sm bg-[var(--vantage-bg)] text-[var(--vantage-gold)] border border-[var(--vantage-border)] flex items-center justify-center shrink-0">
+                                <i data-lucide="message-square" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h2 class="font-semibold text-base text-[var(--vantage-text-main)] uppercase tracking-[1px]" id="detail-title">Department Title</h2>
+                                <p class="text-xs text-[var(--vantage-text-muted)]" data-i18n="detailSub">Live Teams-Kommentare & Diskussionsverlauf</p>
+                            </div>
+                        </div>
+
+                        <!-- AKTIONEN (TEAMS & OPTIONAL SHAREPOINT BUTTON) -->
+                        <div class="flex items-center gap-2.5 w-full sm:w-auto flex-wrap" id="detail-action-buttons">
+                            <!-- Wird dynamisch belegt -->
+                        </div>
+                    </div>
+
+                    <!-- UNTERKATEGORIEN & TOOLS NAVIGATION -->
+                    <div class="bg-[var(--vantage-panel)] border border-[var(--vantage-border)] rounded-sm p-5 shadow-xs space-y-3 no-print">
+                        <h3 class="font-bold text-xs uppercase tracking-[1.5px] text-[var(--vantage-text-muted)] flex items-center gap-1.5">
+                            <i data-lucide="folder-tree" class="w-4 h-4 text-[var(--vantage-gold)]"></i> <span data-i18n="subCategoriesHeader">Unterkategorien & Tools</span>
+                        </h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" id="subcategories-container">
+                            <!-- Wird dynamisch gerendert -->
+                        </div>
+                    </div>
+
+                    <!-- DYNAMISCHER CONTAINER FÜR EINGEBETTETE TOOLS -->
+                    <div id="tool-view-container" class="hidden">
+                        <!-- Mattscheiben-Rechner -->
+                    </div>
+
+                    <!-- TEAMS LIVE COMMENTS STREAM -->
+                    <div id="chat-stream-card" class="bg-[var(--vantage-panel)] border border-[var(--vantage-border)] rounded-sm p-5 shadow-xs flex-1 flex flex-col no-print">
+                        <h3 class="font-bold text-xs uppercase tracking-[1.5px] text-[var(--vantage-text-muted)] mb-4 flex items-center gap-1.5">
+                            <i data-lucide="messages-square" class="w-4 h-4 text-[var(--vantage-gold)]"></i> <span data-i18n="chatHeader">Diskussionsverlauf & Neuigkeiten</span>
+                        </h3>
+
+                        <div class="space-y-4 flex-1 overflow-y-auto pr-1 max-h-[40vh]" id="detail-chat-stream">
+                            <div class="p-3.5 rounded-sm bg-[var(--vantage-bg)] border border-[var(--vantage-border)]">
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <span class="font-bold text-xs text-[var(--vantage-text-main)] flex items-center gap-2">
+                                        <span class="w-6 h-6 rounded-sm bg-[var(--vantage-dark-panel)] text-[var(--vantage-gold)] font-bold flex items-center justify-center text-[10px]">TG</span>
+                                        Thomas Gietzke <span class="text-[10px] text-[var(--vantage-text-muted)] font-normal hidden sm:inline">15.10.2026</span>
+                                    </span>
+                                    <span class="text-[10px] bg-[var(--vantage-panel)] text-[var(--vantage-text-main)] px-2 py-0.5 rounded-sm border border-[var(--vantage-border)] font-semibold uppercase" data-i18n="badgeTechnical">Technical</span>
+                                </div>
+                                <p class="text-xs text-[var(--vantage-text-main)] mb-2 font-medium">NEW Updates & Channel Discussion Active</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 pt-3 border-t border-[var(--vantage-border)] flex items-center gap-2">
+                            <input type="text" id="detail-chat-input" data-i18n-placeholder="chatInputPlaceholder" placeholder="Antwort schreiben..." class="flex-1 px-3 py-2 text-xs bg-[var(--vantage-bg)] border border-[var(--vantage-border)] rounded-sm focus:outline-none focus:border-[var(--vantage-gold)] transition text-[var(--vantage-text-main)] placeholder-[var(--vantage-text-muted)]">
+                            <button onclick="sendDetailChatMessage()" class="px-3.5 py-2 bg-[var(--vantage-gold)] hover:bg-[var(--vantage-gold-dark)] text-white rounded-sm text-xs font-semibold uppercase tracking-wider transition flex items-center gap-1.5 shadow-sm shrink-0">
+                                <i data-lucide="send" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline" data-i18n="btnSend">Senden</span>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <footer class="p-4 lg:p-6 text-center text-xs text-[var(--vantage-text-muted)] border-t border-[var(--vantage-border)] mt-auto no-print uppercase tracking-widest bg-[var(--vantage-panel)]">
+                <p data-i18n="footerText">Vantage Intranet PWA V3.7.5 &bull; MS365 & Teams Integration</p>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- EASTER EGG MODAL (VANTAGE SNAKE MINIGAME) -->
+    <div id="easter-egg-modal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-[var(--vantage-dark-panel)] border border-[var(--vantage-gold)] p-6 rounded-sm text-center max-w-md w-full shadow-2xl relative">
+            <button onclick="closeSnakeGame()" class="absolute top-3 right-3 text-slate-400 hover:text-white text-lg font-bold">&times;</button>
+            <div class="flex items-center justify-center gap-2 mb-2">
+                <i data-lucide="gamepad-2" class="w-5 h-5 text-[var(--vantage-gold)]"></i>
+                <h3 class="text-base font-bold text-white uppercase tracking-widest" data-i18n="snakeTitle">Vantage Snake 🕹️</h3>
+            </div>
+            <p class="text-[11px] text-slate-400 mb-4 uppercase tracking-wider" data-i18n="snakeSub">Benutze die Pfeiltasten zum Steuern!</p>
+            
+            <div class="flex justify-between items-center text-xs font-bold text-white mb-2 px-2 border-b border-slate-700 pb-2">
+                <span><span data-i18n="snakeScore">Score</span>: <span id="snake-score" class="text-[var(--vantage-gold)]">0</span></span>
+                <span><span data-i18n="snakeHighscore">Highscore</span>: <span id="snake-highscore" class="text-emerald-400">0</span></span>
+            </div>
+
+            <div class="relative flex justify-center items-center bg-black rounded-sm border border-slate-800 p-1">
+                <canvas id="snakeCanvas" width="300" height="300" class="bg-black"></canvas>
+            </div>
+
+            <div class="mt-4 flex gap-2 justify-center">
+                <button onclick="startSnakeGame()" class="px-4 py-2 bg-[var(--vantage-gold)] hover:bg-[var(--vantage-gold-dark)] text-white text-xs font-bold uppercase tracking-wider rounded-sm transition" data-i18n="snakeNewBtn">
+                    Neues Spiel
+                </button>
+                <button onclick="closeSnakeGame()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold uppercase tracking-wider rounded-sm transition" data-i18n="snakeCloseBtn">
+                    Schließen
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        let currentLanguage = "de";
+
+        // =========================================================================
+        // SMART FALLBACK-FUNKTIONEN FÜR NATIVE APPS VS. WEB-APPS
+        // =========================================================================
+        function openSmartTeams(teamsProtocolUrl, webFallbackUrl) {
+            let hasFocus = true;
+            const onBlur = () => { hasFocus = false; };
+            window.addEventListener('blur', onBlur);
+
+            // Versuch 1: Protocol Handler der Desktop App ausführen
+            window.location.href = teamsProtocolUrl;
+
+            // Versuch 2: Nach 1.5 Sekunden prüfen, ob die App gestartet ist
+            setTimeout(() => {
+                window.removeEventListener('blur', onBlur);
+                // Wenn das Fenster noch Fokus hat, hat das OS den Protocol Handler ignoriert
+                if (hasFocus) {
+                    window.open(webFallbackUrl || 'https://teams.microsoft.com/', '_blank');
+                }
+            }, 1500);
+        }
+
+        function openSmartMail(email) {
+            let hasFocus = true;
+            const onBlur = () => { hasFocus = false; };
+            window.addEventListener('blur', onBlur);
+
+            window.location.href = `mailto:${email}`;
+
+            setTimeout(() => {
+                window.removeEventListener('blur', onBlur);
+                if (hasFocus) {
+                    window.open(`https://outlook.office.com/mail/deeplink/compose?to=${encodeURIComponent(email)}`, '_blank');
+                }
+            }, 1500);
+        }
+
+        function openSmartOutlook(webUrl) {
+            window.open(webUrl, '_blank');
+        }
+
+        const translations = {
+            de: {
+                versionBadge: "Intranet V3.7.5 🚀",
+                teamsStatus: "Teams Status",
+                searchPlaceholder: "Mitarbeiter oder Ort...",
+                login: "M365 Anmelden",
+                newChannel: "Neuer Channel",
+                bulletinBoard: "BULLETIN BOARD",
+                liveFeeds: "Live Feeds",
+                bulletinSub: "Vantage News & Outlook Kalender",
+                todayCalendar: "Heute im Kalender",
+                outlookSync: "Outlook Sync",
+                upcomingCalendar: "Vorschau nächste Tage",
+                vantageCalendar: "Vantage Kalender",
+                quickAccess: "Schnellzugriffe",
+                qaCases: "Leerkoffer",
+                qaWiki: "Kamera Wiki",
+                qaOptics: "Optik Service",
+                qaSupport: "Support",
+                qaDocs: "Dokumente",
+                deptHeader: "Fachbereiche & System-Channels",
+                btnTestbetreuung: "Testbetreuung (SharePoint)",
+                btnWhoWithWhom: "WHO WITH WHOM Suche",
+                btnBack: "Schritt zurück",
+                btnHome: "Zum Dashboard",
+                subCategoriesHeader: "Unterkategorien & Tools",
+                detailSub: "Live Teams-Kommentare & Diskussionsverlauf",
+                btnOpenTeams: "In Teams öffnen",
+                chatHeader: "Diskussionsverlauf & Neuigkeiten",
+                chatInputPlaceholder: "Antwort schreiben...",
+                btnSend: "Senden",
+                badgeTechnical: "Technical",
+                footerText: "Vantage Intranet PWA V3.7.5 • MS365 & Teams Integration",
+                burgerTooltip: "Teams Status Leiste ein-/ausblenden",
+                
+                deptTechRentalTitle: "Technical Departments Rental",
+                deptTechRentalDesc: "Kamera, Mechanik, NLN & Werkstatt-Protokolle.",
+                
+                deptBookingTitle: "Booking Department & Client Contacts",
+                deptBookingDesc: "Buchungen, Kundenkontakte & Verfügbarkeiten.",
+
+                deptProductsTitle: "VANTAGE & HAWK Products",
+                deptProductsDesc: "Eigenentwicklungen, HAWK Lenses & Datenblätter.",
+
+                deptAccountingTitle: "Buchhaltung",
+                deptAccountingDesc: "Rechnungen, Spesen & Finanzprozesse.",
+
+                deptPreparationTitle: "Vorbereitung / Job Handling",
+                deptPreparationDesc: "Job-Vorbereitung, Checklisten & Check-Outs.",
+
+                deptItTitle: "IT / Software",
+                deptItDesc: "Infrastruktur, Tools, Netzwerke & Support.",
+
+                deptMarketingTitle: "Marketing",
+                deptMarketingDesc: "Social Media, Events, Presse & CI-Materialien.",
+
+                subFirmware: "Firmware Updates",
+                subSoftwareUpdates: "Software Updates",
+                subGroundglass: "Mattscheiben-Rechner S35",
+                subCaseLists: "Kofferlisten (Leerkoffer)",
+                subArriCatalog: "ARRI Ersatzteil-Katalog (Web-Tool)",
+                subWorkshopProtocols: "Werkstatt Protokolle",
+                subWhoWithWhom: "WHO WITH WHOM Suche",
+                subPhotoStation: "Vantage PhotoStation",
+
+                ggTitle: "Mattscheiben-Rechner S35",
+                ggSub: "Berechnung von Zielformaten & Schnittabständen für Framing-Schablonen",
+                ggCloseBtn: "Tool schließen",
+                ggTypeLabel: "Mattscheibe Typ",
+                ggAspectLabel: "Ziel-Seitenverhältnis (z. B. 1.78, 1.85, 2.39)",
+                ggMaxW: "Max. Breite",
+                ggMaxH: "Max. Höhe",
+                ggTargetW: "Zielbreite",
+                ggTargetH: "Zielhöhe",
+                ggCenterDist: "Mitte nach oben/unten",
+                ggEdgeDist: "Abstand Ober-/Unterkante",
+                ggPrintBtn: "Schablone mit Grafik drucken",
+                ggPreviewHint: "Visuelle Vorschau (Rot = Zielformat)",
+                printTemplateTitle: "Druck-Schablone & Grafische Vorschau",
+                printTemplateSub: "Mattscheiben-Berechnung für Kameraschablonen",
+                printParam: "Parameter",
+                printSpec: "Spezifikation / Wert",
+                printSelectedGlass: "Gewählte Mattscheibe",
+                printMaxDim: "Max. Breite × Höhe",
+                printAspectLabel: "Ziel-Seitenverhältnis",
+                printTargetH: "Zielhöhe (Schnittfenster)",
+                printCenterLine: "Linie von Mitte nach oben / unten",
+                printEdgeDist: "Abstand zur Ober- / Unterkante",
+                printGraphicsHeader: "Visuelle Grafiken",
+                printScale1: "1. Originalgröße (1:1 Maßstab)",
+                printScale2: "2. Vergrößerte Übersicht",
+                printHintText: "Hinweis zum Anzeichnen: Der äußere schwarze Rahmen entspricht der Gesamtabmessung der Mattscheibe. Der innere rote Rahmen markiert das berechnete Zielformat.",
+
+                snakeTitle: "Vantage Snake 🕹️",
+                snakeSub: "Benutze die Pfeiltasten zum Steuern!",
+                snakeScore: "Score",
+                snakeHighscore: "Highscore",
+                snakeNewBtn: "Neues Spiel",
+                snakeCloseBtn: "Schließen"
+            },
+            en: {
+                versionBadge: "Intranet V3.7.5 🚀",
+                teamsStatus: "Teams Presence",
+                searchPlaceholder: "Search employee or location...",
+                login: "Sign in to M365",
+                newChannel: "New Channel",
+                bulletinBoard: "BULLETIN BOARD",
+                liveFeeds: "Live Feeds",
+                bulletinSub: "Vantage News & Outlook Calendar",
+                todayCalendar: "Today's Calendar",
+                outlookSync: "Outlook Sync",
+                upcomingCalendar: "Upcoming Days",
+                vantageCalendar: "Vantage Calendar",
+                quickAccess: "Quick Access",
+                qaCases: "Empty Cases",
+                qaWiki: "Camera Wiki",
+                qaOptics: "Optics Service",
+                qaSupport: "Support",
+                qaDocs: "Documents",
+                deptHeader: "Departments & System Channels",
+                btnTestbetreuung: "Test Support (SharePoint)",
+                btnWhoWithWhom: "WHO WITH WHOM Search",
+                btnBack: "Step Back",
+                btnHome: "To Dashboard",
+                subCategoriesHeader: "Subcategories & Tools",
+                detailSub: "Live Teams comments & discussion thread",
+                btnOpenTeams: "Open in Teams",
+                chatHeader: "Discussion Feed & Updates",
+                chatInputPlaceholder: "Write a reply...",
+                btnSend: "Send",
+                badgeTechnical: "Technical",
+                footerText: "Vantage Intranet PWA V3.7.5 • MS365 & Teams Integration",
+                burgerTooltip: "Toggle Teams status sidebar",
+
+                deptTechRentalTitle: "Technical Departments Rental",
+                deptTechRentalDesc: "Camera, mechanics, NLN & workshop protocols.",
+                
+                deptBookingTitle: "Booking Department & Client Contacts",
+                deptBookingDesc: "Bookings, client contacts & availabilities.",
+
+                deptProductsTitle: "VANTAGE & HAWK Products",
+                deptProductsDesc: "Proprietary developments, HAWK Lenses & datasheets.",
+
+                deptAccountingTitle: "Accounting",
+                deptAccountingDesc: "Invoices, expenses & financial workflows.",
+
+                deptPreparationTitle: "Preparation / Job Handling",
+                deptPreparationDesc: "Job preparation, checklists & check-outs.",
+
+                deptItTitle: "IT / Software",
+                deptItDesc: "Infrastructure, tools, networks & support.",
+
+                deptMarketingTitle: "Marketing",
+                deptMarketingDesc: "Social media, events, PR & CI materials.",
+
+                subFirmware: "Firmware Updates",
+                subSoftwareUpdates: "Software Updates",
+                subGroundglass: "Groundglass Calculator S35",
+                subCaseLists: "Case Lists (Empty Cases)",
+                subArriCatalog: "ARRI Spare Parts Catalog (Web Tool)",
+                subWorkshopProtocols: "Workshop Protocols",
+                subWhoWithWhom: "WHO WITH WHOM Search",
+                subPhotoStation: "Vantage PhotoStation",
+
+                ggTitle: "Groundglass Calculator S35",
+                ggSub: "Calculation of target formats & cutting distances for framing templates",
+                ggCloseBtn: "Close Tool",
+                ggTypeLabel: "Groundglass Type",
+                ggAspectLabel: "Target Aspect Ratio (e.g. 1.78, 1.85, 2.39)",
+                ggMaxW: "Max Width",
+                ggMaxH: "Max Height",
+                ggTargetW: "Target Width",
+                ggTargetH: "Target Height",
+                ggCenterDist: "Center to Top/Bottom",
+                ggEdgeDist: "Top/Bottom Edge Distance",
+                ggPrintBtn: "Print Template with Graphic",
+                ggPreviewHint: "Visual Preview (Red = Target Format)",
+                printTemplateTitle: "Print Template & Visual Preview",
+                printTemplateSub: "Groundglass calculation for camera templates",
+                printParam: "Parameter",
+                printSpec: "Specification / Value",
+                printSelectedGlass: "Selected Groundglass",
+                printMaxDim: "Max Width × Height",
+                printAspectLabel: "Target Aspect Ratio",
+                printTargetH: "Target Height (Cutting Window)",
+                printCenterLine: "Center Line to Top / Bottom",
+                printEdgeDist: "Distance to Top / Bottom Edge",
+                printGraphicsHeader: "Visual Graphics",
+                printScale1: "1. Actual Size (1:1 Scale)",
+                printScale2: "2. Enlarged Overview",
+                printHintText: "Marking Note: The outer black frame corresponds to the total dimensions of the groundglass. The inner red frame marks the calculated target format.",
+
+                snakeTitle: "Vantage Snake 🕹️",
+                snakeSub: "Use arrow keys to steer!",
+                snakeScore: "Score",
+                snakeHighscore: "Highscore",
+                snakeNewBtn: "New Game",
+                snakeCloseBtn: "Close"
+            },
+            fr: {
+                versionBadge: "Intranet V3.7.5 🚀",
+                teamsStatus: "Statut Teams",
+                searchPlaceholder: "Chercher employé ou site...",
+                login: "Connexion M365",
+                newChannel: "Nouveau canal",
+                bulletinBoard: "TABLEAU D’INFORMATION",
+                liveFeeds: "Flux en direct",
+                bulletinSub: "Actualités Vantage & Calendrier Outlook",
+                todayCalendar: "Agenda du jour",
+                outlookSync: "Sync Outlook",
+                upcomingCalendar: "Prochains jours",
+                vantageCalendar: "Calendrier Vantage",
+                quickAccess: "Accès rapides",
+                qaCases: "Valises vides",
+                qaWiki: "Wiki Caméra",
+                qaOptics: "Service Optique",
+                qaSupport: "Support",
+                qaDocs: "Documents",
+                deptHeader: "Services & Canaux Système",
+                btnTestbetreuung: "Support de test (SharePoint)",
+                btnWhoWithWhom: "Recherche WHO WITH WHOM",
+                btnBack: "Retour",
+                btnHome: "Au Tableau de bord",
+                subCategoriesHeader: "Sous-catégories & Outils",
+                detailSub: "Commentaires Teams en direct & fil de discussion",
+                btnOpenTeams: "Ouvrir dans Teams",
+                chatHeader: "Fil de discussion & Nouveautés",
+                chatInputPlaceholder: "Écrire une réponse...",
+                btnSend: "Envoyer",
+                badgeTechnical: "Technique",
+                footerText: "Vantage Intranet PWA V3.7.5 • MS365 & Teams Integration",
+                burgerTooltip: "Afficher/masquer la barre latérale Teams",
+
+                deptTechRentalTitle: "Technical Departments Rental",
+                deptTechRentalDesc: "Caméra, mécanique, NLN & protocoles d'atelier.",
+                
+                deptBookingTitle: "Booking Department & Client Contacts",
+                deptBookingDesc: "Réservations, contacts clients & disponibilités.",
+
+                deptProductsTitle: "VANTAGE & HAWK Products",
+                deptProductsDesc: "Développements, HAWK Lenses & fiches techniques.",
+
+                deptAccountingTitle: "Buchhaltung",
+                deptAccountingDesc: "Factures, notes de frais & processus financiers.",
+
+                deptPreparationTitle: "Vorbereitung / Job Handling",
+                deptPreparationDesc: "Préparation des jobs, checklists & check-outs.",
+
+                deptItTitle: "IT / Software",
+                deptItDesc: "Infrastructure, outils, réseaux & support.",
+
+                deptMarketingTitle: "Marketing",
+                deptMarketingDesc: "Réseaux sociaux, événements & supports CI.",
+
+                subFirmware: "Mises à jour Firmware",
+                subSoftwareUpdates: "Mises à jour Logiciel",
+                subGroundglass: "Calculateur de dépoli S35",
+                subCaseLists: "Listes de valises",
+                subArriCatalog: "Catalogue de pièces ARRI",
+                subWorkshopProtocols: "Protocoles d'atelier",
+                subWhoWithWhom: "Recherche WHO WITH WHOM",
+                subPhotoStation: "Vantage PhotoStation",
+
+                ggTitle: "Calculateur de dépoli S35",
+                ggSub: "Calcul des formats cibles & des distances de coupe pour les gabarits",
+                ggCloseBtn: "Fermer l'outil",
+                ggTypeLabel: "Type de dépoli",
+                ggAspectLabel: "Format d'image cible (ex. 1.78, 1.85, 2.39)",
+                ggMaxW: "Largeur max.",
+                ggMaxH: "Hauteur max.",
+                ggTargetW: "Largeur cible",
+                ggTargetH: "Hauteur cible",
+                ggCenterDist: "Centre vers haut/bas",
+                ggEdgeDist: "Distance bord sup./inf.",
+                ggPrintBtn: "Imprimer le gabarit avec graphique",
+                ggPreviewHint: "Aperçu visuel (Rouge = Format cible)",
+                printTemplateTitle: "Gabarit d'impression & Aperçu graphique",
+                printTemplateSub: "Calcul du dépoli pour les masques de caméra",
+                printParam: "Paramètre",
+                printSpec: "Spécification / Valeur",
+                printSelectedGlass: "Dépoli sélectionné",
+                printMaxDim: "Largeur × Hauteur max.",
+                printAspectLabel: "Format d'image cible",
+                printTargetH: "Hauteur cible (Fenêtre de coupe)",
+                printCenterLine: "Ligne du centre vers le haut / bas",
+                printEdgeDist: "Distance au bord supérieur / inférieur",
+                printGraphicsHeader: "Graphiques visuels",
+                printScale1: "1. Taille réelle (Échelle 1:1)",
+                printScale2: "2. Vue d'ensemble agrandie",
+                printHintText: "Remarque de marquage : Le cadre noir extérieur correspond aux dimensions totales du dépoli. Le cadre rouge intérieur marque le format cible calculé.",
+
+                snakeTitle: "Vantage Snake 🕹️",
+                snakeSub: "Utilisez les flèches pour diriger !",
+                snakeScore: "Score",
+                snakeHighscore: "Meilleur score",
+                snakeNewBtn: "Nouvelle partie",
+                snakeCloseBtn: "Fermer"
+            },
+            cs: {
+                versionBadge: "Intranet V3.7.5 🚀",
+                teamsStatus: "Stav Teams",
+                searchPlaceholder: "Hledat zaměstnance nebo místo...",
+                login: "Přihlásit M365",
+                newChannel: "Nový kanál",
+                bulletinBoard: "NÁSTĚNKA",
+                liveFeeds: "Živé přenosy",
+                bulletinSub: "Novinky Vantage & Outlook Kalendář",
+                todayCalendar: "Dnes v kalendáři",
+                outlookSync: "Outlook Sync",
+                upcomingCalendar: "Nadcházející dny",
+                vantageCalendar: "Vantage Kalendář",
+                quickAccess: "Rychlý přístup",
+                qaCases: "Prázdné kufry",
+                qaWiki: "Kamera Wiki",
+                qaOptics: "Servis optiky",
+                qaSupport: "Podpora",
+                qaDocs: "Dokumenty",
+                deptHeader: "Oddělení & Systémové kanály",
+                btnTestbetreuung: "Správa testů (SharePoint)",
+                btnWhoWithWhom: "Vyhledávání WHO WITH WHOM",
+                btnBack: "Zpět",
+                btnHome: "Na nástěnku",
+                subCategoriesHeader: "Podkategorie & Nástroje",
+                detailSub: "Živé komentáře Teams & diskuze",
+                btnOpenTeams: "Otevřít v Teams",
+                chatHeader: "Diskuze & Novinky",
+                chatInputPlaceholder: "Napsat odpověď...",
+                btnSend: "Odeslat",
+                badgeTechnical: "Technické",
+                footerText: "Vantage Intranet PWA V3.7.5 • MS365 & Teams Integration",
+                burgerTooltip: "Zapnout/vypnout boční panel Teams",
+
+                deptTechRentalTitle: "Technical Departments Rental",
+                deptTechRentalDesc: "Kamera, mechanika, NLN & dílenské protokoly.",
+                
+                deptBookingTitle: "Booking Department & Client Contacts",
+                deptBookingDesc: "Rezervace, kontakty na klienty & dostupnost.",
+
+                deptProductsTitle: "VANTAGE & HAWK Products",
+                deptProductsDesc: "Vlastní vývoj, HAWK Lenses & datové listy.",
+
+                deptAccountingTitle: "Buchhaltung",
+                deptAccountingDesc: "Faktury, výdaje & finanční procesy.",
+
+                deptPreparationTitle: "Vorbereitung / Job Handling",
+                deptPreparationDesc: "Příprava zakázek, kontrolní seznamy & check-outy.",
+
+                deptItTitle: "IT / Software",
+                deptItDesc: "Infrastruktur, nástroje, sítě & podpora.",
+
+                deptMarketingTitle: "Marketing",
+                deptMarketingDesc: "Sociální sítě, akce, PR & CI materiály.",
+
+                subFirmware: "Aktualizace Firmware",
+                subSoftwareUpdates: "Aktualizace Softwaru",
+                subGroundglass: "Kalkulátor matnic S35",
+                subCaseLists: "Seznamy kufrů",
+                subArriCatalog: "Katalog náhradních dílů ARRI",
+                subWorkshopProtocols: "Dílenské protokoly",
+                subWhoWithWhom: "Vyhledávání WHO WITH WHOM",
+                subPhotoStation: "Vantage PhotoStation",
+
+                ggTitle: "Kalkulátor matnic S35",
+                ggSub: "Výpočet cílových formátů & vzdáleností ořezu pro šablony rámečků",
+                ggCloseBtn: "Zavřít nástroj",
+                ggTypeLabel: "Typ matnice",
+                ggAspectLabel: "Cílový poměr stran (např. 1.78, 1.85, 2.39)",
+                ggMaxW: "Max. šířka",
+                ggMaxH: "Max. výška",
+                ggTargetW: "Cílová šířka",
+                ggTargetH: "Cílová výška",
+                ggCenterDist: "Střed nahoru/dolů",
+                ggEdgeDist: "Vzdálenost horní/dolní okraj",
+                ggPrintBtn: "Tisknout šablonu s grafikou",
+                ggPreviewHint: "Vizuální náhled (Červená = Cílový formát)",
+                printTemplateTitle: "Tisková šablona & Grafický náhled",
+                printTemplateSub: "Výpočet matnice pro kamerové šablony",
+                printParam: "Parametr",
+                printSpec: "Specifikace / Hodnota",
+                printSelectedGlass: "Zvolená matnice",
+                printMaxDim: "Max. šířka × výška",
+                printAspectLabel: "Cílový poměr stran",
+                printTargetH: "Cílová výška (Ořezové okno)",
+                printCenterLine: "Čára od středu nahoru / dolů",
+                printEdgeDist: "Vzdálenost k hornímu / dolnímu okraji",
+                printGraphicsHeader: "Vizuální grafika",
+                printScale1: "1. Skutečná velikost (Měřítko 1:1)",
+                printScale2: "2. Zvětšený přehled",
+                printHintText: "Poznámka k obrysu: Vnější černý rám odpovídá celkovým rozměrům matnice. Vnitřní červený rám označuje vypočítaný cílový formát.",
+
+                snakeTitle: "Vantage Snake 🕹️",
+                snakeSub: "Použijte šipky pro ovládání!",
+                snakeScore: "Skóre",
+                snakeHighscore: "Nejlepší skóre",
+                snakeNewBtn: "Nová hra",
+                snakeCloseBtn: "Zavřít"
+            }
+        };
+
+        const departmentsConfig = [
+            {
+                id: "techRental",
+                titleKey: "deptTechRentalTitle",
+                descKey: "deptTechRentalDesc",
+                color: "gold",
+                icon: "camera",
+                borderColor: "hover:border-[var(--vantage-gold)]",
+                hasSharePointLink: true,
+                sharePointUrl: "https://vantageweiden.sharepoint.com/sites/Testbetreuung2/Lists/Testbetreuung/AllItems.aspx",
+                subcategories: [
+                    { nameKey: "subFirmware", icon: "download-cloud" },
+                    { nameKey: "subGroundglass", icon: "layout-template", isTool: true, toolType: "groundglass" },
+                    { nameKey: "subCaseLists", icon: "box" },
+                    { nameKey: "subArriCatalog", icon: "external-link", externalUrl: "https://arri.academy/SPC" },
+                    { nameKey: "subWorkshopProtocols", icon: "clipboard-list" },
+                    { nameKey: "subWhoWithWhom", icon: "external-link", externalUrl: "WhoWithWhom-Tool.html" }
+                ]
+            },
+            {
+                id: "booking",
+                titleKey: "deptBookingTitle",
+                descKey: "deptBookingDesc",
+                color: "gold",
+                icon: "calendar-check",
+                borderColor: "hover:border-[var(--vantage-gold)]",
+                hasSharePointLink: true,
+                sharePointUrl: "https://vantageweiden.sharepoint.com/sites/Testbetreuung2/Lists/Testbetreuung/AllItems.aspx",
+                subcategories: [
+                    { nameKey: "subWhoWithWhom", icon: "external-link", externalUrl: "WhoWithWhom-Tool.html" }
+                ]
+            },
+            {
+                id: "products",
+                titleKey: "deptProductsTitle",
+                descKey: "deptProductsDesc",
+                color: "gold",
+                icon: "cpu",
+                borderColor: "hover:border-[var(--vantage-gold)]",
+                subcategories: []
+            },
+            {
+                id: "accounting",
+                titleKey: "deptAccountingTitle",
+                descKey: "deptAccountingDesc",
+                color: "gold",
+                icon: "receipt",
+                borderColor: "hover:border-[var(--vantage-gold)]",
+                subcategories: []
+            },
+            {
+                id: "preparation",
+                titleKey: "deptPreparationTitle",
+                descKey: "deptPreparationDesc",
+                color: "gold",
+                icon: "check-square",
+                borderColor: "hover:border-[var(--vantage-gold)]",
+                subcategories: []
+            },
+            {
+                id: "it",
+                titleKey: "deptItTitle",
+                descKey: "deptItDesc",
+                color: "gold",
+                icon: "server",
+                borderColor: "hover:border-[var(--vantage-gold)]",
+                subcategories: [
+                    { nameKey: "subSoftwareUpdates", icon: "shield" }
+                ]
+            },
+            {
+                id: "marketing",
+                titleKey: "deptMarketingTitle",
+                descKey: "deptMarketingDesc",
+                color: "gold",
+                icon: "megaphone",
+                borderColor: "hover:border-[var(--vantage-gold)]",
+                subcategories: [
+                    { nameKey: "subPhotoStation", icon: "image", externalUrl: "https://photostation.vantagefilm.com/photo/?launchApp=SYNO.Foto.Sharing.AppInstance&app_name=SYNO.Foto.AppInstance&photos_action=external_login&folderId=6&alias=photo#/signin" }
+                ]
+            }
+        ];
+
+        function renderDepartments() {
+            const grid = document.getElementById('department-grid');
+            if (!grid) return;
+            grid.innerHTML = "";
+            const t = translations[currentLanguage];
+
+            departmentsConfig.forEach(dept => {
+                const title = t[dept.titleKey] || dept.titleKey;
+                const desc = t[dept.descKey] || dept.descKey;
+
+                const card = document.createElement('div');
+                card.className = `bg-[var(--vantage-panel)] border border-[var(--vantage-border)] ${dept.borderColor} rounded-sm p-5 transition-all duration-200 hover:shadow-md flex flex-col justify-between cursor-pointer group`;
+                card.onclick = () => openDepartment(dept.titleKey);
+                
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-10 h-10 rounded-sm bg-[var(--vantage-bg)] border border-[var(--vantage-border)] text-[var(--vantage-gold)] flex items-center justify-center group-hover:scale-105 transition">
+                                <i data-lucide="${dept.icon}" class="w-5 h-5"></i>
+                            </div>
+                        </div>
+                        <h3 class="font-semibold text-[var(--vantage-text-main)] text-base mb-1 uppercase tracking-[0.5px] group-hover:text-[var(--vantage-gold-dark)] transition">${title}</h3>
+                        <p class="text-xs text-[var(--vantage-text-muted)] mb-4 leading-relaxed">${desc}</p>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+            lucide.createIcons();
+            updateTranslations();
+        }
+
+        function updateTranslations() {
+            const lang = currentLanguage;
+            document.querySelectorAll("[data-i18n]").forEach(el => {
+                const key = el.dataset.i18n;
+                if (translations[lang]?.[key]) el.textContent = translations[lang][key];
+            });
+            document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+                const key = el.dataset.i18nPlaceholder;
+                if (translations[lang]?.[key]) el.placeholder = translations[lang][key];
+            });
+            document.querySelectorAll("[data-i18n-title]").forEach(el => {
+                const key = el.dataset.i18nTitle;
+                if (translations[lang]?.[key]) el.title = translations[lang][key];
+            });
+            document.documentElement.lang = lang;
+        }
+
+        function changeLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem("vantage-language", lang);
+            renderDepartments();
+            const activeDetailTitleKey = window._currentActiveDeptKey;
+            if (activeDetailTitleKey) {
+                openDepartment(activeDetailTitleKey, true);
+            }
+            if (!document.getElementById('tool-view-container').classList.contains('hidden')) {
+                loadGroundglassTool();
+            }
+        }
+
+        function initializeLanguage() {
+            const languageSelect = document.getElementById("language-select");
+            const savedLanguage = localStorage.getItem("vantage-language");
+            if (savedLanguage && translations[savedLanguage]) {
+                currentLanguage = savedLanguage;
+                languageSelect.value = savedLanguage;
+                return;
+            }
+            const browserLanguage = navigator.language.toLowerCase();
+            let detectedLanguage = browserLanguage.startsWith("de") ? "de" : browserLanguage.startsWith("fr") ? "fr" : browserLanguage.startsWith("cs") ? "cs" : "en";
+            currentLanguage = detectedLanguage;
+            languageSelect.value = detectedLanguage;
+        }
+
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('mobile-sidebar-backdrop');
+            const isHidden = sidebar.classList.contains('-translate-x-full');
+            if (isHidden) {
+                sidebar.classList.remove('-translate-x-full');
+                backdrop.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                backdrop.classList.add('hidden');
+            }
+        }
+
+        window._currentActiveDeptKey = null;
+
+        function openDepartment(departmentTitleKey, keepToolState = false) {
+            window._currentActiveDeptKey = departmentTitleKey;
+            document.getElementById('dashboard-view').classList.add('hidden');
+            document.getElementById('detail-view').classList.remove('hidden');
+            
+            const t = translations[currentLanguage];
+            const translatedDeptTitle = t[departmentTitleKey] || departmentTitleKey;
+
+            document.getElementById('detail-title').innerText = translatedDeptTitle;
+            document.getElementById('breadcrumb-path').innerHTML = translatedDeptTitle;
+
+            const actionButtonsContainer = document.getElementById('detail-action-buttons');
+            actionButtonsContainer.innerHTML = "";
+
+            const foundDept = departmentsConfig.find(d => d.titleKey === departmentTitleKey);
+            
+            if (foundDept && foundDept.hasSharePointLink) {
+                const spBtn = document.createElement('a');
+                spBtn.href = foundDept.sharePointUrl;
+                spBtn.target = "_blank";
+                spBtn.className = "bg-[var(--vantage-gold)] hover:bg-[var(--vantage-gold-dark)] text-white px-3.5 py-2.5 rounded-sm text-xs font-semibold uppercase tracking-wider transition flex items-center justify-center gap-1.5 shadow-sm active:scale-95";
+                spBtn.innerHTML = `<i data-lucide="external-link" class="w-4 h-4"></i> <span data-i18n="btnTestbetreuung">Testbetreuung (SharePoint)</span>`;
+                actionButtonsContainer.appendChild(spBtn);
+            }
+
+            const teamsBtn = document.createElement('button');
+            teamsBtn.onclick = () => openSmartTeams("msteams://teams.microsoft.com/l/channel/19%3a.../Technical%20Departments?groupId=...", "https://teams.microsoft.com/");
+            teamsBtn.className = "bg-[var(--vantage-dark-panel)] hover:bg-black text-white px-4 py-2.5 rounded-sm text-xs font-semibold uppercase tracking-wider transition flex items-center justify-center gap-2 shadow-sm active:scale-95 cursor-pointer";
+            teamsBtn.innerHTML = `<i data-lucide="external-link" class="w-4 h-4 text-[var(--vantage-gold)]"></i> <span data-i18n="btnOpenTeams">In Teams öffnen</span>`;
+            actionButtonsContainer.appendChild(teamsBtn);
+
+            if (!keepToolState) {
+                closeEmbeddedTool();
+            }
+
+            const subContainer = document.getElementById('subcategories-container');
+            subContainer.innerHTML = "";
+
+            const subcategories = foundDept ? foundDept.subcategories : [];
+
+            subcategories.forEach(sub => {
+                const subName = t[sub.nameKey] || sub.nameKey;
+                const btn = document.createElement('div');
+                btn.className = "flex items-center justify-between p-3 bg-[var(--vantage-bg)] hover:bg-[var(--vantage-panel)] border border-[var(--vantage-border)] hover:border-[var(--vantage-gold)] rounded-sm cursor-pointer transition group";
+                
+                if (sub.externalUrl) {
+                    btn.onclick = () => {
+                        window.open(sub.externalUrl, '_blank');
+                    };
+                } else if (sub.isTool && sub.toolType === "groundglass") {
+                    btn.onclick = () => loadGroundglassTool();
+                }
+
+                btn.innerHTML = `
+                    <span class="flex items-center gap-2.5 text-xs font-semibold text-[var(--vantage-text-main)] group-hover:text-[var(--vantage-gold-dark)] uppercase tracking-wide">
+                        <i data-lucide="${sub.icon}" class="w-4 h-4 text-[var(--vantage-gold)]"></i> ${subName}
+                    </span>
+                    <i data-lucide="chevron-right" class="w-4 h-4 text-[var(--vantage-text-muted)] group-hover:text-[var(--vantage-gold)]"></i>
+                `;
+                subContainer.appendChild(btn);
+            });
+
+            lucide.createIcons();
+            updateTranslations();
+        }
+
+        function goHome() {
+            window._currentActiveDeptKey = null;
+            document.getElementById('detail-view').classList.add('hidden');
+            document.getElementById('dashboard-view').classList.remove('hidden');
+            closeEmbeddedTool();
+        }
+
+        function goBack() { goHome(); }
+
+        function closeEmbeddedTool() {
+            const toolContainer = document.getElementById('tool-view-container');
+            const chatStream = document.getElementById('chat-stream-card');
+            toolContainer.classList.add('hidden');
+            toolContainer.innerHTML = "";
+            chatStream.classList.remove('hidden');
+        }
+
+        // =========================================================================
+        // EINGEBETTETES TOOL: MATTSCHEIBEN-RECHNER S35
+        // =========================================================================
+        function loadGroundglassTool() {
+            const toolContainer = document.getElementById('tool-view-container');
+            const chatStream = document.getElementById('chat-stream-card');
+            const t = translations[currentLanguage];
+            
+            chatStream.classList.add('hidden');
+            toolContainer.classList.remove('hidden');
+
+            toolContainer.innerHTML = `
+                <div class="bg-[var(--vantage-dark-panel)] text-slate-100 rounded-sm p-6 border border-[var(--vantage-border)] shadow-lg space-y-6 no-print">
+                    <div class="flex items-center justify-between border-b border-slate-700 pb-4">
+                        <div>
+                            <h3 class="text-base font-semibold text-[var(--vantage-gold)] uppercase tracking-wider">${t.ggTitle}</h3>
+                            <p class="text-xs text-slate-400">${t.ggSub}</p>
+                        </div>
+                        <button onclick="closeEmbeddedTool()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-sm text-xs font-semibold uppercase tracking-wider transition">${t.ggCloseBtn}</button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">${t.ggTypeLabel}</label>
+                                <select id="gg-mattscheibe" onchange="calculateGG()" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-sm text-xs text-white focus:border-[var(--vantage-gold)] outline-none"></select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">${t.ggAspectLabel}</label>
+                                <input type="number" id="gg-aspect" step="0.01" value="" placeholder="z. B. 1.78" oninput="calculateGG()" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-sm text-xs text-white focus:border-[var(--vantage-gold)] outline-none">
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2 pt-2">
+                                <div class="bg-slate-950 p-3 rounded-sm border border-slate-800"><div class="text-[10px] text-slate-400 uppercase tracking-wider">${t.ggMaxW}</div><div id="gg-res-breite" class="text-sm font-bold text-white mt-1">-</div></div>
+                                <div class="bg-slate-950 p-3 rounded-sm border border-slate-800"><div class="text-[10px] text-slate-400 uppercase tracking-wider">${t.ggMaxH}</div><div id="gg-res-hoehe" class="text-sm font-bold text-white mt-1">-</div></div>
+                                <div class="bg-slate-950 p-3 rounded-sm border border-slate-800"><div class="text-[10px] text-slate-400 uppercase tracking-wider">${t.ggTargetW}</div><div id="gg-res-zielbreite" class="text-sm font-bold text-white mt-1">-</div></div>
+                                <div class="bg-slate-950 p-3 rounded-sm border border-slate-800"><div class="text-[10px] text-slate-400 uppercase tracking-wider">${t.ggTargetH}</div><div id="gg-res-zielhoehe" class="text-sm font-bold text-white mt-1">-</div></div>
+                                <div class="bg-slate-950 p-3 rounded-sm border border-slate-800"><div class="text-[10px] text-slate-400 uppercase tracking-wider">${t.ggCenterDist}</div><div id="gg-res-mitte" class="text-sm font-bold text-white mt-1">-</div></div>
+                                <div class="bg-slate-950 p-3 rounded-sm border border-slate-800"><div class="text-[10px] text-slate-400 uppercase tracking-wider">${t.ggEdgeDist}</div><div id="gg-res-kante" class="text-sm font-bold text-white mt-1">-</div></div>
+                            </div>
+
+                            <div class="pt-2 flex justify-end">
+                                <button onclick="window.print()" class="bg-[var(--vantage-gold)] hover:bg-[var(--vantage-gold-dark)] text-white font-bold px-4 py-2 rounded-sm text-xs uppercase tracking-wider transition flex items-center gap-2">
+                                    <i data-lucide="printer" class="w-4 h-4"></i> ${t.ggPrintBtn}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col items-center justify-center bg-slate-950 p-4 rounded-sm border border-slate-800">
+                            <canvas id="gg-previewCanvas" width="400" height="300" class="bg-black rounded-sm border border-slate-800 max-w-full h-auto"></canvas>
+                            <span class="text-[10px] text-slate-500 mt-2 uppercase tracking-wide">${t.ggPreviewHint}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DRUCK ANSICHT -->
+                <div class="print-only print-template">
+                    <h1>${t.printTemplateTitle}</h1>
+                    <p class="sub">${t.printTemplateSub}</p>
+
+                    <table class="print-table">
+                        <thead>
+                            <tr>
+                                <th>${t.printParam}</th>
+                                <th>${t.printSpec}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>${t.printSelectedGlass}</td>
+                                <td id="print-mattscheibe">-</td>
+                            </tr>
+                            <tr>
+                                <td>${t.printMaxDim}</td>
+                                <td><span id="print-breite">-</span> mm &times; <span id="print-hoehe">-</span> mm</td>
+                            </tr>
+                            <tr>
+                                <td>${t.printAspectLabel}</td>
+                                <td id="print-aspect">-</td>
+                            </tr>
+                            <tr>
+                                <td>${t.printTargetH}</td>
+                                <td><strong id="print-zielhoehe">-</strong> mm</td>
+                            </tr>
+                            <tr>
+                                <td>${t.printCenterLine}</td>
+                                <td><strong id="print-mitte-oben">-</strong> mm</td>
+                            </tr>
+                            <tr>
+                                <td>${t.printEdgeDist}</td>
+                                <td><strong id="print-kante-oben">-</strong> mm</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h2>${t.printGraphicsHeader}</h2>
+
+                    <div class="preview-section-print">
+                        <div class="scale-box">
+                            <h3>${t.printScale1}</h3>
+                            <canvas id="gg-actualCanvas" class="print-canvas-actual"></canvas>
+                        </div>
+                        <div class="scale-box">
+                            <h3>${t.printScale2}</h3>
+                            <canvas id="gg-printCanvas" width="280" height="200" style="background:#fff; border:1px solid #000;"></canvas>
+                        </div>
+                    </div>
+
+                    <p class="hint-text">
+                        <strong>${t.printHintText}</strong>
+                    </p>
+                </div>
+            `;
+
+            lucide.createIcons();
+            initGGSelect();
+            calculateGG();
+        }
+
+        const mattscheibenData = [
+            { name: "ANSI S35 Silent 1.33", breite: 24.0, hoehe: 18.00 },
+            { name: "ANSI S35 TV 1.33 safe", breite: 23.0, hoehe: 17.25 },
+            { name: "ANSI S35 TV 1.78 transmitted", breite: 24.0, hoehe: 13.50 },
+            { name: "ANSI S35 TV 1.78 + 1.33 trans", breite: 24.0, hoehe: 13.50 },
+            { name: "ANSI S35 TV 1.78 safe", breite: 23.0, hoehe: 12.94 },
+            { name: "ANSI S35 1.78 + 1.55 + 1.33 CGG", breite: 24.0, hoehe: 13.50 },
+            { name: "ANSI S35 1.85", breite: 24.0, hoehe: 13.00 },
+            { name: "ANSI S35 2.35 + 1.85 + TV 1.33", breite: 24.0, hoehe: 13.00 },
+            { name: "ANSI S35 2.35 centric", breite: 24.0, hoehe: 10.20 },
+            { name: "ANSI S35 2.35 + 1.85 1/4 offset", breite: 24.0, hoehe: 13.00 },
+            { name: "ANSI S35 2.35 + 1.85 centric", breite: 24.0, hoehe: 13.00 },
+            { name: "ANSI S35 2.35 + 1.85 common top", breite: 24.0, hoehe: 13.00 }
+        ];
+
+        function initGGSelect() {
+            const select = document.getElementById("gg-mattscheibe");
+            if (!select) return;
+            select.innerHTML = "";
+            mattscheibenData.forEach((item, index) => {
+                const opt = document.createElement("option");
+                opt.value = index;
+                opt.textContent = item.name;
+                select.appendChild(opt);
+            });
+        }
+
+        function calculateGG() {
+            const select = document.getElementById("gg-mattscheibe");
+            if (!select) return;
+            const selectedItem = mattscheibenData[select.value];
+            const rawAspect = document.getElementById("gg-aspect").value.trim();
+            const targetAR = parseFloat(rawAspect);
+
+            if (!selectedItem) return;
+
+            const breite = selectedItem.breite;
+            const hoehe = selectedItem.hoehe;
+
+            if (!rawAspect || isNaN(targetAR) || targetAR <= 0) {
+                document.getElementById("gg-res-breite").textContent = breite.toFixed(2) + " mm";
+                document.getElementById("gg-res-hoehe").textContent = hoehe.toFixed(2) + " mm";
+                document.getElementById("gg-res-zielbreite").textContent = "-";
+                document.getElementById("gg-res-zielhoehe").textContent = "-";
+                document.getElementById("gg-res-mitte").textContent = "-";
+                document.getElementById("gg-res-kante").textContent = "-";
+
+                document.getElementById("print-mattscheibe").textContent = selectedItem.name;
+                document.getElementById("print-breite").textContent = breite.toFixed(2);
+                document.getElementById("print-hoehe").textContent = hoehe.toFixed(2);
+                document.getElementById("print-aspect").textContent = "-";
+                document.getElementById("print-zielhoehe").textContent = "-";
+                document.getElementById("print-mitte-oben").textContent = "-";
+                document.getElementById("print-kante-oben").textContent = "-";
+
+                drawGGCanvas("gg-previewCanvas", breite, hoehe, 0, 0, 400, 300, false);
+                drawGGCanvas("gg-printCanvas", breite, hoehe, 0, 0, 280, 200, true);
+                drawGG1to1Canvas(breite, hoehe, 0, 0);
+                return;
+            }
+
+            const zielbreite = breite;
+            const zielhoehe = zielbreite / targetAR;
+            const abstandMitte = zielhoehe / 2;
+            const abstandKante = (hoehe - zielhoehe) / 2;
+
+            document.getElementById("gg-res-breite").textContent = breite.toFixed(2) + " mm";
+            document.getElementById("gg-res-hoehe").textContent = hoehe.toFixed(2) + " mm";
+            document.getElementById("gg-res-zielbreite").textContent = zielbreite.toFixed(2) + " mm";
+            document.getElementById("gg-res-zielhoehe").textContent = zielhoehe.toFixed(2) + " mm";
+            document.getElementById("gg-res-mitte").textContent = abstandMitte.toFixed(2) + " mm";
+            document.getElementById("gg-res-kante").textContent = abstandKante.toFixed(2) + " mm";
+
+            document.getElementById("print-mattscheibe").textContent = selectedItem.name;
+            document.getElementById("print-breite").textContent = breite.toFixed(2);
+            document.getElementById("print-hoehe").textContent = hoehe.toFixed(2);
+            document.getElementById("print-aspect").textContent = targetAR.toFixed(2);
+            document.getElementById("print-zielhoehe").textContent = zielhoehe.toFixed(2);
+            document.getElementById("print-mitte-oben").textContent = abstandMitte.toFixed(2);
+            document.getElementById("print-kante-oben").textContent = abstandKante.toFixed(2);
+
+            drawGGCanvas("gg-previewCanvas", breite, hoehe, zielbreite, zielhoehe, 400, 300, false);
+            drawGGCanvas("gg-printCanvas", breite, hoehe, zielbreite, zielhoehe, 280, 200, true);
+            drawGG1to1Canvas(breite, hoehe, zielbreite, zielhoehe);
+        }
+
+        function drawGGCanvas(canvasId, sensorW, sensorH, targetW, targetH, width, height, isPrint) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            const ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, width, height);
+
+            if (isPrint) {
+                ctx.fillStyle = "#ffffff";
+                ctx.fillRect(0, 0, width, height);
+            }
+
+            const margin = 25;
+            const scale = Math.min((width - margin * 2) / sensorW, (height - margin * 2) / sensorH);
+            const drawSensorW = sensorW * scale, drawSensorH = sensorH * scale;
+            const startX = (width - drawSensorW) / 2, startY = (height - drawSensorH) / 2;
+
+            ctx.strokeStyle = isPrint ? "#000000" : "#94a3b8";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(startX, startY, drawSensorW, drawSensorH);
+
+            if (!isPrint) {
+                ctx.fillStyle = "rgba(148, 163, 184, 0.1)";
+                ctx.fillRect(startX, startY, drawSensorW, drawSensorH);
+            }
+
+            if (targetW > 0 && targetH > 0) {
+                const drawTargetW = targetW * scale, drawTargetH = targetH * scale;
+                ctx.strokeStyle = "#dc2626";
+                ctx.lineWidth = 2;
+                ctx.strokeRect(startX + (drawSensorW - drawTargetW) / 2, startY + (drawSensorH - drawTargetH) / 2, drawTargetW, drawTargetH);
+            }
+
+            ctx.strokeStyle = isPrint ? "#888888" : "rgba(184, 146, 59, 0.4)";
+            ctx.setLineDash([3, 3]);
+            ctx.beginPath();
+            ctx.moveTo(width / 2, startY); ctx.lineTo(width / 2, startY + drawSensorH);
+            ctx.moveTo(startX, height / 2); ctx.lineTo(startX + drawSensorW, height / 2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        function drawGG1to1Canvas(sensorW, sensorH, targetW, targetH) {
+            const canvas = document.getElementById("gg-actualCanvas");
+            if (!canvas) return;
+            const ctx = canvas.getContext("2d");
+            const dpr = window.devicePixelRatio || 1;
+            const mmToPx = 3.7795275591;
+            const pxW = sensorW * mmToPx, pxH = sensorH * mmToPx;
+
+            canvas.style.width = sensorW + "mm";
+            canvas.style.height = sensorH + "mm";
+            canvas.width = pxW * dpr; canvas.height = pxH * dpr;
+            ctx.scale(dpr, dpr);
+
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, pxW, pxH);
+            ctx.strokeStyle = "#000000";
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(0, 0, pxW, pxH);
+
+            if (targetW > 0 && targetH > 0) {
+                const targetPxW = targetW * mmToPx, targetPxH = targetH * mmToPx;
+                ctx.strokeStyle = "#dc2626";
+                ctx.lineWidth = 1.5;
+                ctx.strokeRect((pxW - targetPxW) / 2, (pxH - targetPxH) / 2, targetPxW, targetPxH);
+            }
+        }
+
+
+        // System Start
+        const locationsList = ["Weiden", "Berlin", "Leipzig", "Paris", "Prag", "LA"];
+        const firstNames = ["Tom", "Max", "Anna", "Pierre", "Jan", "Sarah", "Christian", "Laura", "Felix", "Elena"];
+        const lastNames = ["Müller", "Schmidt", "Schneider", "Weber", "Fischer", "Meyer", "Dubois", "Novák", "Smith"];
+        const statuses = ["online", "online", "busy", "away", "offline"];
+        let employees = [];
+
+        function generateEmployees() {
+            employees = [];
+            let id = 1;
+            locationsList.forEach(loc => {
+                for (let i = 0; i < 5; i++) {
+                    const fName = firstNames[Math.floor(Math.random() * firstNames.length)];
+                    const lName = lastNames[Math.floor(Math.random() * lastNames.length)];
+                    const email = `${fName.toLowerCase()}.${lName.toLowerCase()}@vantagefilm.com`;
+                    employees.push({
+                        id: id++,
+                        name: `${fName} ${lName}`,
+                        email: email,
+                        location: loc,
+                        status: statuses[Math.floor(Math.random() * statuses.length)]
+                    });
+                }
+            });
+        }
+
+        function renderSidebarPresence(filteredList = null) {
+            const listEl = document.getElementById('sidebar-presence-list');
+            if (!listEl) return;
+            listEl.innerHTML = '';
+            const listToRender = filteredList || employees;
+            const grouped = {};
+            locationsList.forEach(loc => grouped[loc] = []);
+            listToRender.forEach(emp => { if (grouped[emp.location]) grouped[emp.location].push(emp); });
+
+            let totalVisible = 0;
+            locationsList.forEach(loc => {
+                const emps = grouped[loc];
+                if (emps.length === 0) return;
+                totalVisible += emps.length;
+
+                const locHeader = document.createElement('div');
+                locHeader.className = "text-[10px] font-bold text-[var(--vantage-text-muted)] uppercase tracking-wider mt-2 mb-1 px-1";
+                locHeader.innerText = loc;
+                listEl.appendChild(locHeader);
+
+                emps.forEach(emp => {
+                    let dot = "bg-emerald-500 glow-green";
+                    if (emp.status === "busy") dot = "bg-rose-500 glow-red";
+                    if (emp.status === "away") dot = "bg-amber-500 glow-yellow";
+                    if (emp.status === "offline") dot = "bg-slate-300";
+
+                    const item = document.createElement('div');
+                    item.className = "relative group py-1.5 px-2 rounded-sm bg-[var(--vantage-bg)] hover:bg-[var(--vantage-panel)] transition text-xs border border-[var(--vantage-border)] hover:border-[var(--vantage-gold)] shadow-2xs cursor-pointer";
+                    
+                    item.innerHTML = `
+                        <div class="flex items-center justify-between pointer-events-none">
+                            <span class="font-medium text-[var(--vantage-text-main)] truncate pr-4">${emp.name}</span>
+                            <span class="w-2 h-2 rounded-full shrink-0 ${dot}"></span>
+                        </div>
+                        <div class="absolute right-1 top-1 bottom-1 hidden group-hover:flex items-center gap-1 bg-[var(--vantage-panel)] px-1 z-20">
+                            <button onclick="openSmartTeams('msteams://teams.microsoft.com/l/chat/0/0?users=${emp.email}', 'https://teams.microsoft.com/')" title="In Teams anchatten" class="p-1 bg-[var(--vantage-dark-panel)] hover:bg-black text-[var(--vantage-gold)] rounded-sm shadow transition flex items-center justify-center cursor-pointer">
+                                <i data-lucide="message-square" class="w-3 h-3"></i>
+                            </button>
+                            <button onclick="openSmartMail('${emp.email}')" title="E-Mail schreiben" class="p-1 bg-[var(--vantage-gold)] hover:bg-[var(--vantage-gold-dark)] text-white rounded-sm shadow transition flex items-center justify-center cursor-pointer">
+                                <i data-lucide="mail" class="w-3 h-3"></i>
+                            </button>
+                        </div>
+                    `;
+                    listEl.appendChild(item);
+                });
+            });
+            const countLabel = document.getElementById('presence-count-label');
+            if (countLabel) countLabel.innerText = `${totalVisible} MS365 Kontakte`;
+            lucide.createIcons();
+        }
+
+        function filterEmployees() {
+            const query = document.getElementById('employee-search').value.toLowerCase();
+            if (!query) { renderSidebarPresence(); return; }
+            renderSidebarPresence(employees.filter(e => e.name.toLowerCase().includes(query) || e.location.toLowerCase().includes(query)));
+        }
+
+        function toggleDemoPresence() {
+            employees.forEach(emp => emp.status = statuses[Math.floor(Math.random() * statuses.length)]);
+            renderSidebarPresence();
+        }
+
+        // =========================================================================
+        // EASTER EGG LOGIC (VANTAGE SNAKE MINIGAME + KONAMI CODE & TRIPLE CLICK)
+        // =========================================================================
+        let konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+        let konamiIndex = 0;
+        let logoClickCount = 0;
+        let logoClickTimer = null;
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === konamiCode[konamiIndex]) {
+                konamiIndex++;
+                if (konamiIndex === konamiCode.length) {
+                    openSnakeGame();
+                    konamiIndex = 0;
+                }
+            } else {
+                konamiIndex = 0;
+            }
+        });
+
+        function triggerEasterEggClick() {
+            logoClickCount++;
+            clearTimeout(logoClickTimer);
+            if (logoClickCount === 3) {
+                openSnakeGame();
+                logoClickCount = 0;
+            } else {
+                logoClickTimer = setTimeout(() => { logoClickCount = 0; }, 800);
+            }
+        }
+
+        let snakeCanvas, snakeCtx;
+        let snake = [], food = {};
+        let snakeDir = 'RIGHT', nextDir = 'RIGHT';
+        let snakeScore = 0, snakeHighscore = 0;
+        let snakeGameLoop = null;
+        const gridSize = 15, tileCount = 20;
+
+        function openSnakeGame() {
+            document.getElementById('easter-egg-modal').classList.remove('hidden');
+            snakeCanvas = document.getElementById('snakeCanvas');
+            snakeCtx = snakeCanvas.getContext('2d');
+            startSnakeGame();
+            document.addEventListener('keydown', handleSnakeControls);
+        }
+
+        function closeSnakeGame() {
+            document.getElementById('easter-egg-modal').classList.add('hidden');
+            clearInterval(snakeGameLoop);
+            document.removeEventListener('keydown', handleSnakeControls);
+        }
+
+        function startSnakeGame() {
+            clearInterval(snakeGameLoop);
+            snake = [{ x: 10, y: 10 }, { x: 9, y: 10 }, { x: 8, y: 10 }];
+            snakeDir = 'RIGHT';
+            nextDir = 'RIGHT';
+            snakeScore = 0;
+            document.getElementById('snake-score').innerText = snakeScore;
+            spawnFood();
+            snakeGameLoop = setInterval(updateSnake, 140);
+        }
+
+        function spawnFood() {
+            food = {
+                x: Math.floor(Math.random() * tileCount),
+                y: Math.floor(Math.random() * tileCount)
+            };
+        }
+
+        function handleSnakeControls(e) {
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                e.preventDefault();
+            }
+            if (e.key === 'ArrowUp' && snakeDir !== 'DOWN') nextDir = 'UP';
+            if (e.key === 'ArrowDown' && snakeDir !== 'UP') nextDir = 'DOWN';
+            if (e.key === 'ArrowLeft' && snakeDir !== 'RIGHT') nextDir = 'LEFT';
+            if (e.key === 'ArrowRight' && snakeDir !== 'LEFT') nextDir = 'RIGHT';
+        }
+
+        function updateSnake() {
+            snakeDir = nextDir;
+            let head = { ...snake[0] };
+
+            if (snakeDir === 'UP') head.y--;
+            if (snakeDir === 'DOWN') head.y++;
+            if (snakeDir === 'LEFT') head.x--;
+            if (snakeDir === 'RIGHT') head.x++;
+
+            // Kollision mit Wänden oder sich selbst
+            if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount || snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+                clearInterval(snakeGameLoop);
+                if (snakeScore > snakeHighscore) {
+                    snakeHighscore = snakeScore;
+                    document.getElementById('snake-highscore').innerText = snakeHighscore;
+                }
+                return;
+            }
+
+            snake.unshift(head);
+
+            // Essen fressen
+            if (head.x === food.x && head.y === food.y) {
+                snakeScore += 10;
+                document.getElementById('snake-score').innerText = snakeScore;
+                spawnFood();
+            } else {
+                snake.pop();
+            }
+
+            // Zeichnen
+            snakeCtx.fillStyle = '#000000';
+            snakeCtx.fillRect(0, 0, snakeCanvas.width, snakeCanvas.height);
+
+            // Food (Goldschimmer)
+            snakeCtx.fillStyle = '#B8923B';
+            snakeCtx.fillRect(food.x * gridSize, food.y * gridSize, gridSize - 1, gridSize - 1);
+
+            // Snake (Grüne & weiße Segmente)
+            snake.forEach((segment, index) => {
+                snakeCtx.fillStyle = index === 0 ? '#10b981' : '#ffffff';
+                snakeCtx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize - 1, gridSize - 1);
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            initializeLanguage();
+            generateEmployees();
+            renderSidebarPresence();
+            renderDepartments();
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>
