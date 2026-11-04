@@ -157,37 +157,31 @@
                     </div>
                     <div>
                         <h2 class="font-bold text-xs text-[var(--vantage-text-main)] leading-tight uppercase tracking-wide" data-i18n="teamsStatus">Teams Status</h2>
-                        <p class="text-[10px] text-[var(--vantage-text-muted)]" id="presence-count-label">60 Mitarbeiter</p>
+                        <p class="text-[10px] text-[var(--vantage-text-muted)]" id="presence-count-label">M365 Verzeichnis</p>
                     </div>
                 </div>
                 
-                <div class="flex items-center gap-1">
-                    <button onclick="toggleDemoPresence()" title="Präsenzen für Demo simulieren" class="text-[var(--vantage-text-muted)] hover:text-[var(--vantage-gold)] p-1.5 rounded-sm hover:bg-[var(--vantage-panel)] transition">
-                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
-                    </button>
-                    <button onclick="toggleMobileSidebar()" class="text-[var(--vantage-text-muted)] hover:text-[var(--vantage-text-main)] p-1.5 rounded-sm hover:bg-[var(--vantage-panel)]">
-                        <i data-lucide="x" class="w-4 h-4"></i>
-                    </button>
-                </div>
+                <button onclick="toggleMobileSidebar()" class="text-[var(--vantage-text-muted)] hover:text-[var(--vantage-text-main)] p-1.5 rounded-sm hover:bg-[var(--vantage-panel)]">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
             </div>
 
             <div class="p-2.5 border-b border-[var(--vantage-border)] bg-[var(--vantage-panel)]">
                 <div class="relative">
                     <i data-lucide="search" class="w-3.5 h-3.5 text-[var(--vantage-text-muted)] absolute left-2.5 top-2"></i>
-                    <input type="text" id="employee-search" oninput="filterEmployees()" data-i18n-placeholder="searchPlaceholder" placeholder="Mitarbeiter oder Ort..." 
+                    <input type="text" id="employee-search" data-i18n-placeholder="searchPlaceholder" placeholder="Mitarbeiter suchen..." 
                         class="w-full pl-7 pr-2.5 py-1 text-xs bg-[var(--vantage-bg)] border border-[var(--vantage-border)] rounded-sm focus:outline-none focus:border-[var(--vantage-gold)] transition text-[var(--vantage-text-main)] placeholder-[var(--vantage-text-muted)]">
                 </div>
             </div>
 
-            <div class="flex-1 overflow-y-visible overflow-x-hidden p-2 space-y-1.5" id="sidebar-presence-list">
-                <!-- Dynamisch gefüllt -->
+            <!-- Hier werden zukünftig echte M365-Präsenzen geladen -->
+            <div class="flex-1 overflow-y-auto p-3 space-y-1.5 text-xs text-[var(--vantage-text-muted)] italic" id="sidebar-presence-list">
+                Bitte bei M365 anmelden, um Mitarbeiter-Präsenzen zu laden.
             </div>
 
             <div class="p-2.5 border-t border-[var(--vantage-border)] bg-[var(--vantage-panel)] text-[10px] text-[var(--vantage-text-muted)] flex items-center justify-around font-medium uppercase tracking-wider">
                 <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Online</span>
                 <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Busy</span>
-                <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Away</span>
-                <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span> Off</span>
             </div>
         </aside>
 
@@ -209,7 +203,7 @@
                 </div>
 
                 <div class="flex items-center gap-2 lg:gap-3">
-                    <!-- SPRACHAUSWAHL DROPDOWN (INKLUSIVE TSCHECHISCH 🇨ℤ) -->
+                    <!-- SPRACHAUSWAHL DROPDOWN (INKLUSIVE TSCHECHISCH 🇨🇿) -->
                     <select
                         id="language-select"
                         onchange="changeLanguage(this.value)"
@@ -254,7 +248,7 @@
                                 <div>
                                     <h2 class="font-semibold text-[var(--vantage-text-main)] tracking-[1px] uppercase text-sm lg:text-base flex items-center gap-2">
                                         <span data-i18n="bulletinBoard">BULLETIN BOARD</span> 
-                                        <span id="sync-status" class="text-[10px] uppercase tracking-[1px] text-amber-500 font-semibold bg-[var(--vantage-bg)] px-2 py-0.5 rounded-sm border border-[var(--vantage-border)]">SharePoint Sync: Bereit (Warte auf M365)</span>
+                                        <span id="sync-status" class="text-[10px] uppercase tracking-[1px] text-amber-500 font-semibold bg-[var(--vantage-bg)] px-2 py-0.5 rounded-sm border border-[var(--vantage-border)]">SharePoint Sync: Bereit (Warte auf Admin-Freigabe)</span>
                                     </h2>
                                     <p class="text-[11px] lg:text-xs text-[var(--vantage-text-muted)]" data-i18n="bulletinSub">Vantage News & Outlook Kalender</p>
                                 </div>
@@ -674,7 +668,7 @@
             de: {
                 versionBadge: "Intranet V3.8.0 🚀",
                 teamsStatus: "Teams Status",
-                searchPlaceholder: "Mitarbeiter oder Ort...",
+                searchPlaceholder: "Mitarbeiter suchen...",
                 login: "M365 Anmelden",
                 newChannel: "Neuer Channel",
                 bulletinBoard: "BULLETIN BOARD",
@@ -773,7 +767,7 @@
             en: {
                 versionBadge: "Intranet V3.8.0 🚀",
                 teamsStatus: "Teams Presence",
-                searchPlaceholder: "Search employee or location...",
+                searchPlaceholder: "Search employee...",
                 login: "Sign in to M365",
                 newChannel: "New Channel",
                 bulletinBoard: "BULLETIN BOARD",
@@ -872,7 +866,7 @@
             fr: {
                 versionBadge: "Intranet V3.8.0 🚀",
                 teamsStatus: "Statut Teams",
-                searchPlaceholder: "Chercher employé ou site...",
+                searchPlaceholder: "Chercher employé...",
                 login: "Connexion M365",
                 newChannel: "Nouveau canal",
                 bulletinBoard: "TABLEAU D’INFORMATION",
@@ -971,7 +965,7 @@
             cs: {
                 versionBadge: "Intranet V3.8.0 🚀",
                 teamsStatus: "Stav Teams",
-                searchPlaceholder: "Hledat zaměstnance nebo místo...",
+                searchPlaceholder: "Hledat zaměstnance...",
                 login: "Přihlásit M365",
                 newChannel: "Nový kanál",
                 bulletinBoard: "NÁSTĚNKA",
@@ -1595,94 +1589,6 @@
             }
         }
 
-        // System Start / Sidebar Präsenzen
-        const locationsList = ["Weiden", "Berlin", "Leipzig", "Paris", "Prag", "LA"];
-        const firstNames = ["Tom", "Max", "Anna", "Pierre", "Jan", "Sarah", "Christian", "Laura", "Felix", "Elena"];
-        const lastNames = ["Müller", "Schmidt", "Schneider", "Weber", "Fischer", "Meyer", "Dubois", "Novák", "Smith"];
-        const statuses = ["online", "online", "busy", "away", "offline"];
-        let employees = [];
-
-        function generateEmployees() {
-            employees = [];
-            let id = 1;
-            locationsList.forEach(loc => {
-                for (let i = 0; i < 5; i++) {
-                    const fName = firstNames[Math.floor(Math.random() * firstNames.length)];
-                    const lName = lastNames[Math.floor(Math.random() * lastNames.length)];
-                    const email = `${fName.toLowerCase()}.${lName.toLowerCase()}@vantagefilm.com`;
-                    employees.push({
-                        id: id++,
-                        name: `${fName} ${lName}`,
-                        email: email,
-                        location: loc,
-                        status: statuses[Math.floor(Math.random() * statuses.length)]
-                    });
-                }
-            });
-        }
-
-        function renderSidebarPresence(filteredList = null) {
-            const listEl = document.getElementById('sidebar-presence-list');
-            if (!listEl) return;
-            listEl.innerHTML = '';
-            const listToRender = filteredList || employees;
-            const grouped = {};
-            locationsList.forEach(loc => grouped[loc] = []);
-            listToRender.forEach(emp => { if (grouped[emp.location]) grouped[emp.location].push(emp); });
-
-            let totalVisible = 0;
-            locationsList.forEach(loc => {
-                const emps = grouped[loc];
-                if (emps.length === 0) return;
-                totalVisible += emps.length;
-
-                const locHeader = document.createElement('div');
-                locHeader.className = "text-[10px] font-bold text-[var(--vantage-text-muted)] uppercase tracking-wider mt-2 mb-1 px-1";
-                locHeader.innerText = loc;
-                listEl.appendChild(locHeader);
-
-                emps.forEach(emp => {
-                    let dot = "bg-emerald-500 glow-green";
-                    if (emp.status === "busy") dot = "bg-rose-500 glow-red";
-                    if (emp.status === "away") dot = "bg-amber-500 glow-yellow";
-                    if (emp.status === "offline") dot = "bg-slate-300";
-
-                    const item = document.createElement('div');
-                    item.className = "relative group py-1.5 px-2 rounded-sm bg-[var(--vantage-bg)] hover:bg-[var(--vantage-panel)] transition text-xs border border-[var(--vantage-border)] hover:border-[var(--vantage-gold)] shadow-2xs cursor-pointer";
-                    
-                    item.innerHTML = `
-                        <div class="flex items-center justify-between pointer-events-none">
-                            <span class="font-medium text-[var(--vantage-text-main)] truncate pr-4">${emp.name}</span>
-                            <span class="w-2 h-2 rounded-full shrink-0 ${dot}"></span>
-                        </div>
-                        <div class="absolute right-1 top-1 bottom-1 hidden group-hover:flex items-center gap-1 bg-[var(--vantage-panel)] px-1 z-20">
-                            <button onclick="openSmartTeams('msteams://teams.microsoft.com/l/chat/0/0?users=${emp.email}', 'https://teams.microsoft.com/')" title="In Teams anchatten" class="p-1 bg-[var(--vantage-dark-panel)] hover:bg-black text-[var(--vantage-gold)] rounded-sm shadow transition flex items-center justify-center cursor-pointer">
-                                <i data-lucide="message-square" class="w-3 h-3"></i>
-                            </button>
-                            <button onclick="openSmartMail('${emp.email}')" title="E-Mail schreiben" class="p-1 bg-[var(--vantage-gold)] hover:bg-[var(--vantage-gold-dark)] text-white rounded-sm shadow transition flex items-center justify-center cursor-pointer">
-                                <i data-lucide="mail" class="w-3 h-3"></i>
-                            </button>
-                        </div>
-                    `;
-                    listEl.appendChild(item);
-                });
-            });
-            const countLabel = document.getElementById('presence-count-label');
-            if (countLabel) countLabel.innerText = `${totalVisible} MS365 Kontakte`;
-            lucide.createIcons();
-        }
-
-        function filterEmployees() {
-            const query = document.getElementById('employee-search').value.toLowerCase();
-            if (!query) { renderSidebarPresence(); return; }
-            renderSidebarPresence(employees.filter(e => e.name.toLowerCase().includes(query) || e.location.toLowerCase().includes(query)));
-        }
-
-        function toggleDemoPresence() {
-            employees.forEach(emp => emp.status = statuses[Math.floor(Math.random() * statuses.length)]);
-            renderSidebarPresence();
-        }
-
         // =========================================================================
         // EASTER EGG LOGIC (VANTAGE SNAKE MINIGAME + KONAMI CODE & TRIPLE CLICK)
         // =========================================================================
@@ -1805,8 +1711,6 @@
 
         window.addEventListener("DOMContentLoaded", async () => {
             initializeLanguage();
-            generateEmployees();
-            renderSidebarPresence();
             renderDepartments();
             lucide.createIcons();
 
