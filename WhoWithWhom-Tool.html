@@ -237,7 +237,7 @@
 
 <div class="container">
     <header>
-        <!-- SPRACHAUSWAHL IM TOOL -->
+        <!-- SPRACH-DROPDOWN IM TOOL -->
         <select id="toolLangSelect" class="tool-lang-select" onchange="changeToolLanguage(this.value)">
             <option value="de">🇩🇪 DE</option>
             <option value="en">🇬🇧 EN</option>
@@ -260,7 +260,7 @@
         </div>
 
         <div class="search-box">
-            <input type="text" id="searchInput" data-i18n-placeholder="searchPlaceholder" placeholder="Suchbegriff eingeben (z. B. Mini+Hawk+40mm, Cooke Mini)..." onkeyup="filterData()" autofocus>
+            <input type="text" id="searchInput" data-i18n-placeholder="searchPlaceholder" placeholder="Suchbegriff eingeben (z. B. Mini+Hawk+40mm, Cooke Mini)..." onkeyup="triggerFilter()" autofocus>
         </div>
     </div>
 
@@ -274,6 +274,7 @@
 <script>
     let rawExcelData = [];
     let currentToolLang = "de";
+    let searchTimeout = null;
 
     const toolTranslations = {
         de: {
@@ -330,6 +331,52 @@
         }
     };
 
+    // LOKALES FACHWÖRTERBUCH (FÜR SPALTEN, TITEL & KOMMENTARE)
+    const glossary = {
+        en: {
+            "Eintrag": "Entry",
+            "Hinweis": "Note",
+            "Freigabe": "Approval",
+            "Geprüft": "Tested",
+            "Kamera": "Camera",
+            "Objektiv": "Lens",
+            "Mattscheibe": "Groundglass",
+            "Kompendium": "Matte Box",
+            "Metrisch!!": "Metric!!"
+        },
+        fr: {
+            "Eintrag": "Entrée",
+            "Hinweis": "Remarque",
+            "Freigabe": "Approbation",
+            "Geprüft": "Testé",
+            "Kamera": "Caméra",
+            "Objektiv": "Objectif",
+            "Mattscheibe": "Dépoli",
+            "Kompendium": "Boîte matte",
+            "Metrisch!!": "Métrique!!"
+        },
+        cs: {
+            "Eintrag": "Položka",
+            "Hinweis": "Poznámka",
+            "Freigabe": "Schválení",
+            "Geprüft": "Testováno",
+            "Kamera": "Kamera",
+            "Objektiv": "Objektiv",
+            "Mattscheibe": "Matnice",
+            "Kompendium": "Matte Box",
+            "Metrisch!!": "Metrické!!"
+        }
+    };
+
+    function translateTerm(text, lang) {
+        if (!text || lang === "de") return text;
+        const clean = String(text).trim();
+        if (glossary[lang] && glossary[lang][clean]) {
+            return glossary[lang][clean];
+        }
+        return clean;
+    }
+
     function changeToolLanguage(lang) {
         currentToolLang = lang;
         localStorage.setItem("vantage-language", lang);
@@ -383,8 +430,6 @@
         }
     });
 
-    let lastLoadedSheetName = "";
-
     function processFile(file) {
         document.getElementById('fileBtnText').innerText = file.name.length > 14 ? file.name.substring(0, 12) + '...' : file.name;
 
@@ -395,7 +440,6 @@
                 const workbook = XLSX.read(data, { type: 'array', cellComments: true });
                 
                 const sheetName = workbook.SheetNames[0];
-                lastLoadedSheetName = sheetName;
                 const sheet = workbook.Sheets[sheetName];
                 
                 rawExcelData = parseSheetWithComments(sheet, 4); 
@@ -460,10 +504,16 @@
             .toLowerCase();
     }
 
+    function triggerFilter() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            filterData();
+        }, 150);
+    }
+
     function filterData() {
         const rawQuery = document.getElementById("searchInput").value;
         const grid = document.getElementById("resultsGrid");
-        grid.innerHTML = "";
         const t = toolTranslations[currentToolLang];
 
         if (rawExcelData.length === 0) {
@@ -517,14 +567,18 @@
             return;
         }
 
+        grid.innerHTML = "";
+
         filtered.forEach(row => {
             const keys = Object.keys(row);
             if (keys.length === 0) return;
 
             const titleKey = keys[0];
-            let titleText = row[titleKey] && row[titleKey].value && String(row[titleKey].value).trim() !== "" 
+            let rawTitle = row[titleKey] && row[titleKey].value && String(row[titleKey].value).trim() !== "" 
                 ? String(row[titleKey].value).trim() 
-                : "Eintrag";
+                : translateTerm("Eintrag", currentToolLang);
+
+            let titleText = translateTerm(rawTitle, currentToolLang);
 
             const card = document.createElement("div");
             card.className = "card";
@@ -536,15 +590,28 @@
                 const val = item.value;
                 const comment = item.comment;
 
-                const formattedVal = formatValue(val);
+                const translatedKey = translateTerm(key, currentToolLang);
                 
+                let formattedVal = "";
+                if (val === undefined || val === null || String(val).trim() === "") {
+                    formattedVal = `<span class="not-tested-badge">${t.notTested}</span>`;
+                } else if (typeof val === 'string' && (val.trim() === 'ü' || val.trim() === 'Ü')) {
+                    formattedVal = '<span style="color: #10b981; font-weight: bold; font-size: 1rem;">✔</span>';
+                } else if (typeof val === 'string' && (val.trim() === 'û' || val.trim() === 'þ')) {
+                    formattedVal = '<span style="color: #ef4444; font-weight: bold; font-size: 1rem;">✖</span>';
+                } else {
+                    formattedVal = translateTerm(val, currentToolLang);
+                }
+
+                let translatedComment = comment ? translateTerm(comment, currentToolLang) : null;
+
                 detailsHtml += `
                     <div class="details-row" style="flex-direction: column; align-items: flex-start; padding: 6px 0;">
                         <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
-                            <span class="details-label">${key}:</span>
+                            <span class="details-label">${translatedKey}:</span>
                             <span class="details-value">${formattedVal}</span>
                         </div>
-                        ${comment ? `<div class="comment-box">📌 ${comment}</div>` : ''}
+                        ${translatedComment ? `<div class="comment-box">📌 ${translatedComment}</div>` : ''}
                     </div>
                 `;
             });
@@ -552,24 +619,6 @@
             card.innerHTML = detailsHtml;
             grid.appendChild(card);
         });
-    }
-
-    function formatValue(val) {
-        if (val === undefined || val === null || String(val).trim() === "") {
-            const t = toolTranslations[currentToolLang];
-            return `<span class="not-tested-badge">${t.notTested}</span>`;
-        }
-
-        if (typeof val === 'string') {
-            const retrievedTrimmed = val.trim();
-            if (retrievedTrimmed === 'ü' || retrievedTrimmed === 'Ü') {
-                return '<span style="color: #10b981; font-weight: bold; font-size: 1rem;">✔</span>';
-            }
-            if (retrievedTrimmed === 'û' || retrievedTrimmed === 'þ') {
-                return '<span style="color: #ef4444; font-weight: bold; font-size: 1rem;">✖</span>';
-            }
-        }
-        return val;
     }
 </script>
 
