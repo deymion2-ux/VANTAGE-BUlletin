@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VANTAGE Intranet V3.7.6</title>
+    <title>VANTAGE Intranet V3.8.0</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
@@ -80,30 +80,16 @@
                 size: A4 portrait;
                 margin: 15mm;
             }
-
-            body * {
-                visibility: hidden !important;
-            }
-
-            #tool-view-container, #tool-view-container * {
-                visibility: visible !important;
-            }
-
+            body * { visibility: hidden !important; }
+            #tool-view-container, #tool-view-container * { visibility: visible !important; }
             #tool-view-container {
                 position: absolute !important;
                 left: 0 !important;
                 top: 0 !important;
                 width: 100% !important;
             }
-
-            .no-print {
-                display: none !important;
-            }
-
-            .print-only {
-                display: block !important;
-            }
-
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
             .print-template {
                 width: 160mm !important;
                 max-width: 160mm !important;
@@ -113,19 +99,8 @@
                 color: #000 !important;
                 box-sizing: border-box !important;
             }
-
-            .print-template h1 {
-                font-size: 15pt;
-                margin-bottom: 0.2cm;
-                color: #000 !important;
-            }
-
-            .print-template p.sub {
-                font-size: 8.5pt;
-                color: #444 !important;
-                margin-bottom: 0.4cm;
-            }
-
+            .print-template h1 { font-size: 15pt; margin-bottom: 0.2cm; color: #000 !important; }
+            .print-template p.sub { font-size: 8.5pt; color: #444 !important; margin-bottom: 0.4cm; }
             .print-table {
                 width: 160mm !important;
                 border-collapse: collapse;
@@ -133,7 +108,6 @@
                 font-size: 9pt;
                 table-layout: fixed !important;
             }
-
             .print-table th, .print-table td {
                 border: 1px solid #000 !important;
                 padding: 5px 8px;
@@ -141,12 +115,7 @@
                 word-break: break-word;
                 color: #000 !important;
             }
-
-            .print-table th {
-                background-color: #f0f0f0 !important;
-                width: 50%;
-            }
-
+            .print-table th { background-color: #f0f0f0 !important; width: 50%; }
             .preview-section-print {
                 display: flex !important;
                 flex-direction: row !important;
@@ -155,7 +124,6 @@
                 align-items: flex-start;
                 width: 160mm !important;
             }
-
             .scale-box {
                 border: 1px solid #888 !important;
                 padding: 0.3cm;
@@ -163,31 +131,11 @@
                 border-radius: 2px;
                 box-sizing: border-box !important;
             }
-
-            .scale-box h3 {
-                font-size: 9pt;
-                margin-bottom: 0.2cm;
-                text-transform: uppercase;
-                color: #000 !important;
-            }
-
-            .print-canvas-actual {
-                border: 1px solid #000 !important;
-                background-color: #ffffff !important;
-                display: block;
-            }
-
-            .hint-text {
-                font-size: 8pt;
-                color: #444 !important;
-                margin-top: 0.4cm;
-                width: 160mm !important;
-            }
+            .scale-box h3 { font-size: 9pt; margin-bottom: 0.2cm; text-transform: uppercase; color: #000 !important; }
+            .print-canvas-actual { border: 1px solid #000 !important; background-color: #ffffff !important; display: block; }
+            .hint-text { font-size: 8pt; color: #444 !important; margin-top: 0.4cm; width: 160mm !important; }
         }
-
-        .print-only {
-            display: none;
-        }
+        .print-only { display: none; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col bg-[var(--vantage-bg)] text-[var(--vantage-text-main)] overflow-x-hidden">
@@ -256,12 +204,12 @@
                     </button>
 
                     <h1 class="font-light text-sm lg:text-base tracking-[2px] uppercase text-white flex items-center gap-3">
-                        VANTAGE <span class="hidden sm:inline-block text-[11px] font-semibold text-[var(--vantage-gold)] bg-transparent border border-[var(--vantage-gold)] px-3 py-0.5 rounded-sm tracking-[1.5px]" data-i18n="versionBadge">Intranet V3.7.6 🚀</span>
+                        VANTAGE <span class="hidden sm:inline-block text-[11px] font-semibold text-[var(--vantage-gold)] bg-transparent border border-[var(--vantage-gold)] px-3 py-0.5 rounded-sm tracking-[1.5px]" data-i18n="versionBadge">Intranet V3.8.0 🚀</span>
                     </h1>
                 </div>
 
                 <div class="flex items-center gap-2 lg:gap-3">
-                    <!-- SPRACHAUSWAHL DROPDOWN -->
+                    <!-- SPRACHAUSWAHL DROPDOWN (INKLUSIVE TSCHECHISCH 🇨ℤ) -->
                     <select
                         id="language-select"
                         onchange="changeLanguage(this.value)"
@@ -269,13 +217,18 @@
                         <option value="de">🇩🇪 Deutsch</option>
                         <option value="en">🇬🇧 English</option>
                         <option value="fr">🇫🇷 Français</option>
-                        <option value="cs">🇨ℤ Čeština</option>
+                        <option value="cs">🇨🇿 Čeština</option>
                     </select>
 
-                    <div id="auth-container">
-                        <button id="login-btn" onclick="loginM365()" class="bg-[var(--vantage-gold)] hover:bg-[var(--vantage-gold-dark)] text-white px-3 py-1.5 rounded-sm text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 shadow-sm transition">
+                    <!-- M365 LOGIN & AUTH BUTTON -->
+                    <div id="auth-container" class="flex items-center gap-2">
+                        <button id="login-btn" onclick="loginM365()" class="bg-[var(--vantage-gold)] hover:bg-[var(--vantage-gold-dark)] text-white px-3 py-1.5 rounded-sm text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-sm transition cursor-pointer">
                             <i data-lucide="log-in" class="w-3.5 h-3.5 text-white"></i> <span class="hidden sm:inline" data-i18n="login">M365 Anmelden</span>
                         </button>
+                        <div id="user-profile-badge" class="hidden flex items-center gap-2 bg-[var(--vantage-panel)] border border-[var(--vantage-border)] px-3 py-1 rounded-sm text-xs">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span id="user-display-name" class="font-medium text-[var(--vantage-text-main)]">Verbinde...</span>
+                        </div>
                     </div>
 
                     <button onclick="openNewChannelModal()" class="bg-[var(--vantage-panel)] hover:bg-[var(--vantage-border)] text-[var(--vantage-text-main)] border border-[var(--vantage-border)] px-3 py-1.5 rounded-sm text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 shadow-sm transition">
@@ -301,7 +254,7 @@
                                 <div>
                                     <h2 class="font-semibold text-[var(--vantage-text-main)] tracking-[1px] uppercase text-sm lg:text-base flex items-center gap-2">
                                         <span data-i18n="bulletinBoard">BULLETIN BOARD</span> 
-                                        <span class="text-[10px] uppercase tracking-[1px] text-[var(--vantage-text-muted)] font-semibold bg-[var(--vantage-bg)] px-2 py-0.5 rounded-sm border border-[var(--vantage-border)]" data-i18n="liveFeeds">Live Feeds</span>
+                                        <span id="sync-status" class="text-[10px] uppercase tracking-[1px] text-amber-500 font-semibold bg-[var(--vantage-bg)] px-2 py-0.5 rounded-sm border border-[var(--vantage-border)]">SharePoint Sync: Bereit (Warte auf M365)</span>
                                     </h2>
                                     <p class="text-[11px] lg:text-xs text-[var(--vantage-text-muted)]" data-i18n="bulletinSub">Vantage News & Outlook Kalender</p>
                                 </div>
@@ -322,7 +275,7 @@
                             </div>
                         </div>
 
-                        <!-- KALENDER-SECTION -->
+                        <!-- KALENDER-SECTION (DYNAMISCH MIT OUTLOOK SYNCHRONISIERT) -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
                             <div class="p-4 rounded-sm bg-[var(--vantage-bg)] border border-[var(--vantage-border)]">
                                 <div class="flex items-center justify-between mb-2">
@@ -332,13 +285,8 @@
                                     <span class="text-[10px] text-[var(--vantage-gold-dark)] font-semibold bg-[var(--vantage-panel)] px-2 py-0.5 rounded-sm border border-[var(--vantage-border)] uppercase" data-i18n="outlookSync">Outlook Sync</span>
                                 </div>
                                 <div class="space-y-2 text-xs" id="today-calendar-events">
-                                    <div class="group relative flex items-center justify-between p-2.5 bg-[var(--vantage-panel)] rounded-sm border border-[var(--vantage-border)] hover:border-[var(--vantage-gold)] hover:shadow-xs transition cursor-pointer"
-                                         onclick="openSmartOutlook('https://outlook.office.com/calendar/')">
-                                        <div class="flex items-center gap-2 truncate mr-2">
-                                            <span class="w-2 h-2 rounded-full bg-[var(--vantage-gold)] shrink-0"></span>
-                                            <span class="font-medium text-[var(--vantage-text-main)] truncate">10:00 - Kamera-Test Produktion "CineBerlin"</span>
-                                        </div>
-                                        <span class="text-[10px] bg-[var(--vantage-bg)] text-[var(--vantage-text-muted)] px-2 py-0.5 rounded-sm font-medium shrink-0 border border-[var(--vantage-border)]">Berlin</span>
+                                    <div class="p-2.5 bg-[var(--vantage-panel)] rounded-sm border border-[var(--vantage-border)] text-slate-500 italic">
+                                        Bitte bei M365 anmelden, um den Outlook-Kalender zu laden.
                                     </div>
                                 </div>
                             </div>
@@ -346,18 +294,13 @@
                             <div class="p-4 rounded-sm bg-[var(--vantage-bg)] border border-[var(--vantage-border)]">
                                 <div class="flex items-center justify-between mb-2">
                                     <span class="text-[11px] font-bold text-[var(--vantage-text-muted)] uppercase tracking-wider flex items-center gap-1.5">
-                                        <i data-lucide="clock" class="w-3.5 h-3.5 text-[var(--vantage-gold)]"></i> <span data-i18n="upcomingCalendar">Vorschau nächste Tage</span>
+                                        <i data-lucide="mail" class="w-3.5 h-3.5 text-[var(--vantage-gold)]"></i> Ungelesene Mails (Posteingang)
                                     </span>
-                                    <span class="text-[10px] text-[var(--vantage-text-muted)] uppercase tracking-wider" data-i18n="vantageCalendar">Vantage Kalender</span>
+                                    <span id="unread-mail-count" class="text-[10px] bg-[var(--vantage-panel)] text-[var(--vantage-text-main)] px-2 py-0.5 rounded-sm border border-[var(--vantage-border)] font-bold">0</span>
                                 </div>
-                                <div class="space-y-2 text-xs" id="upcoming-calendar-events">
-                                    <div class="group relative flex items-center justify-between p-2.5 bg-[var(--vantage-panel)] rounded-sm border border-[var(--vantage-border)] hover:border-[var(--vantage-gold)] hover:shadow-xs transition cursor-pointer"
-                                         onclick="openSmartOutlook('https://outlook.office.com/calendar/')">
-                                        <div class="flex items-center gap-2 truncate mr-2">
-                                            <span class="w-2 h-2 rounded-full bg-[var(--vantage-dark-panel)] shrink-0"></span>
-                                            <span class="font-medium text-[var(--vantage-text-main)] truncate">Morgen - HAWK Optik Wartungs-Meeting</span>
-                                        </div>
-                                        <span class="text-[10px] bg-[var(--vantage-bg)] text-[var(--vantage-text-main)] font-semibold px-2 py-0.5 rounded-sm border border-[var(--vantage-border)] shrink-0">Leipzig</span>
+                                <div class="space-y-2 text-xs" id="outlook-mails-container">
+                                    <div class="p-2.5 bg-[var(--vantage-panel)] rounded-sm border border-[var(--vantage-border)] text-slate-500 italic">
+                                        Keine E-Mails geladen.
                                     </div>
                                 </div>
                             </div>
@@ -414,10 +357,10 @@
                     <!-- TWO-WAY NAVIGATION HEADER -->
                     <div class="flex items-center justify-between bg-[var(--vantage-panel)] border border-[var(--vantage-border)] px-4 py-3 rounded-sm shadow-xs no-print">
                         <div class="flex items-center gap-2">
-                            <button onclick="goBack()" class="px-3 py-1.5 bg-[var(--vantage-bg)] hover:bg-[var(--vantage-border)] border border-[var(--vantage-border)] text-[var(--vantage-text-main)] rounded-sm text-xs font-semibold uppercase tracking-wider transition flex items-center gap-1.5">
+                            <button onclick="goBack()" class="px-3 py-1.5 bg-[var(--vantage-bg)] hover:bg-[var(--vantage-border)] border border-[var(--vantage-border)] text-[var(--vantage-text-main)] rounded-sm text-xs font-semibold uppercase tracking-wider transition flex items-center gap-1.5 cursor-pointer">
                                 <i data-lucide="arrow-left" class="w-3.5 h-3.5 text-[var(--vantage-gold)]"></i> <span class="hidden sm:inline" data-i18n="btnBack">Schritt zurück</span>
                             </button>
-                            <button onclick="goHome()" class="px-3 py-1.5 bg-[var(--vantage-bg)] hover:bg-[var(--vantage-border)] border border-[var(--vantage-border)] text-[var(--vantage-text-main)] rounded-sm text-xs font-semibold uppercase tracking-wider transition flex items-center gap-1.5">
+                            <button onclick="goHome()" class="px-3 py-1.5 bg-[var(--vantage-bg)] hover:bg-[var(--vantage-border)] border border-[var(--vantage-border)] text-[var(--vantage-text-main)] rounded-sm text-xs font-semibold uppercase tracking-wider transition flex items-center gap-1.5 cursor-pointer">
                                 <i data-lucide="home" class="w-3.5 h-3.5 text-[var(--vantage-gold)]"></i> <span class="hidden sm:inline" data-i18n="btnHome">Zum Dashboard</span>
                             </button>
                         </div>
@@ -480,7 +423,7 @@
 
                         <div class="mt-4 pt-3 border-t border-[var(--vantage-border)] flex items-center gap-2">
                             <input type="text" id="detail-chat-input" data-i18n-placeholder="chatInputPlaceholder" placeholder="Antwort schreiben..." class="flex-1 px-3 py-2 text-xs bg-[var(--vantage-bg)] border border-[var(--vantage-border)] rounded-sm focus:outline-none focus:border-[var(--vantage-gold)] transition text-[var(--vantage-text-main)] placeholder-[var(--vantage-text-muted)]">
-                            <button onclick="sendDetailChatMessage()" class="px-3.5 py-2 bg-[var(--vantage-gold)] hover:bg-[var(--vantage-gold-dark)] text-white rounded-sm text-xs font-semibold uppercase tracking-wider transition flex items-center gap-1.5 shadow-sm shrink-0">
+                            <button onclick="sendDetailChatMessage()" class="px-3.5 py-2 bg-[var(--vantage-gold)] hover:bg-[var(--vantage-gold-dark)] text-white rounded-sm text-xs font-semibold uppercase tracking-wider transition flex items-center gap-1.5 shadow-sm shrink-0 cursor-pointer">
                                 <i data-lucide="send" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline" data-i18n="btnSend">Senden</span>
                             </button>
                         </div>
@@ -490,7 +433,7 @@
             </div>
 
             <footer class="p-4 lg:p-6 text-center text-xs text-[var(--vantage-text-muted)] border-t border-[var(--vantage-border)] mt-auto no-print uppercase tracking-widest bg-[var(--vantage-panel)]">
-                <p data-i18n="footerText">Vantage Intranet PWA V3.7.6 &bull; MS365 & Teams Integration</p>
+                <p data-i18n="footerText">Vantage Intranet PWA V3.8.0 &bull; MS365 & Teams Integration</p>
             </footer>
 
         </div>
@@ -516,10 +459,10 @@
             </div>
 
             <div class="mt-4 flex gap-2 justify-center">
-                <button onclick="startSnakeGame()" class="px-4 py-2 bg-[var(--vantage-gold)] hover:bg-[var(--vantage-gold-dark)] text-white text-xs font-bold uppercase tracking-wider rounded-sm transition" data-i18n="snakeNewBtn">
+                <button onclick="startSnakeGame()" class="px-4 py-2 bg-[var(--vantage-gold)] hover:bg-[var(--vantage-gold-dark)] text-white text-xs font-bold uppercase tracking-wider rounded-sm transition cursor-pointer" data-i18n="snakeNewBtn">
                     Neues Spiel
                 </button>
-                <button onclick="closeSnakeGame()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold uppercase tracking-wider rounded-sm transition" data-i18n="snakeCloseBtn">
+                <button onclick="closeSnakeGame()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold uppercase tracking-wider rounded-sm transition cursor-pointer" data-i18n="snakeCloseBtn">
                     Schließen
                 </button>
             </div>
@@ -528,23 +471,165 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
+        // =========================================================================
+        // MSAL.js CONFIGURATION & ENTRA ID INTEGRATION
+        // =========================================================================
+        const msalConfig = {
+            auth: {
+                clientId: "cee7a128-4c3e-4a07-b0c8-89b97475a71c",
+                authority: "https://login.microsoftonline.com/7dfd912b-740c-430b-ae2b-10a0948f1378",
+                redirectUri: window.location.origin + window.location.pathname
+            },
+            cache: {
+                cacheLocation: "sessionStorage",
+                storeAuthStateInCookie: false
+            }
+        };
 
-        // Safe localStorage wrapper for SharePoint sandboxed environments
-        function safeGetStorage(key, defaultVal = null) {
+        const loginRequest = {
+            scopes: [
+                "User.Read",
+                "Sites.Read.All",
+                "Calendars.Read",
+                "Mail.Read",
+                "Team.ReadBasic.All"
+            ]
+        };
+
+        const msalInstance = new msal.PublicClientApplication(msalConfig);
+        let currentUserAccount = null;
+
+        async function loginM365() {
             try {
-                return localStorage.getItem(key) || defaultVal;
-            } catch (e) {
-                console.warn('localStorage is blocked in sandboxed environment:', e);
-                return defaultVal;
+                await msalInstance.loginPopup(loginRequest);
+                const accounts = msalInstance.getAllAccounts();
+                if (accounts.length > 0) {
+                    currentUserAccount = accounts[0];
+                    updateUserUI(currentUserAccount);
+                    await loadGraphData();
+                }
+            } catch (err) {
+                console.error("Login Error:", err);
             }
         }
-        function safeSetStorage(key, val) {
+
+        function updateUserUI(account) {
+            document.getElementById('login-btn').classList.add('hidden');
+            const badge = document.getElementById('user-profile-badge');
+            badge.classList.remove('hidden');
+            document.getElementById('user-display-name').textContent = account.name || account.username;
+        }
+
+        async function getAccessToken() {
+            if (!currentUserAccount) return null;
             try {
-                localStorage.setItem(key, val);
-            } catch (e) {
-                console.warn('localStorage setItem blocked:', e);
+                const res = await msalInstance.acquireTokenSilent({ scopes: loginRequest.scopes, account: currentUserAccount });
+                return res.accessToken;
+            } catch (err) {
+                const res = await msalInstance.acquireTokenPopup({ scopes: loginRequest.scopes });
+                return res.accessToken;
             }
         }
+
+        async function loadGraphData() {
+            const token = await getAccessToken();
+            if (!token) return;
+
+            const syncStatus = document.getElementById('sync-status');
+            syncStatus.textContent = "SharePoint Sync: Aktiv";
+            syncStatus.className = "text-[10px] uppercase tracking-[1px] text-emerald-600 font-semibold bg-[var(--vantage-bg)] px-2 py-0.5 rounded-sm border border-[var(--vantage-border)]";
+
+            await Promise.all([
+                fetchSharePointMapping(token),
+                fetchOutlookCalendar(token),
+                fetchOutlookMails(token)
+            ]);
+        }
+
+        // Dynamischer Abruf der Teams-Channel-Mappings aus eurer SharePoint-Liste
+        async function fetchSharePointMapping(token) {
+            try {
+                const url = "https://graph.microsoft.com/v1.0/sites/vantageweiden.sharepoint.com:/sites/Testbetreuung2:/lists/TeamsChannelMapping/items?expand=fields";
+                const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.value) {
+                        data.value.forEach(item => {
+                            const fields = item.fields;
+                            const dept = departmentsConfig.find(d => d.id === fields.DepartmentID);
+                            if (dept) {
+                                if (fields.TeamsWebUrl) dept.teamsWebUrl = fields.TeamsWebUrl;
+                                if (fields.TeamsProtocolUrl) dept.teamsProtocolUrl = fields.TeamsProtocolUrl;
+                            }
+                        });
+                    }
+                }
+            } catch (err) {
+                console.warn("SharePoint Mapping Abruf Hinweis:", err);
+            }
+        }
+
+        // Outlook Kalender Termine einlesen
+        async function fetchOutlookCalendar(token) {
+            const container = document.getElementById('today-calendar-events');
+            try {
+                const now = new Date().toISOString();
+                const res = await fetch(`https://graph.microsoft.com/v1.0/me/calendarView?startDateTime=${now}&endDateTime=${new Date(Date.now() + 24*60*60*1000).toISOString()}&$top=3&$orderby=start/dateTime`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.value && data.value.length > 0) {
+                        container.innerHTML = data.value.map(evt => {
+                            const time = new Date(evt.start.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                            return `
+                                <div class="group relative flex items-center justify-between p-2.5 bg-[var(--vantage-panel)] rounded-sm border border-[var(--vantage-border)] hover:border-[var(--vantage-gold)] transition cursor-pointer"
+                                     onclick="openSmartOutlook('${evt.webLink || 'https://outlook.office.com/calendar/'}')">
+                                    <div class="flex items-center gap-2 truncate mr-2">
+                                        <span class="w-2 h-2 rounded-full bg-[var(--vantage-gold)] shrink-0"></span>
+                                        <span class="font-medium text-[var(--vantage-text-main)] truncate">${time} - ${evt.subject}</span>
+                                    </div>
+                                    <span class="text-[10px] bg-[var(--vantage-bg)] text-[var(--vantage-text-muted)] px-2 py-0.5 rounded-sm font-medium shrink-0 border border-[var(--vantage-border)]">Outlook</span>
+                                </div>
+                            `;
+                        }).join('');
+                    } else {
+                        container.innerHTML = `<div class="p-2.5 bg-[var(--vantage-panel)] rounded-sm border border-[var(--vantage-border)] text-xs text-slate-500">Keine heutigen Termine im Outlook-Kalender.</div>`;
+                    }
+                }
+            } catch (err) {
+                console.error("Calendar Fetch Error:", err);
+            }
+        }
+
+        // Outlook Posteingang / Ungelesene Mails einlesen
+        async function fetchOutlookMails(token) {
+            const container = document.getElementById('outlook-mails-container');
+            const countBadge = document.getElementById('unread-mail-count');
+            try {
+                const res = await fetch(`https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages?$filter=isRead eq false&$top=3&$select=subject,from`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.value && data.value.length > 0) {
+                        countBadge.textContent = data.value.length;
+                        container.innerHTML = data.value.map(m => `
+                            <div class="p-2.5 bg-[var(--vantage-panel)] rounded-sm border border-[var(--vantage-border)]">
+                                <p class="font-semibold text-xs text-[var(--vantage-text-main)] truncate">${m.subject}</p>
+                                <p class="text-[10px] text-[var(--vantage-text-muted)] mt-0.5">${m.from?.emailAddress?.name || 'Unbekannt'}</p>
+                            </div>
+                        `).join('');
+                    } else {
+                        countBadge.textContent = "0";
+                        container.innerHTML = `<div class="p-2.5 bg-[var(--vantage-panel)] rounded-sm border border-[var(--vantage-border)] text-xs text-slate-500">Keine ungelesenen E-Mails.</div>`;
+                    }
+                }
+            } catch (err) {
+                console.error("Mail Fetch Error:", err);
+            }
+        }
+
 
         let currentLanguage = "de";
 
@@ -556,13 +641,10 @@
             const onBlur = () => { hasFocus = false; };
             window.addEventListener('blur', onBlur);
 
-            // Versuch 1: Protocol Handler der Desktop App ausführen
             window.location.href = teamsProtocolUrl;
 
-            // Versuch 2: Nach 1.5 Sekunden prüfen, ob die App gestartet ist
             setTimeout(() => {
                 window.removeEventListener('blur', onBlur);
-                // Wenn das Fenster noch Fokus hat, hat das OS den Protocol Handler ignoriert
                 if (hasFocus) {
                     window.open(webFallbackUrl || 'https://teams.microsoft.com/', '_blank');
                 }
@@ -590,7 +672,7 @@
 
         const translations = {
             de: {
-                versionBadge: "Intranet V3.7.6 🚀",
+                versionBadge: "Intranet V3.8.0 🚀",
                 teamsStatus: "Teams Status",
                 searchPlaceholder: "Mitarbeiter oder Ort...",
                 login: "M365 Anmelden",
@@ -620,7 +702,7 @@
                 chatInputPlaceholder: "Antwort schreiben...",
                 btnSend: "Senden",
                 badgeTechnical: "Technical",
-                footerText: "Vantage Intranet PWA V3.7.6 • MS365 & Teams Integration",
+                footerText: "Vantage Intranet PWA V3.8.0 • MS365 & Teams Integration",
                 burgerTooltip: "Teams Status Leiste ein-/ausblenden",
                 
                 deptTechRentalTitle: "Technical Departments Rental",
@@ -689,7 +771,7 @@
                 snakeCloseBtn: "Schließen"
             },
             en: {
-                versionBadge: "Intranet V3.7.6 🚀",
+                versionBadge: "Intranet V3.8.0 🚀",
                 teamsStatus: "Teams Presence",
                 searchPlaceholder: "Search employee or location...",
                 login: "Sign in to M365",
@@ -719,7 +801,7 @@
                 chatInputPlaceholder: "Write a reply...",
                 btnSend: "Send",
                 badgeTechnical: "Technical",
-                footerText: "Vantage Intranet PWA V3.7.6 • MS365 & Teams Integration",
+                footerText: "Vantage Intranet PWA V3.8.0 • MS365 & Teams Integration",
                 burgerTooltip: "Toggle Teams status sidebar",
 
                 deptTechRentalTitle: "Technical Departments Rental",
@@ -788,7 +870,7 @@
                 snakeCloseBtn: "Close"
             },
             fr: {
-                versionBadge: "Intranet V3.7.6 🚀",
+                versionBadge: "Intranet V3.8.0 🚀",
                 teamsStatus: "Statut Teams",
                 searchPlaceholder: "Chercher employé ou site...",
                 login: "Connexion M365",
@@ -818,7 +900,7 @@
                 chatInputPlaceholder: "Écrire une réponse...",
                 btnSend: "Envoyer",
                 badgeTechnical: "Technique",
-                footerText: "Vantage Intranet PWA V3.7.6 • MS365 & Teams Integration",
+                footerText: "Vantage Intranet PWA V3.8.0 • MS365 & Teams Integration",
                 burgerTooltip: "Afficher/masquer la barre latérale Teams",
 
                 deptTechRentalTitle: "Technical Departments Rental",
@@ -887,7 +969,7 @@
                 snakeCloseBtn: "Fermer"
             },
             cs: {
-                versionBadge: "Intranet V3.7.6 🚀",
+                versionBadge: "Intranet V3.8.0 🚀",
                 teamsStatus: "Stav Teams",
                 searchPlaceholder: "Hledat zaměstnance nebo místo...",
                 login: "Přihlásit M365",
@@ -917,7 +999,7 @@
                 chatInputPlaceholder: "Napsat odpověď...",
                 btnSend: "Odeslat",
                 badgeTechnical: "Technické",
-                footerText: "Vantage Intranet PWA V3.7.6 • MS365 & Teams Integration",
+                footerText: "Vantage Intranet PWA V3.8.0 • MS365 & Teams Integration",
                 burgerTooltip: "Zapnout/vypnout boční panel Teams",
 
                 deptTechRentalTitle: "Technical Departments Rental",
@@ -997,6 +1079,8 @@
                 borderColor: "hover:border-[var(--vantage-gold)]",
                 hasSharePointLink: true,
                 sharePointUrl: "https://vantageweiden.sharepoint.com/sites/Testbetreuung2/Lists/Testbetreuung/AllItems.aspx",
+                teamsProtocolUrl: "",
+                teamsWebUrl: "",
                 subcategories: [
                     { nameKey: "subFirmware", icon: "download-cloud" },
                     { nameKey: "subGroundglass", icon: "layout-template", isTool: true, toolType: "groundglass" },
@@ -1015,6 +1099,8 @@
                 borderColor: "hover:border-[var(--vantage-gold)]",
                 hasSharePointLink: true,
                 sharePointUrl: "https://vantageweiden.sharepoint.com/sites/Testbetreuung2/Lists/Testbetreuung/AllItems.aspx",
+                teamsProtocolUrl: "",
+                teamsWebUrl: "",
                 subcategories: [
                     { nameKey: "subWhoWithWhom", icon: "external-link", externalUrl: "WhoWithWhom-Tool.html" }
                 ]
@@ -1026,6 +1112,8 @@
                 color: "gold",
                 icon: "cpu",
                 borderColor: "hover:border-[var(--vantage-gold)]",
+                teamsProtocolUrl: "",
+                teamsWebUrl: "",
                 subcategories: []
             },
             {
@@ -1035,6 +1123,8 @@
                 color: "gold",
                 icon: "receipt",
                 borderColor: "hover:border-[var(--vantage-gold)]",
+                teamsProtocolUrl: "",
+                teamsWebUrl: "",
                 subcategories: []
             },
             {
@@ -1044,6 +1134,8 @@
                 color: "gold",
                 icon: "check-square",
                 borderColor: "hover:border-[var(--vantage-gold)]",
+                teamsProtocolUrl: "",
+                teamsWebUrl: "",
                 subcategories: []
             },
             {
@@ -1053,6 +1145,8 @@
                 color: "gold",
                 icon: "server",
                 borderColor: "hover:border-[var(--vantage-gold)]",
+                teamsProtocolUrl: "",
+                teamsWebUrl: "",
                 subcategories: [
                     { nameKey: "subSoftwareUpdates", icon: "shield" }
                 ]
@@ -1064,6 +1158,8 @@
                 color: "gold",
                 icon: "megaphone",
                 borderColor: "hover:border-[var(--vantage-gold)]",
+                teamsProtocolUrl: "",
+                teamsWebUrl: "",
                 subcategories: [
                     { nameKey: "subPhotoStation", icon: "image", externalUrl: "https://photostation.vantagefilm.com/photo/?launchApp=SYNO.Foto.Sharing.AppInstance&app_name=SYNO.Foto.AppInstance&photos_action=external_login&folderId=6&alias=photo#/signin" }
                 ]
@@ -1120,7 +1216,7 @@
 
         function changeLanguage(lang) {
             currentLanguage = lang;
-            safeSetStorage("vantage-language", lang);
+            localStorage.setItem("vantage-language", lang);
             renderDepartments();
             const activeDetailTitleKey = window._currentActiveDeptKey;
             if (activeDetailTitleKey) {
@@ -1133,7 +1229,7 @@
 
         function initializeLanguage() {
             const languageSelect = document.getElementById("language-select");
-            const savedLanguage = safeGetStorage("vantage-language");
+            const savedLanguage = localStorage.getItem("vantage-language");
             if (savedLanguage && translations[savedLanguage]) {
                 currentLanguage = savedLanguage;
                 languageSelect.value = savedLanguage;
@@ -1186,7 +1282,12 @@
             }
 
             const teamsBtn = document.createElement('button');
-            teamsBtn.onclick = () => openSmartTeams("msteams://teams.microsoft.com/l/channel/19%3a.../Technical%20Departments?groupId=...", "https://teams.microsoft.com/");
+            const defaultProtocol = "msteams://teams.microsoft.com/";
+            const defaultWeb = "https://teams.microsoft.com/";
+            const proto = foundDept?.teamsProtocolUrl || defaultProtocol;
+            const web = foundDept?.teamsWebUrl || defaultWeb;
+
+            teamsBtn.onclick = () => openSmartTeams(proto, web);
             teamsBtn.className = "bg-[var(--vantage-dark-panel)] hover:bg-black text-white px-4 py-2.5 rounded-sm text-xs font-semibold uppercase tracking-wider transition flex items-center justify-center gap-2 shadow-sm active:scale-95 cursor-pointer";
             teamsBtn.innerHTML = `<i data-lucide="external-link" class="w-4 h-4 text-[var(--vantage-gold)]"></i> <span data-i18n="btnOpenTeams">In Teams öffnen</span>`;
             actionButtonsContainer.appendChild(teamsBtn);
@@ -1206,9 +1307,7 @@
                 btn.className = "flex items-center justify-between p-3 bg-[var(--vantage-bg)] hover:bg-[var(--vantage-panel)] border border-[var(--vantage-border)] hover:border-[var(--vantage-gold)] rounded-sm cursor-pointer transition group";
                 
                 if (sub.externalUrl) {
-                    btn.onclick = () => {
-                        window.open(sub.externalUrl, '_blank');
-                    };
+                    btn.onclick = () => { window.open(sub.externalUrl, '_blank'); };
                 } else if (sub.isTool && sub.toolType === "groundglass") {
                     btn.onclick = () => loadGroundglassTool();
                 }
@@ -1285,7 +1384,7 @@
                             </div>
 
                             <div class="pt-2 flex justify-end">
-                                <button onclick="window.print()" class="bg-[var(--vantage-gold)] hover:bg-[var(--vantage-gold-dark)] text-white font-bold px-4 py-2 rounded-sm text-xs uppercase tracking-wider transition flex items-center gap-2">
+                                <button onclick="window.print()" class="bg-[var(--vantage-gold)] hover:bg-[var(--vantage-gold-dark)] text-white font-bold px-4 py-2 rounded-sm text-xs uppercase tracking-wider transition flex items-center gap-2 cursor-pointer">
                                     <i data-lucide="printer" class="w-4 h-4"></i> ${t.ggPrintBtn}
                                 </button>
                             </div>
@@ -1311,30 +1410,12 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>${t.printSelectedGlass}</td>
-                                <td id="print-mattscheibe">-</td>
-                            </tr>
-                            <tr>
-                                <td>${t.printMaxDim}</td>
-                                <td><span id="print-breite">-</span> mm &times; <span id="print-hoehe">-</span> mm</td>
-                            </tr>
-                            <tr>
-                                <td>${t.printAspectLabel}</td>
-                                <td id="print-aspect">-</td>
-                            </tr>
-                            <tr>
-                                <td>${t.printTargetH}</td>
-                                <td><strong id="print-zielhoehe">-</strong> mm</td>
-                            </tr>
-                            <tr>
-                                <td>${t.printCenterLine}</td>
-                                <td><strong id="print-mitte-oben">-</strong> mm</td>
-                            </tr>
-                            <tr>
-                                <td>${t.printEdgeDist}</td>
-                                <td><strong id="print-kante-oben">-</strong> mm</td>
-                            </tr>
+                            <tr><td>${t.printSelectedGlass}</td><td id="print-mattscheibe">-</td></tr>
+                            <tr><td>${t.printMaxDim}</td><td><span id="print-breite">-</span> mm &times; <span id="print-hoehe">-</span> mm</td></tr>
+                            <tr><td>${t.printAspectLabel}</td><td id="print-aspect">-</td></tr>
+                            <tr><td>${t.printTargetH}</td><td><strong id="print-zielhoehe">-</strong> mm</td></tr>
+                            <tr><td>${t.printCenterLine}</td><td><strong id="print-mitte-oben">-</strong> mm</td></tr>
+                            <tr><td>${t.printEdgeDist}</td><td><strong id="print-kante-oben">-</strong> mm</td></tr>
                         </tbody>
                     </table>
 
@@ -1351,9 +1432,7 @@
                         </div>
                     </div>
 
-                    <p class="hint-text">
-                        <strong>${t.printHintText}</strong>
-                    </p>
+                    <p class="hint-text"><strong>${t.printHintText}</strong></p>
                 </div>
             `;
 
@@ -1516,8 +1595,7 @@
             }
         }
 
-
-        // System Start
+        // System Start / Sidebar Präsenzen
         const locationsList = ["Weiden", "Berlin", "Leipzig", "Paris", "Prag", "LA"];
         const firstNames = ["Tom", "Max", "Anna", "Pierre", "Jan", "Sarah", "Christian", "Laura", "Felix", "Elena"];
         const lastNames = ["Müller", "Schmidt", "Schneider", "Weber", "Fischer", "Meyer", "Dubois", "Novák", "Smith"];
@@ -1694,7 +1772,6 @@
             if (snakeDir === 'LEFT') head.x--;
             if (snakeDir === 'RIGHT') head.x++;
 
-            // Kollision mit Wänden oder sich selbst
             if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount || snake.some(segment => segment.x === head.x && segment.y === head.y)) {
                 clearInterval(snakeGameLoop);
                 if (snakeScore > snakeHighscore) {
@@ -1706,7 +1783,6 @@
 
             snake.unshift(head);
 
-            // Essen fressen
             if (head.x === food.x && head.y === food.y) {
                 snakeScore += 10;
                 document.getElementById('snake-score').innerText = snakeScore;
@@ -1715,27 +1791,37 @@
                 snake.pop();
             }
 
-            // Zeichnen
             snakeCtx.fillStyle = '#000000';
             snakeCtx.fillRect(0, 0, snakeCanvas.width, snakeCanvas.height);
 
-            // Food (Goldschimmer)
             snakeCtx.fillStyle = '#B8923B';
             snakeCtx.fillRect(food.x * gridSize, food.y * gridSize, gridSize - 1, gridSize - 1);
 
-            // Snake (Grüne & weiße Segmente)
             snake.forEach((segment, index) => {
                 snakeCtx.fillStyle = index === 0 ? '#10b981' : '#ffffff';
                 snakeCtx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize - 1, gridSize - 1);
             });
         }
 
-        document.addEventListener("DOMContentLoaded", () => {
+        window.addEventListener("DOMContentLoaded", async () => {
             initializeLanguage();
             generateEmployees();
             renderSidebarPresence();
             renderDepartments();
             lucide.createIcons();
+
+            // MSAL Initialisierung beim Start prüfen
+            try {
+                const response = await msalInstance.handleRedirectPromise();
+                currentUserAccount = response ? response.account : (msalInstance.getAllAccounts()[0] || null);
+
+                if (currentUserAccount) {
+                    updateUserUI(currentUserAccount);
+                    await loadGraphData();
+                }
+            } catch (err) {
+                console.warn("MSAL Init Error:", err);
+            }
         });
     </script>
 </body>
