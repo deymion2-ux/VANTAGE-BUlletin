@@ -40,6 +40,23 @@
         header {
             text-align: center;
             margin-bottom: 32px;
+            position: relative;
+        }
+
+        /* SPRACH-DROPDOWN IM TOOL INTEGRIERT */
+        .tool-lang-select {
+            position: absolute;
+            top: 0;
+            right: 0;
+            font-size: 0.75rem;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            outline: none;
+            text-transform: uppercase;
         }
 
         h1 {
@@ -220,27 +237,35 @@
 
 <div class="container">
     <header>
-        <h1>WHO WITH WHOM Suche</h1>
-        <h2>📋 Einfacher Readout der Exelliste 👍</h2>
-        <div class="subtitle">Excel-Datei laden und nach Suchbegriff in der Liste anzeigen lassen</div>
+        <!-- SPRACHAUSWAHL IM TOOL -->
+        <select id="toolLangSelect" class="tool-lang-select" onchange="changeToolLanguage(this.value)">
+            <option value="de">🇩🇪 DE</option>
+            <option value="en">🇬🇧 EN</option>
+            <option value="fr">🇫🇷 FR</option>
+            <option value="cs">🇨🇿 CS</option>
+        </select>
+
+        <h1 data-i18n="title">WHO WITH WHOM Suche</h1>
+        <h2 data-i18n="subtitleMain">📋 Einfacher Readout der Exelliste 👍</h2>
+        <div class="subtitle" data-i18n="subtitleDesc">Excel-Datei laden und nach Suchbegriff in der Liste anzeigen lassen</div>
     </header>
 
     <div class="controls">
         <div>
             <label class="file-upload-btn">
-                <span id="fileBtnText">WHO WITH WHOM-Liste wählen!</span>
+                <span id="fileBtnText" data-i18n="uploadBtn">WHO WITH WHOM-Liste wählen!</span>
                 <input type="file" id="excelFile" accept=".xlsx, .xls">
             </label>
-            <div id="statusText">☝️ Bitte die Liste über den Button oder per Drag&Drop einfügen</div>
+            <div id="statusText" data-i18n="statusInit">☝️ Bitte die Liste über den Button oder per Drag&Drop einfügen</div>
         </div>
 
         <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Suchbegriff eingeben( z.B. Mini+Hawk+40mm, Cooke Mini)..." onkeyup="filterData()" autofocus>
+            <input type="text" id="searchInput" data-i18n-placeholder="searchPlaceholder" placeholder="Suchbegriff eingeben (z. B. Mini+Hawk+40mm, Cooke Mini)..." onkeyup="filterData()" autofocus>
         </div>
     </div>
 
     <div id="resultsGrid" class="grid-container">
-        <div class="no-results" style="font-style: italic;">
+        <div class="no-results" style="font-style: italic;" data-i18n="noFileLoaded">
             Bitte zuerst die WHO WITH WHOM-Liste laden.
         </div>
     </div>
@@ -248,8 +273,88 @@
 
 <script>
     let rawExcelData = [];
+    let currentToolLang = "de";
 
-    // 1. EVENT-LISTENERS FÜR DRAG & DROP
+    const toolTranslations = {
+        de: {
+            title: "WHO WITH WHOM Suche",
+            subtitleMain: "📋 Einfacher Readout der Exelliste 👍",
+            subtitleDesc: "Excel-Datei laden und nach Suchbegriff in der Liste anzeigen lassen",
+            uploadBtn: "WHO WITH WHOM-Liste wählen!",
+            statusInit: "☝️ Bitte die Liste über den Button oder per Drag&Drop einfügen",
+            statusLoaded: (count, sheet) => `${count} Einträge aus "${sheet}" geladen 👍 Bereit für die Suche!`,
+            searchPlaceholder: "Suchbegriff eingeben (z. B. Mini+Hawk+40mm, Cooke Mini)...",
+            noFileLoaded: "Bitte zuerst die WHO WITH WHOM-Liste laden.",
+            typePrompt: "Suchbegriff eingeben, um die Einträge anzuzeigen...",
+            noResults: (query) => `Keine Ergebnisse für "${query}"`,
+            notTested: "NICHT GETESTET"
+        },
+        en: {
+            title: "WHO WITH WHOM Search",
+            subtitleMain: "📋 Easy Excel Sheet Readout 👍",
+            subtitleDesc: "Load Excel file and search entries in the list",
+            uploadBtn: "Select WHO WITH WHOM list!",
+            statusInit: "☝️ Please insert the list via button or Drag&Drop",
+            statusLoaded: (count, sheet) => `${count} entries loaded from "${sheet}" 👍 Ready for search!`,
+            searchPlaceholder: "Enter search term (e.g. Mini+Hawk+40mm, Cooke Mini)...",
+            noFileLoaded: "Please load the WHO WITH WHOM list first.",
+            typePrompt: "Enter search term to display entries...",
+            noResults: (query) => `No results for "${query}"`,
+            notTested: "NOT TESTED"
+        },
+        fr: {
+            title: "Recherche WHO WITH WHOM",
+            subtitleMain: "📋 Lecture simple du fichier Excel 👍",
+            subtitleDesc: "Charger le fichier Excel et rechercher dans la liste",
+            uploadBtn: "Sélectionner la liste !",
+            statusInit: "☝️ Veuillez insérer la liste via le bouton ou par Glisser-Déposer",
+            statusLoaded: (count, sheet) => `${count} entrées chargées de "${sheet}" 👍 Prêt pour la recherche !`,
+            searchPlaceholder: "Entrer un terme (ex. Mini+Hawk+40mm, Cooke Mini)...",
+            noFileLoaded: "Veuillez d'abord charger la liste WHO WITH WHOM.",
+            typePrompt: "Entrez un terme de recherche pour afficher les entrées...",
+            noResults: (query) => `Aucun résultat pour "${query}"`,
+            notTested: "NON TESTÉ"
+        },
+        cs: {
+            title: "Vyhledávání WHO WITH WHOM",
+            subtitleMain: "📋 Jednoduché čtení souboru Excel 👍",
+            subtitleDesc: "Načtěte soubor Excel a vyhledávejte v seznamu",
+            uploadBtn: "Vybrat seznam WHO WITH WHOM!",
+            statusInit: "☝️ Vložte seznam pomocí tlačítka nebo přetažením (Drag&Drop)",
+            statusLoaded: (count, sheet) => `Načteno ${count} položek z "${sheet}" 👍 Připraveno k vyhledávání!`,
+            searchPlaceholder: "Zadejte hledaný výraz (např. Mini+Hawk+40mm, Cooke Mini)...",
+            noFileLoaded: "Nejprve prosím načtěte seznam WHO WITH WHOM.",
+            typePrompt: "Zadejte hledaný výraz pro zobrazení položek...",
+            noResults: (query) => `Žádné výsledky pro "${query}"`,
+            notTested: "NETESTOVÁNO"
+        }
+    };
+
+    function changeToolLanguage(lang) {
+        currentToolLang = lang;
+        localStorage.setItem("vantage-language", lang);
+        
+        const t = toolTranslations[lang];
+        document.querySelector("[data-i18n='title']").textContent = t.title;
+        document.querySelector("[data-i18n='subtitleMain']").textContent = t.subtitleMain;
+        document.querySelector("[data-i18n='subtitleDesc']").textContent = t.subtitleDesc;
+        document.querySelector("[data-i18n='uploadBtn']").textContent = t.uploadBtn;
+        document.querySelector("[data-i18n='statusInit']").textContent = t.statusInit;
+        document.querySelector("[data-i18n='noFileLoaded']").textContent = t.noFileLoaded;
+        document.getElementById('searchInput').placeholder = t.searchPlaceholder;
+
+        filterData();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        const savedLang = localStorage.getItem("vantage-language");
+        if (savedLang && toolTranslations[savedLang]) {
+            currentToolLang = savedLang;
+            document.getElementById('toolLangSelect').value = savedLang;
+            changeToolLanguage(savedLang);
+        }
+    });
+
     window.addEventListener('dragover', (e) => {
         e.preventDefault();
         document.body.classList.add('drag-over');
@@ -271,7 +376,6 @@
         }
     });
 
-    // 2. EVENT-LISTENER FÜR DEN FILE-INPUT BUTTON
     document.getElementById('excelFile').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
@@ -279,7 +383,8 @@
         }
     });
 
-    // 3. ZENTRALE VERARBEITUNGS-FUNKTION (für Button & Drag & Drop)
+    let lastLoadedSheetName = "";
+
     function processFile(file) {
         document.getElementById('fileBtnText').innerText = file.name.length > 14 ? file.name.substring(0, 12) + '...' : file.name;
 
@@ -290,12 +395,13 @@
                 const workbook = XLSX.read(data, { type: 'array', cellComments: true });
                 
                 const sheetName = workbook.SheetNames[0];
+                lastLoadedSheetName = sheetName;
                 const sheet = workbook.Sheets[sheetName];
                 
-                // Liest die Matrix ab Zeile 5 aus
                 rawExcelData = parseSheetWithComments(sheet, 4); 
 
-                document.getElementById("statusText").innerText = `${rawExcelData.length} Einträge aus "${sheetName}" geladen 👍 Bereit für die Suche!`;
+                const t = toolTranslations[currentToolLang];
+                document.getElementById("statusText").innerText = t.statusLoaded(rawExcelData.length, sheetName);
 
                 filterData();
             } catch (err) {
@@ -305,7 +411,6 @@
         reader.readAsArrayBuffer(file);
     }
 
-    // 4. EINLESEN DER EXCEL-DATEN (AB ZEILE 5)
     function parseSheetWithComments(sheet, headerRowIndex) {
         const range = XLSX.utils.decode_range(sheet['!ref']);
         const headers = [];
@@ -347,7 +452,6 @@
         return result;
     }
 
-    // HILFSFUNKTION: Entfernt Sonderzeichen & Diakritika (ō -> o, É -> e, etc.)
     function normalizeText(text) {
         if (!text) return "";
         return String(text)
@@ -356,30 +460,29 @@
             .toLowerCase();
     }
 
-    // 5. MATRIX-SUCHE (Mit Sonderzeichen-Normalisierung)
     function filterData() {
         const rawQuery = document.getElementById("searchInput").value;
         const grid = document.getElementById("resultsGrid");
         grid.innerHTML = "";
+        const t = toolTranslations[currentToolLang];
 
         if (rawExcelData.length === 0) {
-            grid.innerHTML = `<div class="no-results">Bitte erst die WHO WITH WHOM-Datei laden.</div>`;
+            grid.innerHTML = `<div class="no-results" data-i18n="noFileLoaded">${t.noFileLoaded}</div>`;
             return;
         }
 
         const trimmedQuery = rawQuery.trim();
 
         if (trimmedQuery.length === 0) {
-            grid.innerHTML = `<div class="no-results" style="font-style: italic;">Suchbegriff eingeben, um die Einträge anzuzeigen...</div>`;
+            grid.innerHTML = `<div class="no-results" style="font-style: italic;">${t.typePrompt}</div>`;
             return;
         }
 
-        // Trennung der Suchbegriffe nach '+' oder Leerzeichen & Normalisierung
         let searchTerms = [];
         if (trimmedQuery.includes('+')) {
-            searchTerms = trimmedQuery.split('+').map(t => normalizeText(t)).filter(t => t.length > 0);
+            searchTerms = trimmedQuery.split('+').map(term => normalizeText(term)).filter(term => term.length > 0);
         } else {
-            searchTerms = trimmedQuery.split(/\s+/).map(t => normalizeText(t)).filter(t => t.length > 0);
+            searchTerms = trimmedQuery.split(/\s+/).map(term => normalizeText(term)).filter(term => term.length > 0);
         }
 
         const filtered = rawExcelData.filter(row => {
@@ -397,9 +500,7 @@
                 const commentVal = item.comment ? item.comment : "";
 
                 if ((cellVal !== "" && cellVal !== "0") || commentVal !== "") {
-                    // Gesamten Kontext für die Zelle normalisieren (Titel, Header, Wert, Kommentar)
                     const cellContextText = normalizeText(`${titleValue} ${header} ${cellVal} ${commentVal}`);
-
                     const allTermsMatchThisCell = searchTerms.every(term => cellContextText.includes(term));
 
                     if (allTermsMatchThisCell) {
@@ -412,11 +513,10 @@
         });
 
         if (filtered.length === 0) {
-            grid.innerHTML = `<div class="no-results">Keine Ergebnisse für "${rawQuery}"</div>`;
+            grid.innerHTML = `<div class="no-results">${t.noResults(rawQuery)}</div>`;
             return;
         }
 
-        // Ergebnis-Karten rendern
         filtered.forEach(row => {
             const keys = Object.keys(row);
             if (keys.length === 0) return;
@@ -454,18 +554,18 @@
         });
     }
 
-    // 6. FORMATIERUNG FÜR MARKIERSYMBOLE
     function formatValue(val) {
         if (val === undefined || val === null || String(val).trim() === "") {
-            return '<span class="not-tested-badge">NOT TESTED</span>';
+            const t = toolTranslations[currentToolLang];
+            return `<span class="not-tested-badge">${t.notTested}</span>`;
         }
 
         if (typeof val === 'string') {
-            const trimmed = val.trim();
-            if (trimmed === 'ü' || trimmed === 'Ü') {
+            const retrievedTrimmed = val.trim();
+            if (retrievedTrimmed === 'ü' || retrievedTrimmed === 'Ü') {
                 return '<span style="color: #10b981; font-weight: bold; font-size: 1rem;">✔</span>';
             }
-            if (trimmed === 'û' || trimmed === 'þ') {
+            if (retrievedTrimmed === 'û' || retrievedTrimmed === 'þ') {
                 return '<span style="color: #ef4444; font-weight: bold; font-size: 1rem;">✖</span>';
             }
         }
