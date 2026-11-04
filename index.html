@@ -174,7 +174,6 @@
                 </div>
             </div>
 
-            <!-- Hier werden zukünftig echte M365-Präsenzen geladen -->
             <div class="flex-1 overflow-y-auto p-3 space-y-1.5 text-xs text-[var(--vantage-text-muted)] italic" id="sidebar-presence-list">
                 Bitte bei M365 anmelden, um Mitarbeiter-Präsenzen zu laden.
             </div>
@@ -203,7 +202,7 @@
                 </div>
 
                 <div class="flex items-center gap-2 lg:gap-3">
-                    <!-- SPRACHAUSWAHL DROPDOWN (INKLUSIVE TSCHECHISCH 🇨🇿) -->
+                    <!-- SPRACHAUSWAHL DROPDOWN (INKLUSIVE TSCHECHISCH 🇨ℤ) -->
                     <select
                         id="language-select"
                         onchange="changeLanguage(this.value)"
@@ -255,16 +254,14 @@
                             </div>
                         </div>
 
-                        <!-- TICKER ÜBER DIE VOLLE SPALTENBREITE -->
+                        <!-- TICKER OHNE FIKTIVE MELDUNGEN -->
                         <div class="w-full bg-[var(--vantage-dark-panel)] text-white rounded-sm px-3 py-2.5 flex items-center gap-3 overflow-hidden shadow-inner border border-[var(--vantage-border)]">
                             <span class="bg-[var(--vantage-gold)] text-white text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wider shrink-0 flex items-center gap-1 z-10">
                                 <i data-lucide="radio" class="w-3 h-3 animate-pulse"></i> NEWS
                             </span>
                             <div class="flex-1 overflow-hidden relative h-4 flex items-center">
-                                <div class="marquee-content text-xs font-medium text-slate-200 flex items-center gap-8">
-                                    <span class="flex items-center gap-1.5"><i data-lucide="bell" class="w-3.5 h-3.5 text-[var(--vantage-gold)]"></i> NEW Updates for ARRI Alexa35 V6.2.0 & HI-5 V3.6.6</span>
-                                    <span class="text-slate-600">&bull;</span>
-                                    <span class="flex items-center gap-1.5"><i data-lucide="truck" class="w-3.5 h-3.5 text-emerald-400"></i> NEW Updates for TERADEK Bolt 6 / 4K V4.5.1</span>
+                                <div class="marquee-content text-xs font-medium text-slate-400 italic">
+                                    Keine aktuellen News-Meldungen vorhanden.
                                 </div>
                             </div>
                         </div>
@@ -403,15 +400,8 @@
                         </h3>
 
                         <div class="space-y-4 flex-1 overflow-y-auto pr-1 max-h-[40vh]" id="detail-chat-stream">
-                            <div class="p-3.5 rounded-sm bg-[var(--vantage-bg)] border border-[var(--vantage-border)]">
-                                <div class="flex items-center justify-between mb-1.5">
-                                    <span class="font-bold text-xs text-[var(--vantage-text-main)] flex items-center gap-2">
-                                        <span class="w-6 h-6 rounded-sm bg-[var(--vantage-dark-panel)] text-[var(--vantage-gold)] font-bold flex items-center justify-center text-[10px]">TG</span>
-                                        Thomas Gietzke <span class="text-[10px] text-[var(--vantage-text-muted)] font-normal hidden sm:inline">15.10.2026</span>
-                                    </span>
-                                    <span class="text-[10px] bg-[var(--vantage-panel)] text-[var(--vantage-text-main)] px-2 py-0.5 rounded-sm border border-[var(--vantage-border)] font-semibold uppercase" data-i18n="badgeTechnical">Technical</span>
-                                </div>
-                                <p class="text-xs text-[var(--vantage-text-main)] mb-2 font-medium">NEW Updates & Channel Discussion Active</p>
+                            <div class="p-3.5 rounded-sm bg-[var(--vantage-bg)] border border-[var(--vantage-border)] text-xs text-slate-500 italic">
+                                Keine Diskussionen vorhanden.
                             </div>
                         </div>
 
