@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WHO WITH WHOM Suche</title>
+    <!-- SheetJS Bibliothek zum Einlesen von Excel-Dateien -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #0c0e12;          /* Vantage Deep Dark Background */
+            --card-bg: #161a22;        /* Suite Panel Dark Slate */
+            --card-border: #262c36;    /* Subtle Metallic Border */
+            --primary-accent: #d97706; /* Detuning Suite Signature Amber/Gold */
+            --primary-hover: #b45309;  /* Deep Gold Hover */
+            --text-primary: #f3f4f6;   /* Clean Off-White */
+            --text-secondary: #9ca3af; /* Muted Gold/Grey Text */
+            --input-bg: #090b0e;       /* Inset Pitch Dark Input */
+            --highlight-border: #f59e0b;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        h1 {
+            margin: 0 0 8px 0;
+            color: var(--text-primary);
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .controls {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            margin-bottom: 28px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .file-upload-btn {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            background-color: var(--primary-accent);
+            color: #ffffff;
+            padding: 10px 22px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(217, 119, 6, 0.25);
+        }
+
+        .file-upload-btn:hover {
+            background-color: var(--primary-hover);
+            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.4);
+        }
+
+        .file-upload-btn input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 11px 16px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-sizing: border-box;
+        }
+
+        .search-box input::placeholder {
+            color: #4b5563;
+        }
+
+        .search-box input:focus {
+            border-color: var(--highlight-border);
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+        }
+
+        #statusText {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 6px;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+            width: 100%;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 18px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: border-color 0.2s ease;
+        }
+
+        .card:hover {
+            border-color: rgba(217, 119, 6, 0.4);
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--primary-accent);
+            padding-bottom: 8px;
+            margin-bottom: 4px;
+        }
+
+        .details-row {
+            font-size: 0.9rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .details-label {
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .details-value {
+            color: var(--text-primary);
+        }
+
+        .not-tested-badge {
+            color: #9ca3af;
+            font-weight: 600;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            background: rgba(156, 163, 175, 0.12);
+            padding: 3px 8px;
+            border-radius: 4px;
+            border: 1px dashed rgba(156, 163, 175, 0.3);
+        }
+
+        .no-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 48px;
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+        }
+
+        .comment-box {
+            background: rgba(217, 119, 6, 0.12);
+            color: #fef08a;
+            border-left: 3px solid var(--primary-accent);
+            padding: 6px 10px;
+            font-size: 0.825rem;
+            border-radius: 4px;
+            margin-top: 6px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        body.drag-over {
+            background-color: #141923;
+            outline: 3px dashed var(--primary-accent);
+            outline-offset: -10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>WHO WITH WHOM Suche</h1>
+        <h2>📋 Einfacher Readout der Exelliste 👍</h2>
+        <div class="subtitle">Excel-Datei laden und nach Suchbegriff in der Liste anzeigen lassen</div>
+    </header>
+
+    <div class="controls">
+        <div>
+            <label class="file-upload-btn">
+                <span id="fileBtnText">WHO WITH WHOM-Liste wählen!</span>
+                <input type="file" id="excelFile" accept=".xlsx, .xls">
+            </label>
+            <div id="statusText">☝️ Bitte die Liste über den Button oder per Drag&Drop einfügen</div>
+        </div>
+
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Suchbegriff eingeben( z.B. Mini+Hawk+40mm, Cooke Mini)..." onkeyup="filterData()" autofocus>
+        </div>
+    </div>
+
+    <div id="resultsGrid" class="grid-container">
+        <div class="no-results" style="font-style: italic;">
+            Bitte zuerst die WHO WITH WHOM-Liste laden.
+        </div>
+    </div>
+</div>
+
+<script>
+    let rawExcelData = [];
+
+    // 1. EVENT-LISTENERS FÜR DRAG & DROP
+    window.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        document.body.classList.add('drag-over');
+    });
+
+    window.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        if (e.clientX <= 0 || e.clientY <= 0 || e.clientX >= window.innerWidth || e.clientY >= window.innerHeight) {
+            document.body.classList.remove('drag-over');
+        }
+    });
+
+    window.addEventListener('drop', (e) => {
+        e.preventDefault();
+        document.body.classList.remove('drag-over');
+
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            processFile(e.dataTransfer.files[0]);
+        }
+    });
+
+    // 2. EVENT-LISTENER FÜR DEN FILE-INPUT BUTTON
+    document.getElementById('excelFile').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            processFile(file);
+        }
+    });
+
+    // 3. ZENTRALE VERARBEITUNGS-FUNKTION (für Button & Drag & Drop)
+    function processFile(file) {
+        document.getElementById('fileBtnText').innerText = file.name.length > 14 ? file.name.substring(0, 12) + '...' : file.name;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array', cellComments: true });
+                
+                const sheetName = workbook.SheetNames[0];
+                const sheet = workbook.Sheets[sheetName];
+                
+                // Liest die Matrix ab Zeile 5 aus
+                rawExcelData = parseSheetWithComments(sheet, 4); 
+
+                document.getElementById("statusText").innerText = `${rawExcelData.length} Einträge aus "${sheetName}" geladen 👍 Bereit für die Suche!`;
+
+                filterData();
+            } catch (err) {
+                alert("Fehler beim Lesen der Excel-Datei: " + err.message);
+            }
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
+    // 4. EINLESEN DER EXCEL-DATEN (AB ZEILE 5)
+    function parseSheetWithComments(sheet, headerRowIndex) {
+        const range = XLSX.utils.decode_range(sheet['!ref']);
+        const headers = [];
+        const result = [];
+
+        for (let C = range.s.c; C <= range.e.c; ++C) {
+            const cell = sheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+            headers[C] = cell && cell.v ? String(cell.v).trim() : `__EMPTY_${C}`;
+        }
+
+        for (let R = headerRowIndex + 1; R <= range.e.r; ++R) {
+            let rowData = {};
+            let hasData = false;
+
+            for (let C = range.s.c; C <= range.e.c; ++C) {
+                const header = headers[C];
+                if (!header || header.startsWith("__EMPTY")) continue;
+
+                const cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
+                const cell = sheet[cellAddress];
+
+                let val = cell ? cell.v : "";
+                let comment = cell && cell.c && cell.c.length > 0 ? cell.c[0].t : null;
+
+                if (val !== undefined && val !== null && val !== "") {
+                    hasData = true;
+                }
+
+                rowData[header] = {
+                    value: val,
+                    comment: comment
+                };
+            }
+
+            if (hasData) {
+                result.push(rowData);
+            }
+        }
+        return result;
+    }
+
+    // HILFSFUNKTION: Entfernt Sonderzeichen & Diakritika (ō -> o, É -> e, etc.)
+    function normalizeText(text) {
+        if (!text) return "";
+        return String(text)
+            .normalize("NFD")
+            .replace(/\p{Diacritic}/gu, "")
+            .toLowerCase();
+    }
+
+    // 5. MATRIX-SUCHE (Mit Sonderzeichen-Normalisierung)
+    function filterData() {
+        const rawQuery = document.getElementById("searchInput").value;
+        const grid = document.getElementById("resultsGrid");
+        grid.innerHTML = "";
+
+        if (rawExcelData.length === 0) {
+            grid.innerHTML = `<div class="no-results">Bitte erst die WHO WITH WHOM-Datei laden.</div>`;
+            return;
+        }
+
+        const trimmedQuery = rawQuery.trim();
+
+        if (trimmedQuery.length === 0) {
+            grid.innerHTML = `<div class="no-results" style="font-style: italic;">Suchbegriff eingeben, um die Einträge anzuzeigen...</div>`;
+            return;
+        }
+
+        // Trennung der Suchbegriffe nach '+' oder Leerzeichen & Normalisierung
+        let searchTerms = [];
+        if (trimmedQuery.includes('+')) {
+            searchTerms = trimmedQuery.split('+').map(t => normalizeText(t)).filter(t => t.length > 0);
+        } else {
+            searchTerms = trimmedQuery.split(/\s+/).map(t => normalizeText(t)).filter(t => t.length > 0);
+        }
+
+        const filtered = rawExcelData.filter(row => {
+            const keys = Object.keys(row);
+            if (keys.length === 0) return false;
+
+            const titleKey = keys[0];
+            const titleValue = normalizeText(row[titleKey].value);
+
+            let rowMatches = false;
+
+            keys.slice(1).forEach(header => {
+                const item = row[header];
+                const cellVal = String(item.value).trim();
+                const commentVal = item.comment ? item.comment : "";
+
+                if ((cellVal !== "" && cellVal !== "0") || commentVal !== "") {
+                    // Gesamten Kontext für die Zelle normalisieren (Titel, Header, Wert, Kommentar)
+                    const cellContextText = normalizeText(`${titleValue} ${header} ${cellVal} ${commentVal}`);
+
+                    const allTermsMatchThisCell = searchTerms.every(term => cellContextText.includes(term));
+
+                    if (allTermsMatchThisCell) {
+                        rowMatches = true;
+                    }
+                }
+            });
+
+            return rowMatches;
+        });
+
+        if (filtered.length === 0) {
+            grid.innerHTML = `<div class="no-results">Keine Ergebnisse für "${rawQuery}"</div>`;
+            return;
+        }
+
+        // Ergebnis-Karten rendern
+        filtered.forEach(row => {
+            const keys = Object.keys(row);
+            if (keys.length === 0) return;
+
+            const titleKey = keys[0];
+            let titleText = row[titleKey] && row[titleKey].value && String(row[titleKey].value).trim() !== "" 
+                ? String(row[titleKey].value).trim() 
+                : "Eintrag";
+
+            const card = document.createElement("div");
+            card.className = "card";
+
+            let detailsHtml = `<div class="card-title">${titleText}</div>`;
+
+            keys.slice(1).forEach(key => {
+                const item = row[key];
+                const val = item.value;
+                const comment = item.comment;
+
+                const formattedVal = formatValue(val);
+                
+                detailsHtml += `
+                    <div class="details-row" style="flex-direction: column; align-items: flex-start; padding: 6px 0;">
+                        <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+                            <span class="details-label">${key}:</span>
+                            <span class="details-value">${formattedVal}</span>
+                        </div>
+                        ${comment ? `<div class="comment-box">📌 ${comment}</div>` : ''}
+                    </div>
+                `;
+            });
+
+            card.innerHTML = detailsHtml;
+            grid.appendChild(card);
+        });
+    }
+
+    // 6. FORMATIERUNG FÜR MARKIERSYMBOLE
+    function formatValue(val) {
+        if (val === undefined || val === null || String(val).trim() === "") {
+            return '<span class="not-tested-badge">NOT TESTED</span>';
+        }
+
+        if (typeof val === 'string') {
+            const trimmed = val.trim();
+            if (trimmed === 'ü' || trimmed === 'Ü') {
+                return '<span style="color: #10b981; font-weight: bold; font-size: 1rem;">✔</span>';
+            }
+            if (trimmed === 'û' || trimmed === 'þ') {
+                return '<span style="color: #ef4444; font-weight: bold; font-size: 1rem;">✖</span>';
+            }
+        }
+        return val;
+    }
+</script>
+
+</body>
+</html>
