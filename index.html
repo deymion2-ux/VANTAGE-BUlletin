@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VANTAGE Intranet V3.8.0</title>
+    <title>VANTAGE Intranet V3.8.1</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
@@ -197,7 +197,7 @@
                     </button>
 
                     <h1 class="font-light text-sm lg:text-base tracking-[2px] uppercase text-white flex items-center gap-3">
-                        VANTAGE <span class="hidden sm:inline-block text-[11px] font-semibold text-[var(--vantage-gold)] bg-transparent border border-[var(--vantage-gold)] px-3 py-0.5 rounded-sm tracking-[1.5px]" data-i18n="versionBadge">Intranet V3.8.0 🚀</span>
+                        VANTAGE <span class="hidden sm:inline-block text-[11px] font-semibold text-[var(--vantage-gold)] bg-transparent border border-[var(--vantage-gold)] px-3 py-0.5 rounded-sm tracking-[1.5px]" data-i18n="versionBadge">Intranet V3.8.1 🚀</span>
                     </h1>
                 </div>
 
@@ -223,10 +223,6 @@
                             <span id="user-display-name" class="font-medium text-[var(--vantage-text-main)]">Verbinde...</span>
                         </div>
                     </div>
-
-                    <button onclick="openNewChannelModal()" class="bg-[var(--vantage-panel)] hover:bg-[var(--vantage-border)] text-[var(--vantage-text-main)] border border-[var(--vantage-border)] px-3 py-1.5 rounded-sm text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 shadow-sm transition">
-                        <i data-lucide="plus-circle" class="w-3.5 h-3.5 text-[var(--vantage-gold)]"></i> <span class="hidden sm:inline" data-i18n="newChannel">Neuer Channel</span>
-                    </button>
                 </div>
             </header>
 
@@ -247,7 +243,7 @@
                                 <div>
                                     <h2 class="font-semibold text-[var(--vantage-text-main)] tracking-[1px] uppercase text-sm lg:text-base flex items-center gap-2">
                                         <span data-i18n="bulletinBoard">BULLETIN BOARD</span> 
-                                        <span id="sync-status" class="text-[10px] uppercase tracking-[1px] text-emerald-600 font-semibold bg-[var(--vantage-bg)] px-2 py-0.5 rounded-sm border border-[var(--vantage-border)]">SharePoint Sync: Bereit (Ohne Admin-Zwang)</span>
+                                        <span id="sync-status" class="text-[10px] uppercase tracking-[1px] text-amber-500 font-semibold bg-[var(--vantage-bg)] px-2 py-0.5 rounded-sm border border-[var(--vantage-border)]">SharePoint Sync: Bereit (Warte auf Admin-Freigabe)</span>
                                     </h2>
                                     <p class="text-[11px] lg:text-xs text-[var(--vantage-text-muted)]" data-i18n="bulletinSub">Vantage News & Outlook Kalender</p>
                                 </div>
@@ -416,7 +412,7 @@
             </div>
 
             <footer class="p-4 lg:p-6 text-center text-xs text-[var(--vantage-text-muted)] border-t border-[var(--vantage-border)] mt-auto no-print uppercase tracking-widest bg-[var(--vantage-panel)]">
-                <p data-i18n="footerText">Vantage Intranet PWA V3.8.0 &bull; MS365 & Teams Integration</p>
+                <p data-i18n="footerText">Vantage Intranet PWA V3.8.1 &bull; MS365 & Teams Integration</p>
             </footer>
 
         </div>
@@ -455,7 +451,7 @@
     <!-- JAVASCRIPT LOGIC -->
     <script>
         // =========================================================================
-        // MSAL.js CONFIGURATION & ENTRA ID INTEGRATION (LIGHT MODE / NO ADMIN CONSENT)
+        // MSAL.js CONFIGURATION & ENTRA ID INTEGRATION (FULL PERMISSIONS INCLUDED)
         // =========================================================================
         const msalConfig = {
             auth: {
@@ -469,12 +465,14 @@
             }
         };
 
-        // HIER SIND DIE .ALL BERECHTIGUNGEN ENTFERNT, UM DEN ADMIN-ZWANG AUFZUEHEBEN:
+        // WIEDER VOLLSTÄNDIGE SCOPES INKLUSIVE .ALL WIEDER EINGEPFLEGT:
         const loginRequest = {
             scopes: [
                 "User.Read",
+                "Sites.Read.All",
                 "Calendars.Read",
-                "Mail.Read"
+                "Mail.Read",
+                "Team.ReadBasic.All"
             ]
         };
 
@@ -483,7 +481,6 @@
 
         async function loginM365() {
             try {
-                // Bei lokalem Login im Browser am besten den Cache leeren / neuen Popup-Flow erzwingen
                 await msalInstance.loginPopup(loginRequest);
                 const accounts = msalInstance.getAllAccounts();
                 if (accounts.length > 0) {
@@ -519,16 +516,38 @@
             if (!token) return;
 
             const syncStatus = document.getElementById('sync-status');
-            syncStatus.textContent = "SharePoint Sync: Aktiv (Benutzer-Modus)";
+            syncStatus.textContent = "SharePoint Sync: Aktiv";
             syncStatus.className = "text-[10px] uppercase tracking-[1px] text-emerald-600 font-semibold bg-[var(--vantage-bg)] px-2 py-0.5 rounded-sm border border-[var(--vantage-border)]";
 
             await Promise.all([
+                fetchSharePointMapping(token),
                 fetchOutlookCalendar(token),
                 fetchOutlookMails(token)
             ]);
         }
 
-        // Outlook Kalender Termine einlesen
+        async function fetchSharePointMapping(token) {
+            try {
+                const url = "https://graph.microsoft.com/v1.0/sites/vantageweiden.sharepoint.com:/sites/Testbetreuung2:/lists/TeamsChannelMapping/items?expand=fields";
+                const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.value) {
+                        data.value.forEach(item => {
+                            const fields = item.fields;
+                            const dept = departmentsConfig.find(d => d.id === fields.DepartmentID);
+                            if (dept) {
+                                if (fields.TeamsWebUrl) dept.teamsWebUrl = fields.TeamsWebUrl;
+                                if (fields.TeamsProtocolUrl) dept.teamsProtocolUrl = fields.TeamsProtocolUrl;
+                            }
+                        });
+                    }
+                }
+            } catch (err) {
+                console.warn("SharePoint Mapping Abruf Hinweis:", err);
+            }
+        }
+
         async function fetchOutlookCalendar(token) {
             const container = document.getElementById('today-calendar-events');
             try {
@@ -561,7 +580,6 @@
             }
         }
 
-        // Outlook Posteingang / Ungelesene Mails einlesen
         async function fetchOutlookMails(token) {
             const container = document.getElementById('outlook-mails-container');
             const countBadge = document.getElementById('unread-mail-count');
@@ -588,7 +606,6 @@
                 console.error("Mail Fetch Error:", err);
             }
         }
-
 
         let currentLanguage = "de";
 
@@ -628,11 +645,10 @@
 
         const translations = {
             de: {
-                versionBadge: "Intranet V3.8.0 🚀",
+                versionBadge: "Intranet V3.8.1 🚀",
                 teamsStatus: "Teams Status",
                 searchPlaceholder: "Mitarbeiter suchen...",
                 login: "M365 Anmelden",
-                newChannel: "Neuer Channel",
                 bulletinBoard: "BULLETIN BOARD",
                 liveFeeds: "Live Feeds",
                 bulletinSub: "Vantage News & Outlook Kalender",
@@ -658,7 +674,7 @@
                 chatInputPlaceholder: "Antwort schreiben...",
                 btnSend: "Senden",
                 badgeTechnical: "Technical",
-                footerText: "Vantage Intranet PWA V3.8.0 • MS365 & Teams Integration",
+                footerText: "Vantage Intranet PWA V3.8.1 • MS365 & Teams Integration",
                 burgerTooltip: "Teams Status Leiste ein-/ausblenden",
                 
                 deptTechRentalTitle: "Technical Departments Rental",
@@ -727,11 +743,10 @@
                 snakeCloseBtn: "Schließen"
             },
             en: {
-                versionBadge: "Intranet V3.8.0 🚀",
+                versionBadge: "Intranet V3.8.1 🚀",
                 teamsStatus: "Teams Presence",
                 searchPlaceholder: "Search employee...",
                 login: "Sign in to M365",
-                newChannel: "New Channel",
                 bulletinBoard: "BULLETIN BOARD",
                 liveFeeds: "Live Feeds",
                 bulletinSub: "Vantage News & Outlook Calendar",
@@ -757,7 +772,7 @@
                 chatInputPlaceholder: "Write a reply...",
                 btnSend: "Send",
                 badgeTechnical: "Technical",
-                footerText: "Vantage Intranet PWA V3.8.0 • MS365 & Teams Integration",
+                footerText: "Vantage Intranet PWA V3.8.1 • MS365 & Teams Integration",
                 burgerTooltip: "Toggle Teams status sidebar",
 
                 deptTechRentalTitle: "Technical Departments Rental",
@@ -826,11 +841,10 @@
                 snakeCloseBtn: "Close"
             },
             fr: {
-                versionBadge: "Intranet V3.8.0 🚀",
+                versionBadge: "Intranet V3.8.1 🚀",
                 teamsStatus: "Statut Teams",
                 searchPlaceholder: "Chercher employé...",
                 login: "Connexion M365",
-                newChannel: "Nouveau canal",
                 bulletinBoard: "TABLEAU D’INFORMATION",
                 liveFeeds: "Flux en direct",
                 bulletinSub: "Actualités Vantage & Calendrier Outlook",
@@ -856,7 +870,7 @@
                 chatInputPlaceholder: "Écrire une réponse...",
                 btnSend: "Envoyer",
                 badgeTechnical: "Technique",
-                footerText: "Vantage Intranet PWA V3.8.0 • MS365 & Teams Integration",
+                footerText: "Vantage Intranet PWA V3.8.1 • MS365 & Teams Integration",
                 burgerTooltip: "Afficher/masquer la barre latérale Teams",
 
                 deptTechRentalTitle: "Technical Departments Rental",
@@ -925,11 +939,10 @@
                 snakeCloseBtn: "Fermer"
             },
             cs: {
-                versionBadge: "Intranet V3.8.0 🚀",
+                versionBadge: "Intranet V3.8.1 🚀",
                 teamsStatus: "Stav Teams",
                 searchPlaceholder: "Hledat zaměstnance...",
                 login: "Přihlásit M365",
-                newChannel: "Nový kanál",
                 bulletinBoard: "NÁSTĚNKA",
                 liveFeeds: "Živé přenosy",
                 bulletinSub: "Novinky Vantage & Outlook Kalendář",
@@ -955,7 +968,7 @@
                 chatInputPlaceholder: "Napsat odpověď...",
                 btnSend: "Odeslat",
                 badgeTechnical: "Technické",
-                footerText: "Vantage Intranet PWA V3.8.0 • MS365 & Teams Integration",
+                footerText: "Vantage Intranet PWA V3.8.1 • MS365 & Teams Integration",
                 burgerTooltip: "Zapnout/vypnout boční panel Teams",
 
                 deptTechRentalTitle: "Technical Departments Rental",
@@ -1033,7 +1046,10 @@
                 color: "gold",
                 icon: "camera",
                 borderColor: "hover:border-[var(--vantage-gold)]",
-                hasSharePointLink: false,
+                hasSharePointLink: true,
+                sharePointUrl: "https://vantageweiden.sharepoint.com/sites/Testbetreuung2/Lists/Testbetreuung/AllItems.aspx",
+                teamsProtocolUrl: "",
+                teamsWebUrl: "",
                 subcategories: [
                     { nameKey: "subFirmware", icon: "download-cloud" },
                     { nameKey: "subGroundglass", icon: "layout-template", isTool: true, toolType: "groundglass" },
@@ -1050,7 +1066,10 @@
                 color: "gold",
                 icon: "calendar-check",
                 borderColor: "hover:border-[var(--vantage-gold)]",
-                hasSharePointLink: false,
+                hasSharePointLink: true,
+                sharePointUrl: "https://vantageweiden.sharepoint.com/sites/Testbetreuung2/Lists/Testbetreuung/AllItems.aspx",
+                teamsProtocolUrl: "",
+                teamsWebUrl: "",
                 subcategories: [
                     { nameKey: "subWhoWithWhom", icon: "external-link", externalUrl: "WhoWithWhom-Tool.html" }
                 ]
@@ -1062,6 +1081,8 @@
                 color: "gold",
                 icon: "cpu",
                 borderColor: "hover:border-[var(--vantage-gold)]",
+                teamsProtocolUrl: "",
+                teamsWebUrl: "",
                 subcategories: []
             },
             {
@@ -1071,6 +1092,8 @@
                 color: "gold",
                 icon: "receipt",
                 borderColor: "hover:border-[var(--vantage-gold)]",
+                teamsProtocolUrl: "",
+                teamsWebUrl: "",
                 subcategories: []
             },
             {
@@ -1080,6 +1103,8 @@
                 color: "gold",
                 icon: "check-square",
                 borderColor: "hover:border-[var(--vantage-gold)]",
+                teamsProtocolUrl: "",
+                teamsWebUrl: "",
                 subcategories: []
             },
             {
@@ -1089,6 +1114,8 @@
                 color: "gold",
                 icon: "server",
                 borderColor: "hover:border-[var(--vantage-gold)]",
+                teamsProtocolUrl: "",
+                teamsWebUrl: "",
                 subcategories: [
                     { nameKey: "subSoftwareUpdates", icon: "shield" }
                 ]
@@ -1100,6 +1127,8 @@
                 color: "gold",
                 icon: "megaphone",
                 borderColor: "hover:border-[var(--vantage-gold)]",
+                teamsProtocolUrl: "",
+                teamsWebUrl: "",
                 subcategories: [
                     { nameKey: "subPhotoStation", icon: "image", externalUrl: "https://photostation.vantagefilm.com/photo/?launchApp=SYNO.Foto.Sharing.AppInstance&app_name=SYNO.Foto.AppInstance&photos_action=external_login&folderId=6&alias=photo#/signin" }
                 ]
@@ -1660,10 +1689,9 @@
             renderDepartments();
             lucide.createIcons();
 
-            // MSAL Initialisierung beim Start prüfen
             try {
-                const response = mainAppInit();
-                currentUserAccount = msalInstance.getAllAccounts()[0] || null;
+                const response = await msalInstance.handleRedirectPromise();
+                currentUserAccount = response ? response.account : (msalInstance.getAllAccounts()[0] || null);
 
                 if (currentUserAccount) {
                     updateUserUI(currentUserAccount);
@@ -1673,10 +1701,6 @@
                 console.warn("MSAL Init Error:", err);
             }
         });
-
-        function mainAppInit() {
-            return msalInstance.handleRedirectPromise();
-        }
     </script>
 </body>
 </html>
