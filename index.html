@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VANTAGE Intranet V3.8.1</title>
+    <title>VANTAGE Intranet V3.8.7</title>
+    <!-- Content Security Policy (CSP) -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://cdn.tailwindcss.com https://unpkg.com https://alcdn.msauth.net https://login.microsoftonline.com https://graph.microsoft.com; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com https://alcdn.msauth.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://login.microsoftonline.com https://graph.microsoft.com; img-src 'self' data: https:;">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide@0.294.0/dist/umd/lucide.min.js"></script>
     <!-- Microsoft Authentication Library (MSAL.js v2) -->
     <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
     <script>
@@ -52,10 +54,6 @@
             letter-spacing: 0.2px;
         }
 
-        .glow-green { box-shadow: 0 0 8px rgba(34, 197, 94, 0.4); }
-        .glow-red { box-shadow: 0 0 8px rgba(239, 68, 68, 0.4); }
-        .glow-yellow { box-shadow: 0 0 8px rgba(234, 179, 8, 0.4); }
-        
         @keyframes ticker {
             0% { transform: translate3d(100%, 0, 0); }
             100% { transform: translate3d(-100%, 0, 0); }
@@ -65,21 +63,15 @@
             white-space: nowrap;
             animation: ticker 28s linear infinite;
         }
-        .marquee-content:hover {
-            animation-play-state: paused;
-        }
+        .marquee-content:hover { animation-play-state: paused; }
 
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: var(--vantage-panel); }
         ::-webkit-scrollbar-thumb { background: var(--vantage-border); border-radius: 2px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--vantage-text-muted); }
 
-        /* --- STRIKTE FINALE DRUCK-EINSTELLUNGEN DES MATTSCHEIBEN RECHNERS --- */
+        /* DRUCK-EINSTELLUNGEN DES MATTSCHEIBEN RECHNERS */
         @media print {
-            @page {
-                size: A4 portrait;
-                margin: 15mm;
-            }
+            @page { size: A4 portrait; margin: 15mm; }
             body * { visibility: hidden !important; }
             #tool-view-container, #tool-view-container * { visibility: visible !important; }
             #tool-view-container {
@@ -93,62 +85,36 @@
             .print-template {
                 width: 160mm !important;
                 max-width: 160mm !important;
-                margin: 0 left !important;
+                margin: 0 !important;
                 padding: 0 !important;
                 font-family: Arial, sans-serif;
                 color: #000 !important;
-                box-sizing: border-box !important;
             }
-            .print-template h1 { font-size: 15pt; margin-bottom: 0.2cm; color: #000 !important; }
-            .print-template p.sub { font-size: 8.5pt; color: #444 !important; margin-bottom: 0.4cm; }
             .print-table {
                 width: 160mm !important;
                 border-collapse: collapse;
                 margin-bottom: 0.6cm;
                 font-size: 9pt;
-                table-layout: fixed !important;
             }
             .print-table th, .print-table td {
                 border: 1px solid #000 !important;
                 padding: 5px 8px;
                 text-align: left;
-                word-break: break-word;
                 color: #000 !important;
             }
-            .print-table th { background-color: #f0f0f0 !important; width: 50%; }
-            .preview-section-print {
-                display: flex !important;
-                flex-direction: row !important;
-                gap: 0.8cm !important;
-                margin-top: 0.3cm;
-                align-items: flex-start;
-                width: 160mm !important;
-            }
-            .scale-box {
-                border: 1px solid #888 !important;
-                padding: 0.3cm;
-                background-color: #ffffff !important;
-                border-radius: 2px;
-                box-sizing: border-box !important;
-            }
-            .scale-box h3 { font-size: 9pt; margin-bottom: 0.2cm; text-transform: uppercase; color: #000 !important; }
-            .print-canvas-actual { border: 1px solid #000 !important; background-color: #ffffff !important; display: block; }
-            .hint-text { font-size: 8pt; color: #444 !important; margin-top: 0.4cm; width: 160mm !important; }
+            .print-table th { background-color: #f0f0f0 !important; }
         }
         .print-only { display: none; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col bg-[var(--vantage-bg)] text-[var(--vantage-text-main)] overflow-x-hidden">
 
-    <!-- OVERLAY FÜR MOBILE SIDEBAR BACKDROP -->
+    <!-- MOBILE SIDEBAR BACKDROP -->
     <div id="mobile-sidebar-backdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-black/60 z-40 hidden backdrop-blur-xs transition-opacity no-print"></div>
 
-    <!-- MAIN BODY WRAPPER (SIDEBAR + CONTENT) -->
     <div class="flex-1 flex min-h-screen relative">
 
-        <!-- ========================================== -->
-        <!-- 1. LEFT SIDEBAR: NATIVE DESKTOP DEEP-LINKS -->
-        <!-- ========================================== -->
+        <!-- 1. LEFT SIDEBAR: TEAMS STATUS & VERZEICHNIS -->
         <aside id="sidebar" class="fixed top-0 left-0 w-56 border-r border-[var(--vantage-border)] bg-[var(--vantage-bg)] flex flex-col h-screen z-50 shadow-xl transition-transform duration-300 -translate-x-full shrink-0 no-print">
             <div class="p-4 border-b border-[var(--vantage-border)] bg-white flex items-center justify-between">
                 <div class="flex items-center gap-2">
@@ -157,10 +123,9 @@
                     </div>
                     <div>
                         <h2 class="font-bold text-xs text-[var(--vantage-text-main)] leading-tight uppercase tracking-wide" data-i18n="teamsStatus">Teams Status</h2>
-                        <p class="text-[10px] text-[var(--vantage-text-muted)]" id="presence-count-label">M365 Verzeichnis</p>
+                        <p class="text-[10px] text-[var(--vantage-text-muted)]">M365 Verzeichnis</p>
                     </div>
                 </div>
-                
                 <button onclick="toggleMobileSidebar()" class="text-[var(--vantage-text-muted)] hover:text-[var(--vantage-text-main)] p-1.5 rounded-sm hover:bg-[var(--vantage-panel)]">
                     <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
@@ -184,36 +149,30 @@
             </div>
         </aside>
 
-        <!-- ========================================== -->
-        <!-- 2. MAIN CONTENT AREA                       -->
-        <!-- ========================================== -->
+        <!-- 2. MAIN CONTENT AREA -->
         <div class="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto">
 
             <!-- TOP HEADER BAR -->
             <header class="border-b border-[var(--vantage-border)] bg-[var(--vantage-dark-panel)] px-4 lg:px-8 py-4 flex items-center justify-between shadow-md no-print">
                 <div class="flex items-center gap-3">
-                    <button onclick="toggleMobileSidebar()" id="burger-menu-btn" class="p-2 rounded-sm bg-[var(--vantage-panel)] text-[var(--vantage-text-main)] hover:bg-[var(--vantage-border)] transition" data-i18n-title="burgerTooltip" title="Teams Status Leiste ein-/ausblenden">
+                    <button onclick="toggleMobileSidebar()" id="burger-menu-btn" class="p-2 rounded-sm bg-[var(--vantage-panel)] text-[var(--vantage-text-main)] hover:bg-[var(--vantage-border)] transition" title="Teams Status Leiste ein-/ausblenden">
                         <i data-lucide="menu" class="w-5 h-5"></i>
                     </button>
-
                     <h1 class="font-light text-sm lg:text-base tracking-[2px] uppercase text-white flex items-center gap-3">
-                        VANTAGE <span class="hidden sm:inline-block text-[11px] font-semibold text-[var(--vantage-gold)] bg-transparent border border-[var(--vantage-gold)] px-3 py-0.5 rounded-sm tracking-[1.5px]" data-i18n="versionBadge">Intranet V3.8.1 🚀</span>
+                        VANTAGE <span class="hidden sm:inline-block text-[11px] font-semibold text-[var(--vantage-gold)] bg-transparent border border-[var(--vantage-gold)] px-3 py-0.5 rounded-sm tracking-[1.5px]">Intranet V3.8.7 🚀</span>
                     </h1>
                 </div>
 
                 <div class="flex items-center gap-2 lg:gap-3">
-                    <!-- SPRACHAUSWAHL DROPDOWN (INKLUSIVE TSCHECHISCH 🇨🇿) -->
-                    <select
-                        id="language-select"
-                        onchange="changeLanguage(this.value)"
-                        class="text-xs bg-[var(--vantage-panel)] border border-[var(--vantage-border)] rounded-sm px-3 py-1.5 font-medium text-[var(--vantage-text-main)] focus:outline-none focus:border-[var(--vantage-gold)] cursor-pointer uppercase tracking-wide">
+                    <!-- SPRACHAUSWAHL DROPDOWN -->
+                    <select id="language-select" onchange="changeLanguage(this.value)" class="text-xs bg-[var(--vantage-panel)] border border-[var(--vantage-border)] rounded-sm px-3 py-1.5 font-medium text-[var(--vantage-text-main)] focus:outline-none focus:border-[var(--vantage-gold)] cursor-pointer uppercase tracking-wide">
                         <option value="de">🇩🇪 Deutsch</option>
                         <option value="en">🇬🇧 English</option>
                         <option value="fr">🇫🇷 Français</option>
                         <option value="cs">🇨🇿 Čeština</option>
                     </select>
 
-                    <!-- M365 LOGIN & AUTH BUTTON -->
+                    <!-- M365 AUTH -->
                     <div id="auth-container" class="flex items-center gap-2">
                         <button id="login-btn" onclick="loginM365()" class="bg-[var(--vantage-gold)] hover:bg-[var(--vantage-gold-dark)] text-white px-3 py-1.5 rounded-sm text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-sm transition cursor-pointer">
                             <i data-lucide="log-in" class="w-3.5 h-3.5 text-white"></i> <span class="hidden sm:inline" data-i18n="login">M365 Anmelden</span>
@@ -221,20 +180,22 @@
                         <div id="user-profile-badge" class="hidden flex items-center gap-2 bg-[var(--vantage-panel)] border border-[var(--vantage-border)] px-3 py-1 rounded-sm text-xs">
                             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                             <span id="user-display-name" class="font-medium text-[var(--vantage-text-main)]">Verbinde...</span>
+                            <button onclick="logoutM365()" class="ml-1 text-slate-500 hover:text-rose-600 transition p-0.5" title="Abmelden">
+                                <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
             </header>
 
-            <!-- MAIN VIEW CONTAINER -->
+            <!-- VIEW CONTAINER -->
             <div id="view-container" class="flex-1 flex flex-col">
-                <!-- VIEW 1: DASHBOARD MAIN -->
+                
+                <!-- VIEW 1: DASHBOARD -->
                 <main id="dashboard-view" class="p-4 lg:p-8 space-y-6 max-w-7xl w-full mx-auto flex-1 no-print">
 
-                    <!-- BULLETIN BOARD SECTION -->
-                    <section id="bulletin-board" class="bg-[var(--vantage-panel)] border border-[var(--vantage-border)] rounded-sm p-4 lg:p-6 shadow-sm relative overflow-hidden space-y-4">
-                        
-                        <!-- ÜBERSCHRIFT -->
+                    <!-- BULLETIN BOARD -->
+                    <section class="bg-[var(--vantage-panel)] border border-[var(--vantage-border)] rounded-sm p-4 lg:p-6 shadow-sm relative overflow-hidden space-y-4">
                         <div class="flex items-center justify-between pb-3 border-b border-[var(--vantage-border)]">
                             <div class="flex items-center gap-3">
                                 <div class="p-2 bg-[var(--vantage-bg)] rounded-sm text-[var(--vantage-gold)] border border-[var(--vantage-border)] shrink-0">
@@ -243,7 +204,7 @@
                                 <div>
                                     <h2 class="font-semibold text-[var(--vantage-text-main)] tracking-[1px] uppercase text-sm lg:text-base flex items-center gap-2">
                                         <span data-i18n="bulletinBoard">BULLETIN BOARD</span> 
-                                        <span id="sync-status" class="text-[10px] uppercase tracking-[1px] text-amber-500 font-semibold bg-[var(--vantage-bg)] px-2 py-0.5 rounded-sm border border-[var(--vantage-border)]">SharePoint Sync: Bereit (Warte auf Admin-Freigabe)</span>
+                                        <span id="sync-status" class="text-[10px] uppercase tracking-[1px] text-amber-500 font-semibold bg-[var(--vantage-bg)] px-2 py-0.5 rounded-sm border border-[var(--vantage-border)]">SharePoint Sync: Bereit</span>
                                     </h2>
                                     <p class="text-[11px] lg:text-xs text-[var(--vantage-text-muted)]" data-i18n="bulletinSub">Vantage News & Outlook Kalender</p>
                                 </div>
@@ -262,32 +223,34 @@
                             </div>
                         </div>
 
-                        <!-- KALENDER-SECTION -->
+                        <!-- DOPPELTES KALENDER-GRID (Heute im Kalender & Vorschau nächste Tage) -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+                            <!-- 1. HEUTE IM KALENDER -->
                             <div class="p-4 rounded-sm bg-[var(--vantage-bg)] border border-[var(--vantage-border)]">
                                 <div class="flex items-center justify-between mb-2">
                                     <span class="text-[11px] font-bold text-[var(--vantage-text-muted)] uppercase tracking-wider flex items-center gap-1.5">
                                         <i data-lucide="calendar" class="w-3.5 h-3.5 text-[var(--vantage-gold)]"></i> <span data-i18n="todayCalendar">Heute im Kalender</span>
                                     </span>
-                                    <span class="text-[10px] text-[var(--vantage-gold-dark)] font-semibold bg-[var(--vantage-panel)] px-2 py-0.5 rounded-sm border border-[var(--vantage-border)] uppercase" data-i18n="outlookSync">Outlook Sync</span>
+                                    <span class="text-[10px] text-[var(--vantage-gold-dark)] font-semibold bg-[var(--vantage-panel)] px-2 py-0.5 rounded-sm border border-[var(--vantage-border)] uppercase" data-i18n="vantageCalendar">Vantage Kalender</span>
                                 </div>
                                 <div class="space-y-2 text-xs" id="today-calendar-events">
                                     <div class="p-2.5 bg-[var(--vantage-panel)] rounded-sm border border-[var(--vantage-border)] text-slate-500 italic">
-                                        Bitte bei M365 anmelden, um den Outlook-Kalender zu laden.
+                                        Bitte bei M365 anmelden, um Termine zu laden.
                                     </div>
                                 </div>
                             </div>
 
+                            <!-- 2. VORSCHAU NÄCHSTE TAGE -->
                             <div class="p-4 rounded-sm bg-[var(--vantage-bg)] border border-[var(--vantage-border)]">
                                 <div class="flex items-center justify-between mb-2">
                                     <span class="text-[11px] font-bold text-[var(--vantage-text-muted)] uppercase tracking-wider flex items-center gap-1.5">
-                                        <i data-lucide="mail" class="w-3.5 h-3.5 text-[var(--vantage-gold)]"></i> Ungelesene Mails (Posteingang)
+                                        <i data-lucide="calendar-days" class="w-3.5 h-3.5 text-[var(--vantage-gold)]"></i> <span data-i18n="upcomingCalendar">Vorschau nächste Tage</span>
                                     </span>
-                                    <span id="unread-mail-count" class="text-[10px] bg-[var(--vantage-panel)] text-[var(--vantage-text-main)] px-2 py-0.5 rounded-sm border border-[var(--vantage-border)] font-bold">0</span>
+                                    <span class="text-[10px] text-[var(--vantage-gold-dark)] font-semibold bg-[var(--vantage-panel)] px-2 py-0.5 rounded-sm border border-[var(--vantage-border)] uppercase" data-i18n="vantageCalendar">Vantage Kalender</span>
                                 </div>
-                                <div class="space-y-2 text-xs" id="outlook-mails-container">
+                                <div class="space-y-2 text-xs" id="upcoming-calendar-events">
                                     <div class="p-2.5 bg-[var(--vantage-panel)] rounded-sm border border-[var(--vantage-border)] text-slate-500 italic">
-                                        Keine E-Mails geladen.
+                                        Bitte bei M365 anmelden, um Termine zu laden.
                                     </div>
                                 </div>
                             </div>
@@ -302,37 +265,24 @@
                                 <span data-i18n="quickAccess">Schnellzugriffe</span>
                             </h2>
                         </div>
-
                         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
-                            <button class="p-3 rounded-sm bg-[var(--vantage-bg)] border border-[var(--vantage-border)] hover:border-[var(--vantage-gold)] hover:bg-[var(--vantage-panel)] text-xs font-semibold uppercase tracking-wider transition active:scale-95 text-center text-[var(--vantage-text-main)]" data-i18n="qaCases">
-                                Leerkoffer
-                            </button>
-                            <button class="p-3 rounded-sm bg-[var(--vantage-bg)] border border-[var(--vantage-border)] hover:border-[var(--vantage-gold)] hover:bg-[var(--vantage-panel)] text-xs font-semibold uppercase tracking-wider transition active:scale-95 text-center text-[var(--vantage-text-main)]" data-i18n="qaWiki">
-                                Kamera Wiki
-                            </button>
-                            <button class="p-3 rounded-sm bg-[var(--vantage-bg)] border border-[var(--vantage-border)] hover:border-[var(--vantage-gold)] hover:bg-[var(--vantage-panel)] text-xs font-semibold uppercase tracking-wider transition active:scale-95 text-center text-[var(--vantage-text-main)]" data-i18n="qaOptics">
-                                Optik Service
-                            </button>
-                            <button class="p-3 rounded-sm bg-[var(--vantage-bg)] border border-[var(--vantage-border)] hover:border-[var(--vantage-gold)] hover:bg-[var(--vantage-panel)] text-xs font-semibold uppercase tracking-wider transition active:scale-95 text-center text-[var(--vantage-text-main)]" data-i18n="qaSupport">
-                                Support
-                            </button>
-                            <button class="p-3 rounded-sm bg-[var(--vantage-bg)] border border-[var(--vantage-border)] hover:border-[var(--vantage-gold)] hover:bg-[var(--vantage-panel)] text-xs font-semibold uppercase tracking-wider transition active:scale-95 text-center col-span-2 sm:col-span-1 text-[var(--vantage-text-main)]" data-i18n="qaDocs">
-                                Dokumente
-                            </button>
+                            <button class="p-3 rounded-sm bg-[var(--vantage-bg)] border border-[var(--vantage-border)] hover:border-[var(--vantage-gold)] text-xs font-semibold uppercase tracking-wider transition text-center" data-i18n="qaCases">Leerkoffer</button>
+                            <button class="p-3 rounded-sm bg-[var(--vantage-bg)] border border-[var(--vantage-border)] hover:border-[var(--vantage-gold)] text-xs font-semibold uppercase tracking-wider transition text-center" data-i18n="qaWiki">Kamera Wiki</button>
+                            <button class="p-3 rounded-sm bg-[var(--vantage-bg)] border border-[var(--vantage-border)] hover:border-[var(--vantage-gold)] text-xs font-semibold uppercase tracking-wider transition text-center" data-i18n="qaOptics">Optik Service</button>
+                            <button class="p-3 rounded-sm bg-[var(--vantage-bg)] border border-[var(--vantage-border)] hover:border-[var(--vantage-gold)] text-xs font-semibold uppercase tracking-wider transition text-center" data-i18n="qaSupport">Support</button>
+                            <button class="p-3 rounded-sm bg-[var(--vantage-bg)] border border-[var(--vantage-border)] hover:border-[var(--vantage-gold)] text-xs font-semibold uppercase tracking-wider transition text-center col-span-2 sm:col-span-1" data-i18n="qaDocs">Dokumente</button>
                         </div>
                     </section>
 
-                    <!-- DEPARTMENT HUBS NAVIGATION -->
+                    <!-- DEPARTMENT HUBS -->
                     <section class="space-y-4">
                         <div class="flex items-center justify-between">
                             <h2 class="text-xs font-bold uppercase tracking-[1.5px] text-[var(--vantage-text-muted)] flex items-center gap-2">
                                 <i data-lucide="grid" class="w-4 h-4 text-[var(--vantage-gold)]"></i> <span data-i18n="deptHeader">Fachbereiche & System-Channels</span>
                             </h2>
                         </div>
-
-                        <!-- DYNAMIC CONTAINER FOR DEPARTMENTS -->
                         <div id="department-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
-                            <!-- Wird dynamisch über JavaScript generiert -->
+                            <!-- Wird dynamisch geladen -->
                         </div>
                     </section>
 
@@ -341,69 +291,52 @@
                 <!-- VIEW 2: DETAIL VIEW -->
                 <div id="detail-view" class="hidden p-4 lg:p-8 space-y-6 max-w-6xl w-full mx-auto flex-1 flex flex-col">
                     
-                    <!-- TWO-WAY NAVIGATION HEADER -->
                     <div class="flex items-center justify-between bg-[var(--vantage-panel)] border border-[var(--vantage-border)] px-4 py-3 rounded-sm shadow-xs no-print">
                         <div class="flex items-center gap-2">
                             <button onclick="goBack()" class="px-3 py-1.5 bg-[var(--vantage-bg)] hover:bg-[var(--vantage-border)] border border-[var(--vantage-border)] text-[var(--vantage-text-main)] rounded-sm text-xs font-semibold uppercase tracking-wider transition flex items-center gap-1.5 cursor-pointer">
-                                <i data-lucide="arrow-left" class="w-3.5 h-3.5 text-[var(--vantage-gold)]"></i> <span class="hidden sm:inline" data-i18n="btnBack">Schritt zurück</span>
+                                <i data-lucide="arrow-left" class="w-3.5 h-3.5 text-[var(--vantage-gold)]"></i> <span data-i18n="btnBack">Schritt zurück</span>
                             </button>
                             <button onclick="goHome()" class="px-3 py-1.5 bg-[var(--vantage-bg)] hover:bg-[var(--vantage-border)] border border-[var(--vantage-border)] text-[var(--vantage-text-main)] rounded-sm text-xs font-semibold uppercase tracking-wider transition flex items-center gap-1.5 cursor-pointer">
-                                <i data-lucide="home" class="w-3.5 h-3.5 text-[var(--vantage-gold)]"></i> <span class="hidden sm:inline" data-i18n="btnHome">Zum Dashboard</span>
+                                <i data-lucide="home" class="w-3.5 h-3.5 text-[var(--vantage-gold)]"></i> <span data-i18n="btnHome">Zum Dashboard</span>
                             </button>
                         </div>
-                        <div class="text-xs font-semibold text-[var(--vantage-text-muted)] uppercase tracking-wider truncate max-w-[150px] sm:max-w-none" id="breadcrumb-path">
-                            Department
-                        </div>
+                        <div class="text-xs font-semibold text-[var(--vantage-text-muted)] uppercase tracking-wider truncate" id="breadcrumb-path">Department</div>
                     </div>
 
-                    <!-- CHANNEL HEADER BANNER -->
-                    <div class="bg-[var(--vantage-panel)] border border-[var(--vantage-border)] rounded-sm p-5 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 no-print" id="detail-header-banner">
+                    <div class="bg-[var(--vantage-panel)] border border-[var(--vantage-border)] rounded-sm p-5 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 no-print">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-sm bg-[var(--vantage-bg)] text-[var(--vantage-gold)] border border-[var(--vantage-border)] flex items-center justify-center shrink-0">
                                 <i data-lucide="message-square" class="w-5 h-5"></i>
                             </div>
                             <div>
-                                <h2 class="font-semibold text-base text-[var(--vantage-text-main)] uppercase tracking-[1px]" id="detail-title">Department Title</h2>
+                                <h2 class="font-semibold text-base text-[var(--vantage-text-main)] uppercase tracking-[1px]" id="detail-title">Title</h2>
                                 <p class="text-xs text-[var(--vantage-text-muted)]" data-i18n="detailSub">Live Teams-Kommentare & Diskussionsverlauf</p>
                             </div>
                         </div>
-
-                        <div class="flex items-center gap-2.5 w-full sm:w-auto flex-wrap" id="detail-action-buttons">
-                            <!-- Wird dynamisch belegt -->
-                        </div>
+                        <div class="flex items-center gap-2.5 w-full sm:w-auto flex-wrap" id="detail-action-buttons"></div>
                     </div>
 
-                    <!-- UNTERKATEGORIEN & TOOLS NAVIGATION -->
                     <div class="bg-[var(--vantage-panel)] border border-[var(--vantage-border)] rounded-sm p-5 shadow-xs space-y-3 no-print">
                         <h3 class="font-bold text-xs uppercase tracking-[1.5px] text-[var(--vantage-text-muted)] flex items-center gap-1.5">
                             <i data-lucide="folder-tree" class="w-4 h-4 text-[var(--vantage-gold)]"></i> <span data-i18n="subCategoriesHeader">Unterkategorien & Tools</span>
                         </h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" id="subcategories-container">
-                            <!-- Wird dynamisch gerendert -->
-                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" id="subcategories-container"></div>
                     </div>
 
-                    <!-- DYNAMISCHER CONTAINER FÜR EINGEBETTETE TOOLS -->
-                    <div id="tool-view-container" class="hidden">
-                        <!-- Mattscheiben-Rechner -->
-                    </div>
+                    <!-- DYNAMISCHER CONTAINER FÜR TOOLS (Mattscheiben-Rechner) -->
+                    <div id="tool-view-container" class="hidden"></div>
 
-                    <!-- TEAMS LIVE COMMENTS STREAM -->
                     <div id="chat-stream-card" class="bg-[var(--vantage-panel)] border border-[var(--vantage-border)] rounded-sm p-5 shadow-xs flex-1 flex flex-col no-print">
                         <h3 class="font-bold text-xs uppercase tracking-[1.5px] text-[var(--vantage-text-muted)] mb-4 flex items-center gap-1.5">
                             <i data-lucide="messages-square" class="w-4 h-4 text-[var(--vantage-gold)]"></i> <span data-i18n="chatHeader">Diskussionsverlauf & Neuigkeiten</span>
                         </h3>
-
                         <div class="space-y-4 flex-1 overflow-y-auto pr-1 max-h-[40vh]" id="detail-chat-stream">
-                            <div class="p-3.5 rounded-sm bg-[var(--vantage-bg)] border border-[var(--vantage-border)] text-xs text-slate-500 italic">
-                                Keine Diskussionen vorhanden.
-                            </div>
+                            <div class="p-3.5 bg-[var(--vantage-bg)] border border-[var(--vantage-border)] text-xs text-slate-500 italic">Keine Diskussionen vorhanden.</div>
                         </div>
-
                         <div class="mt-4 pt-3 border-t border-[var(--vantage-border)] flex items-center gap-2">
-                            <input type="text" id="detail-chat-input" data-i18n-placeholder="chatInputPlaceholder" placeholder="Antwort schreiben..." class="flex-1 px-3 py-2 text-xs bg-[var(--vantage-bg)] border border-[var(--vantage-border)] rounded-sm focus:outline-none focus:border-[var(--vantage-gold)] transition text-[var(--vantage-text-main)] placeholder-[var(--vantage-text-muted)]">
-                            <button onclick="sendDetailChatMessage()" class="px-3.5 py-2 bg-[var(--vantage-gold)] hover:bg-[var(--vantage-gold-dark)] text-white rounded-sm text-xs font-semibold uppercase tracking-wider transition flex items-center gap-1.5 shadow-sm shrink-0 cursor-pointer">
-                                <i data-lucide="send" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline" data-i18n="btnSend">Senden</span>
+                            <input type="text" id="detail-chat-input" data-i18n-placeholder="chatInputPlaceholder" placeholder="Antwort schreiben..." class="flex-1 px-3 py-2 text-xs bg-[var(--vantage-bg)] border border-[var(--vantage-border)] rounded-sm focus:outline-none focus:border-[var(--vantage-gold)] text-[var(--vantage-text-main)]">
+                            <button onclick="sendDetailChatMessage()" class="px-3.5 py-2 bg-[var(--vantage-gold)] hover:bg-[var(--vantage-gold-dark)] text-white rounded-sm text-xs font-semibold uppercase tracking-wider transition flex items-center gap-1.5 cursor-pointer">
+                                <i data-lucide="send" class="w-3.5 h-3.5"></i> <span data-i18n="btnSend">Senden</span>
                             </button>
                         </div>
                     </div>
@@ -412,13 +345,13 @@
             </div>
 
             <footer class="p-4 lg:p-6 text-center text-xs text-[var(--vantage-text-muted)] border-t border-[var(--vantage-border)] mt-auto no-print uppercase tracking-widest bg-[var(--vantage-panel)]">
-                <p data-i18n="footerText">Vantage Intranet PWA V3.8.1 &bull; MS365 & Teams Integration</p>
+                <p data-i18n="footerText">Vantage Intranet PWA V3.8.7 &bull; MS365 & Teams Integration</p>
             </footer>
 
         </div>
     </div>
 
-    <!-- EASTER EGG MODAL (VANTAGE SNAKE MINIGAME) -->
+    <!-- EASTER EGG MODAL (Vantage Snake) -->
     <div id="easter-egg-modal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-[var(--vantage-dark-panel)] border border-[var(--vantage-gold)] p-6 rounded-sm text-center max-w-md w-full shadow-2xl relative">
             <button onclick="closeSnakeGame()" class="absolute top-3 right-3 text-slate-400 hover:text-white text-lg font-bold">&times;</button>
@@ -427,70 +360,65 @@
                 <h3 class="text-base font-bold text-white uppercase tracking-widest" data-i18n="snakeTitle">Vantage Snake 🕹️</h3>
             </div>
             <p class="text-[11px] text-slate-400 mb-4 uppercase tracking-wider" data-i18n="snakeSub">Benutze die Pfeiltasten zum Steuern!</p>
-            
             <div class="flex justify-between items-center text-xs font-bold text-white mb-2 px-2 border-b border-slate-700 pb-2">
                 <span><span data-i18n="snakeScore">Score</span>: <span id="snake-score" class="text-[var(--vantage-gold)]">0</span></span>
                 <span><span data-i18n="snakeHighscore">Highscore</span>: <span id="snake-highscore" class="text-emerald-400">0</span></span>
             </div>
-
             <div class="relative flex justify-center items-center bg-black rounded-sm border border-slate-800 p-1">
                 <canvas id="snakeCanvas" width="300" height="300" class="bg-black"></canvas>
             </div>
-
             <div class="mt-4 flex gap-2 justify-center">
-                <button onclick="startSnakeGame()" class="px-4 py-2 bg-[var(--vantage-gold)] hover:bg-[var(--vantage-gold-dark)] text-white text-xs font-bold uppercase tracking-wider rounded-sm transition cursor-pointer" data-i18n="snakeNewBtn">
-                    Neues Spiel
-                </button>
-                <button onclick="closeSnakeGame()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold uppercase tracking-wider rounded-sm transition cursor-pointer" data-i18n="snakeCloseBtn">
-                    Schließen
-                </button>
+                <button onclick="startSnakeGame()" class="px-4 py-2 bg-[var(--vantage-gold)] hover:bg-[var(--vantage-gold-dark)] text-white text-xs font-bold uppercase tracking-wider rounded-sm cursor-pointer" data-i18n="snakeNewBtn">Neues Spiel</button>
+                <button onclick="closeSnakeGame()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold uppercase tracking-wider rounded-sm cursor-pointer" data-i18n="snakeCloseBtn">Schließen</button>
             </div>
         </div>
     </div>
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        // =========================================================================
-        // MSAL.js CONFIGURATION & ENTRA ID INTEGRATION (FULL PERMISSIONS INCLUDED)
-        // =========================================================================
         const msalConfig = {
             auth: {
                 clientId: "cee7a128-4c3e-4a07-b0c8-89b97475a71c",
                 authority: "https://login.microsoftonline.com/7dfd912b-740c-430b-ae2b-10a0948f1378",
                 redirectUri: window.location.origin + window.location.pathname
             },
-            cache: {
-                cacheLocation: "sessionStorage",
-                storeAuthStateInCookie: false
-            }
+            cache: { cacheLocation: "sessionStorage", storeAuthStateInCookie: false }
         };
 
-        // WIEDER VOLLSTÄNDIGE SCOPES INKLUSIVE .ALL WIEDER EINGEPFLEGT:
-        const loginRequest = {
-            scopes: [
-                "User.Read",
-                "Sites.Read.All",
-                "Calendars.Read",
-                "Mail.Read",
-                "Team.ReadBasic.All"
-            ]
-        };
-
+        const loginRequest = { scopes: ["User.Read", "Calendars.Read"] };
         const msalInstance = new msal.PublicClientApplication(msalConfig);
         let currentUserAccount = null;
+
+        function getActiveAccount() {
+            const accounts = msalInstance.getAllAccounts();
+            if (accounts.length === 0) return null;
+            return msalInstance.getActiveAccount() || accounts[0];
+        }
 
         async function loginM365() {
             try {
                 await msalInstance.loginPopup(loginRequest);
-                const accounts = msalInstance.getAllAccounts();
-                if (accounts.length > 0) {
-                    currentUserAccount = accounts[0];
+                currentUserAccount = getActiveAccount();
+                if (currentUserAccount) {
+                    msalInstance.setActiveAccount(currentUserAccount);
                     updateUserUI(currentUserAccount);
                     await loadGraphData();
                 }
-            } catch (err) {
-                console.error("Login Error:", err);
-            }
+            } catch (err) { console.error("Login Error:", err); }
+        }
+
+        async function logoutM365() {
+            try {
+                await msalInstance.logoutPopup({ account: currentUserAccount || getActiveAccount() });
+            } catch (err) { msalInstance.clearCache(); }
+            currentUserAccount = null;
+            document.getElementById('user-profile-badge').classList.add('hidden');
+            document.getElementById('login-btn').classList.remove('hidden');
+            document.getElementById('sync-status').textContent = "SharePoint Sync: Abgemeldet";
+            
+            const emptyMsg = `<div class="p-2.5 bg-[var(--vantage-panel)] rounded-sm border border-[var(--vantage-border)] text-slate-500 italic">Bitte bei M365 anmelden, um Termine zu laden.</div>`;
+            document.getElementById('today-calendar-events').innerHTML = emptyMsg;
+            document.getElementById('upcoming-calendar-events').innerHTML = emptyMsg;
         }
 
         function updateUserUI(account) {
@@ -501,9 +429,10 @@
         }
 
         async function getAccessToken() {
-            if (!currentUserAccount) return null;
+            const activeAcc = getActiveAccount();
+            if (!activeAcc) return null;
             try {
-                const res = await msalInstance.acquireTokenSilent({ scopes: loginRequest.scopes, account: currentUserAccount });
+                const res = await msalInstance.acquireTokenSilent({ scopes: loginRequest.scopes, account: activeAcc });
                 return res.accessToken;
             } catch (err) {
                 const res = await msalInstance.acquireTokenPopup({ scopes: loginRequest.scopes });
@@ -514,146 +443,102 @@
         async function loadGraphData() {
             const token = await getAccessToken();
             if (!token) return;
+            await fetchOutlookCalendars(token);
+        }
 
+        async function fetchOutlookCalendars(token) {
+            const todayContainer = document.getElementById('today-calendar-events');
+            const upcomingContainer = document.getElementById('upcoming-calendar-events');
             const syncStatus = document.getElementById('sync-status');
-            syncStatus.textContent = "SharePoint Sync: Aktiv";
-            syncStatus.className = "text-[10px] uppercase tracking-[1px] text-emerald-600 font-semibold bg-[var(--vantage-bg)] px-2 py-0.5 rounded-sm border border-[var(--vantage-border)]";
-
-            await Promise.all([
-                fetchSharePointMapping(token),
-                fetchOutlookCalendar(token),
-                fetchOutlookMails(token)
-            ]);
-        }
-
-        async function fetchSharePointMapping(token) {
+            
             try {
-                const url = "https://graph.microsoft.com/v1.0/sites/vantageweiden.sharepoint.com:/sites/Testbetreuung2:/lists/TeamsChannelMapping/items?expand=fields";
-                const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data.value) {
-                        data.value.forEach(item => {
-                            const fields = item.fields;
-                            const dept = departmentsConfig.find(d => d.id === fields.DepartmentID);
-                            if (dept) {
-                                if (fields.TeamsWebUrl) dept.teamsWebUrl = fields.TeamsWebUrl;
-                                if (fields.TeamsProtocolUrl) dept.teamsProtocolUrl = fields.TeamsProtocolUrl;
-                            }
-                        });
-                    }
-                }
-            } catch (err) {
-                console.warn("SharePoint Mapping Abruf Hinweis:", err);
-            }
-        }
+                const now = new Date();
+                const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+                const endOfThreeDays = new Date(now.getTime() + 72 * 60 * 60 * 1000).toISOString();
 
-        async function fetchOutlookCalendar(token) {
-            const container = document.getElementById('today-calendar-events');
-            try {
-                const now = new Date().toISOString();
-                const res = await fetch(`https://graph.microsoft.com/v1.0/me/calendarView?startDateTime=${now}&endDateTime=${new Date(Date.now() + 24*60*60*1000).toISOString()}&$top=3&$orderby=start/dateTime`, {
+                const res = await fetch(`https://graph.microsoft.com/v1.0/me/calendarView?startDateTime=${startOfDay}&endDateTime=${endOfThreeDays}&$top=10&$orderby=start/dateTime`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data.value && data.value.length > 0) {
-                        container.innerHTML = data.value.map(evt => {
-                            const time = new Date(evt.start.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                            return `
-                                <div class="group relative flex items-center justify-between p-2.5 bg-[var(--vantage-panel)] rounded-sm border border-[var(--vantage-border)] hover:border-[var(--vantage-gold)] transition cursor-pointer"
-                                     onclick="openSmartOutlook('${evt.webLink || 'https://outlook.office.com/calendar/'}')">
-                                    <div class="flex items-center gap-2 truncate mr-2">
-                                        <span class="w-2 h-2 rounded-full bg-[var(--vantage-gold)] shrink-0"></span>
-                                        <span class="font-medium text-[var(--vantage-text-main)] truncate">${time} - ${evt.subject}</span>
-                                    </div>
-                                    <span class="text-[10px] bg-[var(--vantage-bg)] text-[var(--vantage-text-muted)] px-2 py-0.5 rounded-sm font-medium shrink-0 border border-[var(--vantage-border)]">Outlook</span>
+                if (!res.ok) throw new Error(`Graph API Fehler: ${res.status}`);
+                const data = await res.json();
+                
+                syncStatus.textContent = "Graph API Sync: Aktiv";
+                syncStatus.className = "text-[10px] uppercase tracking-[1px] text-emerald-600 font-semibold bg-[var(--vantage-bg)] px-2 py-0.5 rounded-sm border border-[var(--vantage-border)]";
+
+                todayContainer.innerHTML = "";
+                upcomingContainer.innerHTML = "";
+
+                const todayStr = now.toDateString();
+                let todayCount = 0;
+                let upcomingCount = 0;
+
+                if (data.value && data.value.length > 0) {
+                    data.value.forEach(evt => {
+                        const startDate = new Date(evt.start.dateTime);
+                        const isToday = startDate.toDateString() === todayStr;
+                        
+                        const timeStr = startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        const dateStr = startDate.toLocaleDateString([], { day: '2-digit', month: '2-digit' });
+
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = "flex items-center justify-between p-2.5 bg-[var(--vantage-panel)] rounded-sm border border-[var(--vantage-border)] hover:border-[var(--vantage-gold)] transition cursor-pointer";
+                        itemDiv.onclick = () => {
+                              const url = evt.webLink || '';
+                              const trusted = url.startsWith('https://outlook.office.com/') || url.startsWith('https://outlook.office365.com/') || url.startsWith('https://outlook.office.de/');
+                              const target = trusted ? url : 'https://outlook.office.com/calendar/';
+                              window.open(target, '_blank', 'noopener,noreferrer');
+                          };
+
+                        if (isToday) {
+                            todayCount++;
+                            itemDiv.innerHTML = `
+                                <div class="flex items-center gap-2 truncate mr-2">
+                                    <span class="w-2 h-2 rounded-full bg-[var(--vantage-gold)] shrink-0"></span>
+                                    <span class="font-medium text-[var(--vantage-text-main)] truncate">${timeStr} - ${evt.subject}</span>
                                 </div>
+                                <span class="text-[10px] bg-[var(--vantage-bg)] text-[var(--vantage-text-muted)] px-2 py-0.5 rounded-sm shrink-0 border border-[var(--vantage-border)]">Leipzig</span>
                             `;
-                        }).join('');
-                    } else {
-                        container.innerHTML = `<div class="p-2.5 bg-[var(--vantage-panel)] rounded-sm border border-[var(--vantage-border)] text-xs text-slate-500">Keine heutigen Termine im Outlook-Kalender.</div>`;
-                    }
+                            todayContainer.appendChild(itemDiv);
+                        } else {
+                            upcomingCount++;
+                            itemDiv.innerHTML = `
+                                <div class="flex items-center gap-2 truncate mr-2">
+                                    <span class="w-2 h-2 rounded-full bg-[var(--vantage-gold)] shrink-0"></span>
+                                    <span class="font-medium text-[var(--vantage-text-main)] truncate">${dateStr}, ${timeStr} - ${evt.subject}</span>
+                                </div>
+                                <span class="text-[10px] bg-[var(--vantage-bg)] text-[var(--vantage-text-muted)] px-2 py-0.5 rounded-sm shrink-0 border border-[var(--vantage-border)]">Leipzig</span>
+                            `;
+                            upcomingContainer.appendChild(itemDiv);
+                        }
+                    });
                 }
+
+                if (todayCount === 0) {
+                    todayContainer.innerHTML = `<div class="p-2.5 bg-[var(--vantage-panel)] rounded-sm border border-[var(--vantage-border)] text-xs text-slate-500">Keine Termine für heute.</div>`;
+                }
+                if (upcomingCount === 0) {
+                    upcomingContainer.innerHTML = `<div class="p-2.5 bg-[var(--vantage-panel)] rounded-sm border border-[var(--vantage-border)] text-xs text-slate-500">Keine Termine in der Vorschau.</div>`;
+                }
+
             } catch (err) {
-                console.error("Calendar Fetch Error:", err);
+                syncStatus.textContent = "Graph API Sync: Fehler";
+                syncStatus.className = "text-[10px] uppercase tracking-[1px] text-rose-600 font-semibold bg-[var(--vantage-bg)] px-2 py-0.5 rounded-sm border border-[var(--vantage-border)]";
+                const errorMsg = `<div class="p-2.5 bg-rose-50 rounded-sm border border-rose-200 text-xs text-rose-600">⚠️ Fehler: ${err.message}</div>`;
+                todayContainer.innerHTML = errorMsg;
+                upcomingContainer.innerHTML = errorMsg;
             }
         }
 
-        async function fetchOutlookMails(token) {
-            const container = document.getElementById('outlook-mails-container');
-            const countBadge = document.getElementById('unread-mail-count');
-            try {
-                const res = await fetch(`https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages?$filter=isRead eq false&$top=3&$select=subject,from`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data.value && data.value.length > 0) {
-                        countBadge.textContent = data.value.length;
-                        container.innerHTML = data.value.map(m => `
-                            <div class="p-2.5 bg-[var(--vantage-panel)] rounded-sm border border-[var(--vantage-border)]">
-                                <p class="font-semibold text-xs text-[var(--vantage-text-main)] truncate">${m.subject}</p>
-                                <p class="text-[10px] text-[var(--vantage-text-muted)] mt-0.5">${m.from?.emailAddress?.name || 'Unbekannt'}</p>
-                            </div>
-                        `).join('');
-                    } else {
-                        countBadge.textContent = "0";
-                        container.innerHTML = `<div class="p-2.5 bg-[var(--vantage-panel)] rounded-sm border border-[var(--vantage-border)] text-xs text-slate-500">Keine ungelesenen E-Mails.</div>`;
-                    }
-                }
-            } catch (err) {
-                console.error("Mail Fetch Error:", err);
-            }
-        }
-
+        // SPRACHEN & FACHBEREICHE ÜBERSETZUNGSDATENBANK
         let currentLanguage = "de";
-
-        function openSmartTeams(teamsProtocolUrl, webFallbackUrl) {
-            let hasFocus = true;
-            const onBlur = () => { hasFocus = false; };
-            window.addEventListener('blur', onBlur);
-
-            window.location.href = teamsProtocolUrl;
-
-            setTimeout(() => {
-                window.removeEventListener('blur', onBlur);
-                if (hasFocus) {
-                    window.open(webFallbackUrl || 'https://teams.microsoft.com/', '_blank');
-                }
-            }, 1500);
-        }
-
-        function openSmartMail(email) {
-            let hasFocus = true;
-            const onBlur = () => { hasFocus = false; };
-            window.addEventListener('blur', onBlur);
-
-            window.location.href = `mailto:${email}`;
-
-            setTimeout(() => {
-                window.removeEventListener('blur', onBlur);
-                if (hasFocus) {
-                    window.open(`https://outlook.office.com/mail/deeplink/compose?to=${encodeURIComponent(email)}`, '_blank');
-                }
-            }, 1500);
-        }
-
-        function openSmartOutlook(webUrl) {
-            window.open(webUrl, '_blank');
-        }
-
         const translations = {
             de: {
-                versionBadge: "Intranet V3.8.1 🚀",
                 teamsStatus: "Teams Status",
                 searchPlaceholder: "Mitarbeiter suchen...",
                 login: "M365 Anmelden",
                 bulletinBoard: "BULLETIN BOARD",
-                liveFeeds: "Live Feeds",
                 bulletinSub: "Vantage News & Outlook Kalender",
                 todayCalendar: "Heute im Kalender",
-                outlookSync: "Outlook Sync",
                 upcomingCalendar: "Vorschau nächste Tage",
                 vantageCalendar: "Vantage Kalender",
                 quickAccess: "Schnellzugriffe",
@@ -673,28 +558,20 @@
                 chatHeader: "Diskussionsverlauf & Neuigkeiten",
                 chatInputPlaceholder: "Antwort schreiben...",
                 btnSend: "Senden",
-                badgeTechnical: "Technical",
-                footerText: "Vantage Intranet PWA V3.8.1 • MS365 & Teams Integration",
-                burgerTooltip: "Teams Status Leiste ein-/ausblenden",
+                footerText: "Vantage Intranet PWA V3.8.7 • MS365 & Teams Integration",
                 
                 deptTechRentalTitle: "Technical Departments Rental",
                 deptTechRentalDesc: "Kamera, Mechanik, NLN & Werkstatt-Protokolle.",
-                
                 deptBookingTitle: "Booking Department & Client Contacts",
                 deptBookingDesc: "Buchungen, Kundenkontakte & Verfügbarkeiten.",
-
                 deptProductsTitle: "VANTAGE & HAWK Products",
                 deptProductsDesc: "Eigenentwicklungen, HAWK Lenses & Datenblätter.",
-
                 deptAccountingTitle: "Buchhaltung",
                 deptAccountingDesc: "Rechnungen, Spesen & Finanzprozesse.",
-
                 deptPreparationTitle: "Vorbereitung / Job Handling",
                 deptPreparationDesc: "Job-Vorbereitung, Checklisten & Check-Outs.",
-
                 deptItTitle: "IT / Software",
                 deptItDesc: "Infrastruktur, Tools, Netzwerke & Support.",
-
                 deptMarketingTitle: "Marketing",
                 deptMarketingDesc: "Social Media, Events, Presse & CI-Materialien.",
 
@@ -702,7 +579,7 @@
                 subSoftwareUpdates: "Software Updates",
                 subGroundglass: "Mattscheiben-Rechner S35",
                 subCaseLists: "Kofferlisten (Leerkoffer)",
-                subArriCatalog: "ARRI Ersatzteil-Katalog (Web-Tool)",
+                subArriCatalog: "ARRI Ersatzteil-Katalog",
                 subWorkshopProtocols: "Werkstatt Protokolle",
                 subWhoWithWhom: "WHO WITH WHOM Suche",
                 subPhotoStation: "Vantage PhotoStation",
@@ -720,20 +597,6 @@
                 ggEdgeDist: "Abstand Ober-/Unterkante",
                 ggPrintBtn: "Schablone mit Grafik drucken",
                 ggPreviewHint: "Visuelle Vorschau (Rot = Zielformat)",
-                printTemplateTitle: "Druck-Schablone & Grafische Vorschau",
-                printTemplateSub: "Mattscheiben-Berechnung für Kameraschablonen",
-                printParam: "Parameter",
-                printSpec: "Spezifikation / Wert",
-                printSelectedGlass: "Gewählte Mattscheibe",
-                printMaxDim: "Max. Breite × Höhe",
-                printAspectLabel: "Ziel-Seitenverhältnis",
-                printTargetH: "Zielhöhe (Schnittfenster)",
-                printCenterLine: "Linie von Mitte nach oben / unten",
-                printEdgeDist: "Abstand zur Ober- / Unterkante",
-                printGraphicsHeader: "Visuelle Grafiken",
-                printScale1: "1. Originalgröße (1:1 Maßstab)",
-                printScale2: "2. Vergrößerte Übersicht",
-                printHintText: "Hinweis zum Anzeichnen: Der äußere schwarze Rahmen entspricht der Gesamtabmessung der Mattscheibe. Der innere rote Rahmen markiert das berechnete Zielformat.",
 
                 snakeTitle: "Vantage Snake 🕹️",
                 snakeSub: "Benutze die Pfeiltasten zum Steuern!",
@@ -743,15 +606,12 @@
                 snakeCloseBtn: "Schließen"
             },
             en: {
-                versionBadge: "Intranet V3.8.1 🚀",
                 teamsStatus: "Teams Presence",
                 searchPlaceholder: "Search employee...",
                 login: "Sign in to M365",
                 bulletinBoard: "BULLETIN BOARD",
-                liveFeeds: "Live Feeds",
                 bulletinSub: "Vantage News & Outlook Calendar",
                 todayCalendar: "Today's Calendar",
-                outlookSync: "Outlook Sync",
                 upcomingCalendar: "Upcoming Days",
                 vantageCalendar: "Vantage Calendar",
                 quickAccess: "Quick Access",
@@ -771,36 +631,28 @@
                 chatHeader: "Discussion Feed & Updates",
                 chatInputPlaceholder: "Write a reply...",
                 btnSend: "Send",
-                badgeTechnical: "Technical",
-                footerText: "Vantage Intranet PWA V3.8.1 • MS365 & Teams Integration",
-                burgerTooltip: "Toggle Teams status sidebar",
+                footerText: "Vantage Intranet PWA V3.8.7 • MS365 & Teams Integration",
 
                 deptTechRentalTitle: "Technical Departments Rental",
                 deptTechRentalDesc: "Camera, mechanics, NLN & workshop protocols.",
-                
                 deptBookingTitle: "Booking Department & Client Contacts",
                 deptBookingDesc: "Bookings, client contacts & availabilities.",
-
                 deptProductsTitle: "VANTAGE & HAWK Products",
                 deptProductsDesc: "Proprietary developments, HAWK Lenses & datasheets.",
-
                 deptAccountingTitle: "Accounting",
                 deptAccountingDesc: "Invoices, expenses & financial workflows.",
-
                 deptPreparationTitle: "Preparation / Job Handling",
                 deptPreparationDesc: "Job preparation, checklists & check-outs.",
-
                 deptItTitle: "IT / Software",
                 deptItDesc: "Infrastructure, tools, networks & support.",
-
                 deptMarketingTitle: "Marketing",
                 deptMarketingDesc: "Social media, events, PR & CI materials.",
 
                 subFirmware: "Firmware Updates",
                 subSoftwareUpdates: "Software Updates",
                 subGroundglass: "Groundglass Calculator S35",
-                subCaseLists: "Case Lists (Empty Cases)",
-                subArriCatalog: "ARRI Spare Parts Catalog (Web Tool)",
+                subCaseLists: "Case Lists",
+                subArriCatalog: "ARRI Spare Parts Catalog",
                 subWorkshopProtocols: "Workshop Protocols",
                 subWhoWithWhom: "WHO WITH WHOM Search",
                 subPhotoStation: "Vantage PhotoStation",
@@ -818,20 +670,6 @@
                 ggEdgeDist: "Top/Bottom Edge Distance",
                 ggPrintBtn: "Print Template with Graphic",
                 ggPreviewHint: "Visual Preview (Red = Target Format)",
-                printTemplateTitle: "Print Template & Visual Preview",
-                printTemplateSub: "Groundglass calculation for camera templates",
-                printParam: "Parameter",
-                printSpec: "Specification / Value",
-                printSelectedGlass: "Selected Groundglass",
-                printMaxDim: "Max Width × Height",
-                printAspectLabel: "Target Aspect Ratio",
-                printTargetH: "Target Height (Cutting Window)",
-                printCenterLine: "Center Line to Top / Bottom",
-                printEdgeDist: "Distance to Top / Bottom Edge",
-                printGraphicsHeader: "Visual Graphics",
-                printScale1: "1. Actual Size (1:1 Scale)",
-                printScale2: "2. Enlarged Overview",
-                printHintText: "Marking Note: The outer black frame corresponds to the total dimensions of the groundglass. The inner red frame marks the calculated target format.",
 
                 snakeTitle: "Vantage Snake 🕹️",
                 snakeSub: "Use arrow keys to steer!",
@@ -841,15 +679,12 @@
                 snakeCloseBtn: "Close"
             },
             fr: {
-                versionBadge: "Intranet V3.8.1 🚀",
                 teamsStatus: "Statut Teams",
                 searchPlaceholder: "Chercher employé...",
                 login: "Connexion M365",
                 bulletinBoard: "TABLEAU D’INFORMATION",
-                liveFeeds: "Flux en direct",
                 bulletinSub: "Actualités Vantage & Calendrier Outlook",
                 todayCalendar: "Agenda du jour",
-                outlookSync: "Sync Outlook",
                 upcomingCalendar: "Prochains jours",
                 vantageCalendar: "Calendrier Vantage",
                 quickAccess: "Accès rapides",
@@ -864,33 +699,25 @@
                 btnBack: "Retour",
                 btnHome: "Au Tableau de bord",
                 subCategoriesHeader: "Sous-catégories & Outils",
-                detailSub: "Commentaires Teams en direct & fil de discussion",
+                detailSub: "Commentaires Teams en direct",
                 btnOpenTeams: "Ouvrir dans Teams",
-                chatHeader: "Fil de discussion & Nouveautés",
+                chatHeader: "Fil de discussion",
                 chatInputPlaceholder: "Écrire une réponse...",
                 btnSend: "Envoyer",
-                badgeTechnical: "Technique",
-                footerText: "Vantage Intranet PWA V3.8.1 • MS365 & Teams Integration",
-                burgerTooltip: "Afficher/masquer la barre latérale Teams",
+                footerText: "Vantage Intranet PWA V3.8.7 • MS365 & Teams Integration",
 
                 deptTechRentalTitle: "Technical Departments Rental",
                 deptTechRentalDesc: "Caméra, mécanique, NLN & protocoles d'atelier.",
-                
                 deptBookingTitle: "Booking Department & Client Contacts",
                 deptBookingDesc: "Réservations, contacts clients & disponibilités.",
-
                 deptProductsTitle: "VANTAGE & HAWK Products",
                 deptProductsDesc: "Développements, HAWK Lenses & fiches techniques.",
-
-                deptAccountingTitle: "Buchhaltung",
+                deptAccountingTitle: "Accounting",
                 deptAccountingDesc: "Factures, notes de frais & processus financiers.",
-
-                deptPreparationTitle: "Vorbereitung / Job Handling",
+                deptPreparationTitle: "Preparation / Job Handling",
                 deptPreparationDesc: "Préparation des jobs, checklists & check-outs.",
-
                 deptItTitle: "IT / Software",
                 deptItDesc: "Infrastructure, outils, réseaux & support.",
-
                 deptMarketingTitle: "Marketing",
                 deptMarketingDesc: "Réseaux sociaux, événements & supports CI.",
 
@@ -916,20 +743,6 @@
                 ggEdgeDist: "Distance bord sup./inf.",
                 ggPrintBtn: "Imprimer le gabarit avec graphique",
                 ggPreviewHint: "Aperçu visuel (Rouge = Format cible)",
-                printTemplateTitle: "Gabarit d'impression & Aperçu graphique",
-                printTemplateSub: "Calcul du dépoli pour les masques de caméra",
-                printParam: "Paramètre",
-                printSpec: "Spécification / Valeur",
-                printSelectedGlass: "Dépoli sélectionné",
-                printMaxDim: "Largeur × Hauteur max.",
-                printAspectLabel: "Format d'image cible",
-                printTargetH: "Hauteur cible (Fenêtre de coupe)",
-                printCenterLine: "Ligne du centre vers le haut / bas",
-                printEdgeDist: "Distance au bord supérieur / inférieur",
-                printGraphicsHeader: "Graphiques visuels",
-                printScale1: "1. Taille réelle (Échelle 1:1)",
-                printScale2: "2. Vue d'ensemble agrandie",
-                printHintText: "Remarque de marquage : Le cadre noir extérieur correspond aux dimensions totales du dépoli. Le cadre rouge intérieur marque le format cible calculé.",
 
                 snakeTitle: "Vantage Snake 🕹️",
                 snakeSub: "Utilisez les flèches pour diriger !",
@@ -939,15 +752,12 @@
                 snakeCloseBtn: "Fermer"
             },
             cs: {
-                versionBadge: "Intranet V3.8.1 🚀",
                 teamsStatus: "Stav Teams",
                 searchPlaceholder: "Hledat zaměstnance...",
                 login: "Přihlásit M365",
                 bulletinBoard: "NÁSTĚNKA",
-                liveFeeds: "Živé přenosy",
                 bulletinSub: "Novinky Vantage & Outlook Kalendář",
-                todayCalendar: "Dnes v kalendáři",
-                outlookSync: "Outlook Sync",
+                todayCalendar: "Dnešní kalendář",
                 upcomingCalendar: "Nadcházející dny",
                 vantageCalendar: "Vantage Kalendář",
                 quickAccess: "Rychlý přístup",
@@ -962,33 +772,25 @@
                 btnBack: "Zpět",
                 btnHome: "Na nástěnku",
                 subCategoriesHeader: "Podkategorie & Nástroje",
-                detailSub: "Živé komentáře Teams & diskuze",
+                detailSub: "Živé komentáře Teams",
                 btnOpenTeams: "Otevřít v Teams",
                 chatHeader: "Diskuze & Novinky",
                 chatInputPlaceholder: "Napsat odpověď...",
                 btnSend: "Odeslat",
-                badgeTechnical: "Technické",
-                footerText: "Vantage Intranet PWA V3.8.1 • MS365 & Teams Integration",
-                burgerTooltip: "Zapnout/vypnout boční panel Teams",
+                footerText: "Vantage Intranet PWA V3.8.7 • MS365 & Teams Integration",
 
                 deptTechRentalTitle: "Technical Departments Rental",
                 deptTechRentalDesc: "Kamera, mechanika, NLN & dílenské protokoly.",
-                
                 deptBookingTitle: "Booking Department & Client Contacts",
                 deptBookingDesc: "Rezervace, kontakty na klienty & dostupnost.",
-
                 deptProductsTitle: "VANTAGE & HAWK Products",
                 deptProductsDesc: "Vlastní vývoj, HAWK Lenses & datové listy.",
-
-                deptAccountingTitle: "Buchhaltung",
+                deptAccountingTitle: "Accounting",
                 deptAccountingDesc: "Faktury, výdaje & finanční procesy.",
-
-                deptPreparationTitle: "Vorbereitung / Job Handling",
+                deptPreparationTitle: "Preparation / Job Handling",
                 deptPreparationDesc: "Příprava zakázek, kontrolní seznamy & check-outy.",
-
                 deptItTitle: "IT / Software",
                 deptItDesc: "Infrastruktur, nástroje, sítě & podpora.",
-
                 deptMarketingTitle: "Marketing",
                 deptMarketingDesc: "Sociální sítě, akce, PR & CI materiály.",
 
@@ -1014,20 +816,6 @@
                 ggEdgeDist: "Vzdálenost horní/dolní okraj",
                 ggPrintBtn: "Tisknout šablonu s grafikou",
                 ggPreviewHint: "Vizuální náhled (Červená = Cílový formát)",
-                printTemplateTitle: "Tisková šablona & Grafický náhled",
-                printTemplateSub: "Výpočet matnice pro kamerové šablony",
-                printParam: "Parametr",
-                printSpec: "Specifikace / Hodnota",
-                printSelectedGlass: "Zvolená matnice",
-                printMaxDim: "Max. šířka × výška",
-                printAspectLabel: "Cílový poměr stran",
-                printTargetH: "Cílová výška (Ořezové okno)",
-                printCenterLine: "Čára od středu nahoru / dolů",
-                printEdgeDist: "Vzdálenost k hornímu / dolnímu okraji",
-                printGraphicsHeader: "Vizuální grafika",
-                printScale1: "1. Skutečná velikost (Měřítko 1:1)",
-                printScale2: "2. Zvětšený přehled",
-                printHintText: "Poznámka k obrysu: Vnější černý rám odpovídá celkovým rozměrům matnice. Vnitřní červený rám označuje vypočítaný cílový formát.",
 
                 snakeTitle: "Vantage Snake 🕹️",
                 snakeSub: "Použijte šipky pro ovládání!",
@@ -1040,16 +828,8 @@
 
         const departmentsConfig = [
             {
-                id: "techRental",
-                titleKey: "deptTechRentalTitle",
-                descKey: "deptTechRentalDesc",
-                color: "gold",
-                icon: "camera",
-                borderColor: "hover:border-[var(--vantage-gold)]",
-                hasSharePointLink: true,
-                sharePointUrl: "https://vantageweiden.sharepoint.com/sites/Testbetreuung2/Lists/Testbetreuung/AllItems.aspx",
-                teamsProtocolUrl: "",
-                teamsWebUrl: "",
+                id: "techRental", titleKey: "deptTechRentalTitle", descKey: "deptTechRentalDesc", icon: "camera",
+                hasSharePointLink: true, sharePointUrl: "https://vantageweiden.sharepoint.com/sites/Testbetreuung2/Lists/Testbetreuung/AllItems.aspx",
                 subcategories: [
                     { nameKey: "subFirmware", icon: "download-cloud" },
                     { nameKey: "subGroundglass", icon: "layout-template", isTool: true, toolType: "groundglass" },
@@ -1060,78 +840,22 @@
                 ]
             },
             {
-                id: "booking",
-                titleKey: "deptBookingTitle",
-                descKey: "deptBookingDesc",
-                color: "gold",
-                icon: "calendar-check",
-                borderColor: "hover:border-[var(--vantage-gold)]",
-                hasSharePointLink: true,
-                sharePointUrl: "https://vantageweiden.sharepoint.com/sites/Testbetreuung2/Lists/Testbetreuung/AllItems.aspx",
-                teamsProtocolUrl: "",
-                teamsWebUrl: "",
+                id: "booking", titleKey: "deptBookingTitle", descKey: "deptBookingDesc", icon: "calendar-check",
+                hasSharePointLink: true, sharePointUrl: "https://vantageweiden.sharepoint.com/sites/Testbetreuung2/Lists/Testbetreuung/AllItems.aspx",
                 subcategories: [
                     { nameKey: "subWhoWithWhom", icon: "external-link", externalUrl: "WhoWithWhom-Tool.html" }
                 ]
             },
-            {
-                id: "products",
-                titleKey: "deptProductsTitle",
-                descKey: "deptProductsDesc",
-                color: "gold",
-                icon: "cpu",
-                borderColor: "hover:border-[var(--vantage-gold)]",
-                teamsProtocolUrl: "",
-                teamsWebUrl: "",
-                subcategories: []
+            { id: "products", titleKey: "deptProductsTitle", descKey: "deptProductsDesc", icon: "cpu", subcategories: [] },
+            { id: "accounting", titleKey: "deptAccountingTitle", descKey: "deptAccountingDesc", icon: "receipt", subcategories: [] },
+            { id: "preparation", titleKey: "deptPreparationTitle", descKey: "deptPreparationDesc", icon: "check-square", subcategories: [] },
+            { 
+                id: "it", titleKey: "deptItTitle", descKey: "deptItDesc", icon: "server",
+                subcategories: [{ nameKey: "subSoftwareUpdates", icon: "shield" }] 
             },
-            {
-                id: "accounting",
-                titleKey: "deptAccountingTitle",
-                descKey: "deptAccountingDesc",
-                color: "gold",
-                icon: "receipt",
-                borderColor: "hover:border-[var(--vantage-gold)]",
-                teamsProtocolUrl: "",
-                teamsWebUrl: "",
-                subcategories: []
-            },
-            {
-                id: "preparation",
-                titleKey: "deptPreparationTitle",
-                descKey: "deptPreparationDesc",
-                color: "gold",
-                icon: "check-square",
-                borderColor: "hover:border-[var(--vantage-gold)]",
-                teamsProtocolUrl: "",
-                teamsWebUrl: "",
-                subcategories: []
-            },
-            {
-                id: "it",
-                titleKey: "deptItTitle",
-                descKey: "deptItDesc",
-                color: "gold",
-                icon: "server",
-                borderColor: "hover:border-[var(--vantage-gold)]",
-                teamsProtocolUrl: "",
-                teamsWebUrl: "",
-                subcategories: [
-                    { nameKey: "subSoftwareUpdates", icon: "shield" }
-                ]
-            },
-            {
-                id: "marketing",
-                titleKey: "deptMarketingTitle",
-                descKey: "deptMarketingDesc",
-                color: "gold",
-                icon: "megaphone",
-                borderColor: "hover:border-[var(--vantage-gold)]",
-                teamsProtocolUrl: "",
-                teamsWebUrl: "",
-                subcategories: [
-                    { nameKey: "subPhotoStation", icon: "image", externalUrl: "https://photostation.vantagefilm.com/photo/?launchApp=SYNO.Foto.Sharing.AppInstance&app_name=SYNO.Foto.AppInstance&photos_action=external_login&folderId=6&alias=photo#/signin" }
-                ]
+            { 
+                id: "marketing", titleKey: "deptMarketingTitle", descKey: "deptMarketingDesc", icon: "megaphone",
+                subcategories: [{ nameKey: "subPhotoStation", icon: "image", externalUrl: "https://photostation.vantagefilm.com" }] 
             }
         ];
 
@@ -1146,7 +870,7 @@
                 const desc = t[dept.descKey] || dept.descKey;
 
                 const card = document.createElement('div');
-                card.className = `bg-[var(--vantage-panel)] border border-[var(--vantage-border)] ${dept.borderColor} rounded-sm p-5 transition-all duration-200 hover:shadow-md flex flex-col justify-between cursor-pointer group`;
+                card.className = "bg-[var(--vantage-panel)] border border-[var(--vantage-border)] hover:border-[var(--vantage-gold)] rounded-sm p-5 transition-all duration-200 hover:shadow-md flex flex-col justify-between cursor-pointer group";
                 card.onclick = () => openDepartment(dept.titleKey);
                 
                 card.innerHTML = `
@@ -1176,10 +900,6 @@
                 const key = el.dataset.i18nPlaceholder;
                 if (translations[lang]?.[key]) el.placeholder = translations[lang][key];
             });
-            document.querySelectorAll("[data-i18n-title]").forEach(el => {
-                const key = el.dataset.i18nTitle;
-                if (translations[lang]?.[key]) el.title = translations[lang][key];
-            });
             document.documentElement.lang = lang;
         }
 
@@ -1187,9 +907,8 @@
             currentLanguage = lang;
             localStorage.setItem("vantage-language", lang);
             renderDepartments();
-            const activeDetailTitleKey = window._currentActiveDeptKey;
-            if (activeDetailTitleKey) {
-                openDepartment(activeDetailTitleKey, true);
+            if (window._currentActiveDeptKey) {
+                openDepartment(window._currentActiveDeptKey, true);
             }
             if (!document.getElementById('tool-view-container').classList.contains('hidden')) {
                 loadGroundglassTool();
@@ -1197,30 +916,19 @@
         }
 
         function initializeLanguage() {
-            const languageSelect = document.getElementById("language-select");
-            const savedLanguage = localStorage.getItem("vantage-language");
-            if (savedLanguage && translations[savedLanguage]) {
-                currentLanguage = savedLanguage;
-                languageSelect.value = savedLanguage;
-                return;
+            const langSel = document.getElementById("language-select");
+            const saved = localStorage.getItem("vantage-language");
+            if (saved && translations[saved]) {
+                currentLanguage = saved;
+                langSel.value = saved;
             }
-            const browserLanguage = navigator.language.toLowerCase();
-            let detectedLanguage = browserLanguage.startsWith("de") ? "de" : browserLanguage.startsWith("fr") ? "fr" : browserLanguage.startsWith("cs") ? "cs" : "en";
-            currentLanguage = detectedLanguage;
-            languageSelect.value = detectedLanguage;
         }
 
         function toggleMobileSidebar() {
             const sidebar = document.getElementById('sidebar');
             const backdrop = document.getElementById('mobile-sidebar-backdrop');
-            const isHidden = sidebar.classList.contains('-translate-x-full');
-            if (isHidden) {
-                sidebar.classList.remove('-translate-x-full');
-                backdrop.classList.remove('hidden');
-            } else {
-                sidebar.classList.add('-translate-x-full');
-                backdrop.classList.add('hidden');
-            }
+            sidebar.classList.toggle('-translate-x-full');
+            backdrop.classList.toggle('hidden');
         }
 
         window._currentActiveDeptKey = null;
@@ -1231,43 +939,27 @@
             document.getElementById('detail-view').classList.remove('hidden');
             
             const t = translations[currentLanguage];
-            const translatedDeptTitle = t[departmentTitleKey] || departmentTitleKey;
+            const translatedTitle = t[departmentTitleKey] || departmentTitleKey;
 
-            document.getElementById('detail-title').innerText = translatedDeptTitle;
-            document.getElementById('breadcrumb-path').innerHTML = translatedDeptTitle;
+            document.getElementById('detail-title').textContent = translatedTitle;
+            document.getElementById('breadcrumb-path').textContent = translatedTitle;
 
-            const actionButtonsContainer = document.getElementById('detail-action-buttons');
-            actionButtonsContainer.innerHTML = "";
+            const actionContainer = document.getElementById('detail-action-buttons');
+            actionContainer.innerHTML = "";
 
             const foundDept = departmentsConfig.find(d => d.titleKey === departmentTitleKey);
-            
             if (foundDept && foundDept.hasSharePointLink) {
-                const spBtn = document.createElement('a');
-                spBtn.href = foundDept.sharePointUrl;
-                spBtn.target = "_blank";
-                spBtn.className = "bg-[var(--vantage-gold)] hover:bg-[var(--vantage-gold-dark)] text-white px-3.5 py-2.5 rounded-sm text-xs font-semibold uppercase tracking-wider transition flex items-center justify-center gap-1.5 shadow-sm active:scale-95";
-                spBtn.innerHTML = `<i data-lucide="external-link" class="w-4 h-4"></i> <span data-i18n="btnTestbetreuung">Testbetreuung (SharePoint)</span>`;
-                actionButtonsContainer.appendChild(spBtn);
+                actionContainer.innerHTML = `
+                    <a href="${foundDept.sharePointUrl}" target="_blank" class="bg-[var(--vantage-gold)] hover:bg-[var(--vantage-gold-dark)] text-white px-3.5 py-2.5 rounded-sm text-xs font-semibold uppercase tracking-wider transition flex items-center gap-1.5 shadow-sm">
+                        <i data-lucide="external-link" class="w-4 h-4"></i> <span data-i18n="btnTestbetreuung">${t.btnTestbetreuung}</span>
+                    </a>
+                `;
             }
 
-            const teamsBtn = document.createElement('button');
-            const defaultProtocol = "msteams://teams.microsoft.com/";
-            const defaultWeb = "https://teams.microsoft.com/";
-            const proto = foundDept?.teamsProtocolUrl || defaultProtocol;
-            const web = foundDept?.teamsWebUrl || defaultWeb;
-
-            teamsBtn.onclick = () => openSmartTeams(proto, web);
-            teamsBtn.className = "bg-[var(--vantage-dark-panel)] hover:bg-black text-white px-4 py-2.5 rounded-sm text-xs font-semibold uppercase tracking-wider transition flex items-center justify-center gap-2 shadow-sm active:scale-95 cursor-pointer";
-            teamsBtn.innerHTML = `<i data-lucide="external-link" class="w-4 h-4 text-[var(--vantage-gold)]"></i> <span data-i18n="btnOpenTeams">In Teams öffnen</span>`;
-            actionButtonsContainer.appendChild(teamsBtn);
-
-            if (!keepToolState) {
-                closeEmbeddedTool();
-            }
+            if (!keepToolState) closeEmbeddedTool();
 
             const subContainer = document.getElementById('subcategories-container');
             subContainer.innerHTML = "";
-
             const subcategories = foundDept ? foundDept.subcategories : [];
 
             subcategories.forEach(sub => {
@@ -1276,7 +968,7 @@
                 btn.className = "flex items-center justify-between p-3 bg-[var(--vantage-bg)] hover:bg-[var(--vantage-panel)] border border-[var(--vantage-border)] hover:border-[var(--vantage-gold)] rounded-sm cursor-pointer transition group";
                 
                 if (sub.externalUrl) {
-                    btn.onclick = () => { window.open(sub.externalUrl, '_blank'); };
+                    btn.onclick = () => window.open(sub.externalUrl, '_blank', 'noopener,noreferrer');
                 } else if (sub.isTool && sub.toolType === "groundglass") {
                     btn.onclick = () => loadGroundglassTool();
                 }
@@ -1289,9 +981,7 @@
                 `;
                 subContainer.appendChild(btn);
             });
-
             lucide.createIcons();
-            updateTranslations();
         }
 
         function goHome() {
@@ -1304,23 +994,19 @@
         function goBack() { goHome(); }
 
         function closeEmbeddedTool() {
-            const toolContainer = document.getElementById('tool-view-container');
-            const chatStream = document.getElementById('chat-stream-card');
-            toolContainer.classList.add('hidden');
-            toolContainer.innerHTML = "";
-            chatStream.classList.remove('hidden');
+            document.getElementById('tool-view-container').classList.add('hidden');
+            document.getElementById('tool-view-container').innerHTML = "";
+            document.getElementById('chat-stream-card').classList.remove('hidden');
         }
 
         // =========================================================================
-        // EINGEBETTETES TOOL: MATTSCHEIBEN-RECHNER S35
+        // MATTSCHEIBEN-RECHNER S35
         // =========================================================================
         function loadGroundglassTool() {
+            document.getElementById('chat-stream-card').classList.add('hidden');
             const toolContainer = document.getElementById('tool-view-container');
-            const chatStream = document.getElementById('chat-stream-card');
-            const t = translations[currentLanguage];
-            
-            chatStream.classList.add('hidden');
             toolContainer.classList.remove('hidden');
+            const t = translations[currentLanguage];
 
             toolContainer.innerHTML = `
                 <div class="bg-[var(--vantage-dark-panel)] text-slate-100 rounded-sm p-6 border border-[var(--vantage-border)] shadow-lg space-y-6 no-print">
@@ -1344,12 +1030,12 @@
                             </div>
 
                             <div class="grid grid-cols-2 gap-2 pt-2">
-                                <div class="bg-slate-950 p-3 rounded-sm border border-slate-800"><div class="text-[10px] text-slate-400 uppercase tracking-wider">${t.ggMaxW}</div><div id="gg-res-breite" class="text-sm font-bold text-white mt-1">-</div></div>
-                                <div class="bg-slate-950 p-3 rounded-sm border border-slate-800"><div class="text-[10px] text-slate-400 uppercase tracking-wider">${t.ggMaxH}</div><div id="gg-res-hoehe" class="text-sm font-bold text-white mt-1">-</div></div>
-                                <div class="bg-slate-950 p-3 rounded-sm border border-slate-800"><div class="text-[10px] text-slate-400 uppercase tracking-wider">${t.ggTargetW}</div><div id="gg-res-zielbreite" class="text-sm font-bold text-white mt-1">-</div></div>
-                                <div class="bg-slate-950 p-3 rounded-sm border border-slate-800"><div class="text-[10px] text-slate-400 uppercase tracking-wider">${t.ggTargetH}</div><div id="gg-res-zielhoehe" class="text-sm font-bold text-white mt-1">-</div></div>
-                                <div class="bg-slate-950 p-3 rounded-sm border border-slate-800"><div class="text-[10px] text-slate-400 uppercase tracking-wider">${t.ggCenterDist}</div><div id="gg-res-mitte" class="text-sm font-bold text-white mt-1">-</div></div>
-                                <div class="bg-slate-950 p-3 rounded-sm border border-slate-800"><div class="text-[10px] text-slate-400 uppercase tracking-wider">${t.ggEdgeDist}</div><div id="gg-res-kante" class="text-sm font-bold text-white mt-1">-</div></div>
+                                <div class="bg-slate-950 p-3 rounded-sm border border-slate-800"><div class="text-[10px] text-slate-400 uppercase tracking-wider">Max. Breite</div><div id="gg-res-breite" class="text-sm font-bold text-white mt-1">-</div></div>
+                                <div class="bg-slate-950 p-3 rounded-sm border border-slate-800"><div class="text-[10px] text-slate-400 uppercase tracking-wider">Max. Höhe</div><div id="gg-res-hoehe" class="text-sm font-bold text-white mt-1">-</div></div>
+                                <div class="bg-slate-950 p-3 rounded-sm border border-slate-800"><div class="text-[10px] text-slate-400 uppercase tracking-wider">Zielbreite</div><div id="gg-res-zielbreite" class="text-sm font-bold text-white mt-1">-</div></div>
+                                <div class="bg-slate-950 p-3 rounded-sm border border-slate-800"><div class="text-[10px] text-slate-400 uppercase tracking-wider">Zielhöhe</div><div id="gg-res-zielhoehe" class="text-sm font-bold text-white mt-1">-</div></div>
+                                <div class="bg-slate-950 p-3 rounded-sm border border-slate-800"><div class="text-[10px] text-slate-400 uppercase tracking-wider">Mitte Abstand</div><div id="gg-res-mitte" class="text-sm font-bold text-white mt-1">-</div></div>
+                                <div class="bg-slate-950 p-3 rounded-sm border border-slate-800"><div class="text-[10px] text-slate-400 uppercase tracking-wider">Rand Abstand</div><div id="gg-res-kante" class="text-sm font-bold text-white mt-1">-</div></div>
                             </div>
 
                             <div class="pt-2 flex justify-end">
@@ -1368,61 +1054,32 @@
 
                 <!-- DRUCK ANSICHT -->
                 <div class="print-only print-template">
-                    <h1>${t.printTemplateTitle}</h1>
-                    <p class="sub">${t.printTemplateSub}</p>
-
+                    <h1>Druck-Schablone & Grafische Vorschau</h1>
                     <table class="print-table">
-                        <thead>
-                            <tr>
-                                <th>${t.printParam}</th>
-                                <th>${t.printSpec}</th>
-                            </tr>
-                        </thead>
+                        <thead><tr><th>Parameter</th><th>Spezifikation / Wert</th></tr></thead>
                         <tbody>
-                            <tr><td>${t.printSelectedGlass}</td><td id="print-mattscheibe">-</td></tr>
-                            <tr><td>${t.printMaxDim}</td><td><span id="print-breite">-</span> mm &times; <span id="print-hoehe">-</span> mm</td></tr>
-                            <tr><td>${t.printAspectLabel}</td><td id="print-aspect">-</td></tr>
-                            <tr><td>${t.printTargetH}</td><td><strong id="print-zielhoehe">-</strong> mm</td></tr>
-                            <tr><td>${t.printCenterLine}</td><td><strong id="print-mitte-oben">-</strong> mm</td></tr>
-                            <tr><td>${t.printEdgeDist}</td><td><strong id="print-kante-oben">-</strong> mm</td></tr>
+                            <tr><td>Gewählte Mattscheibe</td><td id="print-mattscheibe">-</td></tr>
+                            <tr><td>Max. Breite × Höhe</td><td><span id="print-breite">-</span> mm &times; <span id="print-hoehe">-</span> mm</td></tr>
+                            <tr><td>Ziel-Seitenverhältnis</td><td id="print-aspect">-</td></tr>
+                            <tr><td>Zielhöhe (Schnittfenster)</td><td><strong id="print-zielhoehe">-</strong> mm</td></tr>
                         </tbody>
                     </table>
-
-                    <h2>${t.printGraphicsHeader}</h2>
-
-                    <div class="preview-section-print">
-                        <div class="scale-box">
-                            <h3>${t.printScale1}</h3>
-                            <canvas id="gg-actualCanvas" class="print-canvas-actual"></canvas>
-                        </div>
-                        <div class="scale-box">
-                            <h3>${t.printScale2}</h3>
-                            <canvas id="gg-printCanvas" width="280" height="200" style="background:#fff; border:1px solid #000;"></canvas>
-                        </div>
+                    <div style="margin-top: 1cm;">
+                        <canvas id="gg-printCanvas" width="280" height="200" style="background:#fff; border:1px solid #000;"></canvas>
                     </div>
-
-                    <p class="hint-text"><strong>${t.printHintText}</strong></p>
                 </div>
             `;
-
             lucide.createIcons();
             initGGSelect();
-            calculateGG();
         }
 
         const mattscheibenData = [
+            { name: "-- Bitte auswählen --", breite: 0, hoehe: 0 },
             { name: "ANSI S35 Silent 1.33", breite: 24.0, hoehe: 18.00 },
             { name: "ANSI S35 TV 1.33 safe", breite: 23.0, hoehe: 17.25 },
             { name: "ANSI S35 TV 1.78 transmitted", breite: 24.0, hoehe: 13.50 },
-            { name: "ANSI S35 TV 1.78 + 1.33 trans", breite: 24.0, hoehe: 13.50 },
-            { name: "ANSI S35 TV 1.78 safe", breite: 23.0, hoehe: 12.94 },
-            { name: "ANSI S35 1.78 + 1.55 + 1.33 CGG", breite: 24.0, hoehe: 13.50 },
             { name: "ANSI S35 1.85", breite: 24.0, hoehe: 13.00 },
-            { name: "ANSI S35 2.35 + 1.85 + TV 1.33", breite: 24.0, hoehe: 13.00 },
-            { name: "ANSI S35 2.35 centric", breite: 24.0, hoehe: 10.20 },
-            { name: "ANSI S35 2.35 + 1.85 1/4 offset", breite: 24.0, hoehe: 13.00 },
-            { name: "ANSI S35 2.35 + 1.85 centric", breite: 24.0, hoehe: 13.00 },
-            { name: "ANSI S35 2.35 + 1.85 common top", breite: 24.0, hoehe: 13.00 }
+            { name: "ANSI S35 2.35 centric", breite: 24.0, hoehe: 10.20 }
         ];
 
         function initGGSelect() {
@@ -1435,42 +1092,18 @@
                 opt.textContent = item.name;
                 select.appendChild(opt);
             });
+            select.selectedIndex = 0;
         }
 
         function calculateGG() {
             const select = document.getElementById("gg-mattscheibe");
-            if (!select) return;
+            if (!select || select.value == "0") return;
             const selectedItem = mattscheibenData[select.value];
-            const rawAspect = document.getElementById("gg-aspect").value.trim();
-            const targetAR = parseFloat(rawAspect);
-
-            if (!selectedItem) return;
+            const targetAR = parseFloat(document.getElementById("gg-aspect").value) || 0;
+            if (!selectedItem || targetAR <= 0) return;
 
             const breite = selectedItem.breite;
             const hoehe = selectedItem.hoehe;
-
-            if (!rawAspect || isNaN(targetAR) || targetAR <= 0) {
-                document.getElementById("gg-res-breite").textContent = breite.toFixed(2) + " mm";
-                document.getElementById("gg-res-hoehe").textContent = hoehe.toFixed(2) + " mm";
-                document.getElementById("gg-res-zielbreite").textContent = "-";
-                document.getElementById("gg-res-zielhoehe").textContent = "-";
-                document.getElementById("gg-res-mitte").textContent = "-";
-                document.getElementById("gg-res-kante").textContent = "-";
-
-                document.getElementById("print-mattscheibe").textContent = selectedItem.name;
-                document.getElementById("print-breite").textContent = breite.toFixed(2);
-                document.getElementById("print-hoehe").textContent = hoehe.toFixed(2);
-                document.getElementById("print-aspect").textContent = "-";
-                document.getElementById("print-zielhoehe").textContent = "-";
-                document.getElementById("print-mitte-oben").textContent = "-";
-                document.getElementById("print-kante-oben").textContent = "-";
-
-                drawGGCanvas("gg-previewCanvas", breite, hoehe, 0, 0, 400, 300, false);
-                drawGGCanvas("gg-printCanvas", breite, hoehe, 0, 0, 280, 200, true);
-                drawGG1to1Canvas(breite, hoehe, 0, 0);
-                return;
-            }
-
             const zielbreite = breite;
             const zielhoehe = zielbreite / targetAR;
             const abstandMitte = zielhoehe / 2;
@@ -1488,12 +1121,9 @@
             document.getElementById("print-hoehe").textContent = hoehe.toFixed(2);
             document.getElementById("print-aspect").textContent = targetAR.toFixed(2);
             document.getElementById("print-zielhoehe").textContent = zielhoehe.toFixed(2);
-            document.getElementById("print-mitte-oben").textContent = abstandMitte.toFixed(2);
-            document.getElementById("print-kante-oben").textContent = abstandKante.toFixed(2);
 
             drawGGCanvas("gg-previewCanvas", breite, hoehe, zielbreite, zielhoehe, 400, 300, false);
             drawGGCanvas("gg-printCanvas", breite, hoehe, zielbreite, zielhoehe, 280, 200, true);
-            drawGG1to1Canvas(breite, hoehe, zielbreite, zielhoehe);
         }
 
         function drawGGCanvas(canvasId, sensorW, sensorH, targetW, targetH, width, height, isPrint) {
@@ -1501,11 +1131,7 @@
             if (!canvas) return;
             const ctx = canvas.getContext("2d");
             ctx.clearRect(0, 0, width, height);
-
-            if (isPrint) {
-                ctx.fillStyle = "#ffffff";
-                ctx.fillRect(0, 0, width, height);
-            }
+            if (isPrint) { ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, width, height); }
 
             const margin = 25;
             const scale = Math.min((width - margin * 2) / sensorW, (height - margin * 2) / sensorH);
@@ -1516,56 +1142,16 @@
             ctx.lineWidth = 2;
             ctx.strokeRect(startX, startY, drawSensorW, drawSensorH);
 
-            if (!isPrint) {
-                ctx.fillStyle = "rgba(148, 163, 184, 0.1)";
-                ctx.fillRect(startX, startY, drawSensorW, drawSensorH);
-            }
-
             if (targetW > 0 && targetH > 0) {
                 const drawTargetW = targetW * scale, drawTargetH = targetH * scale;
                 ctx.strokeStyle = "#dc2626";
                 ctx.lineWidth = 2;
                 ctx.strokeRect(startX + (drawSensorW - drawTargetW) / 2, startY + (drawSensorH - drawTargetH) / 2, drawTargetW, drawTargetH);
             }
-
-            ctx.strokeStyle = isPrint ? "#888888" : "rgba(184, 146, 59, 0.4)";
-            ctx.setLineDash([3, 3]);
-            ctx.beginPath();
-            ctx.moveTo(width / 2, startY); ctx.lineTo(width / 2, startY + drawSensorH);
-            ctx.moveTo(startX, height / 2); ctx.lineTo(startX + drawSensorW, height / 2);
-            ctx.stroke();
-            ctx.setLineDash([]);
-        }
-
-        function drawGG1to1Canvas(sensorW, sensorH, targetW, targetH) {
-            const canvas = document.getElementById("gg-actualCanvas");
-            if (!canvas) return;
-            const ctx = canvas.getContext("2d");
-            const dpr = window.devicePixelRatio || 1;
-            const mmToPx = 3.7795275591;
-            const pxW = sensorW * mmToPx, pxH = sensorH * mmToPx;
-
-            canvas.style.width = sensorW + "mm";
-            canvas.style.height = sensorH + "mm";
-            canvas.width = pxW * dpr; canvas.height = pxH * dpr;
-            ctx.scale(dpr, dpr);
-
-            ctx.fillStyle = "#ffffff";
-            ctx.fillRect(0, 0, pxW, pxH);
-            ctx.strokeStyle = "#000000";
-            ctx.lineWidth = 1.5;
-            ctx.strokeRect(0, 0, pxW, pxH);
-
-            if (targetW > 0 && targetH > 0) {
-                const targetPxW = targetW * mmToPx, targetPxH = targetH * mmToPx;
-                ctx.strokeStyle = "#dc2626";
-                ctx.lineWidth = 1.5;
-                ctx.strokeRect((pxW - targetPxW) / 2, (pxH - targetPxH) / 2, targetPxW, targetPxH);
-            }
         }
 
         // =========================================================================
-        // EASTER EGG LOGIC (VANTAGE SNAKE MINIGAME + KONAMI CODE & TRIPLE CLICK)
+        // EASTER EGG LOGIC (Vantage Snake)
         // =========================================================================
         let konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
         let konamiIndex = 0;
@@ -1575,24 +1161,15 @@
         document.addEventListener('keydown', (e) => {
             if (e.key === konamiCode[konamiIndex]) {
                 konamiIndex++;
-                if (konamiIndex === konamiCode.length) {
-                    openSnakeGame();
-                    konamiIndex = 0;
-                }
-            } else {
-                konamiIndex = 0;
-            }
+                if (konamiIndex === konamiCode.length) { openSnakeGame(); konamiIndex = 0; }
+            } else { konamiIndex = 0; }
         });
 
         function triggerEasterEggClick() {
             logoClickCount++;
             clearTimeout(logoClickTimer);
-            if (logoClickCount === 3) {
-                openSnakeGame();
-                logoClickCount = 0;
-            } else {
-                logoClickTimer = setTimeout(() => { logoClickCount = 0; }, 800);
-            }
+            if (logoClickCount === 3) { openSnakeGame(); logoClickCount = 0; }
+            else { logoClickTimer = setTimeout(() => { logoClickCount = 0; }, 800); }
         }
 
         let snakeCanvas, snakeCtx;
@@ -1619,25 +1196,19 @@
         function startSnakeGame() {
             clearInterval(snakeGameLoop);
             snake = [{ x: 10, y: 10 }, { x: 9, y: 10 }, { x: 8, y: 10 }];
-            snakeDir = 'RIGHT';
-            nextDir = 'RIGHT';
+            snakeDir = 'RIGHT'; nextDir = 'RIGHT';
             snakeScore = 0;
-            document.getElementById('snake-score').innerText = snakeScore;
+            document.getElementById('snake-score').textContent = snakeScore;
             spawnFood();
             snakeGameLoop = setInterval(updateSnake, 140);
         }
 
         function spawnFood() {
-            food = {
-                x: Math.floor(Math.random() * tileCount),
-                y: Math.floor(Math.random() * tileCount)
-            };
+            food = { x: Math.floor(Math.random() * tileCount), y: Math.floor(Math.random() * tileCount) };
         }
 
         function handleSnakeControls(e) {
-            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
-                e.preventDefault();
-            }
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) e.preventDefault();
             if (e.key === 'ArrowUp' && snakeDir !== 'DOWN') nextDir = 'UP';
             if (e.key === 'ArrowDown' && snakeDir !== 'UP') nextDir = 'DOWN';
             if (e.key === 'ArrowLeft' && snakeDir !== 'RIGHT') nextDir = 'LEFT';
@@ -1647,40 +1218,34 @@
         function updateSnake() {
             snakeDir = nextDir;
             let head = { ...snake[0] };
-
             if (snakeDir === 'UP') head.y--;
             if (snakeDir === 'DOWN') head.y++;
             if (snakeDir === 'LEFT') head.x--;
             if (snakeDir === 'RIGHT') head.x++;
 
-            if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount || snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+            if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount || snake.some(s => s.x === head.x && s.y === head.y)) {
                 clearInterval(snakeGameLoop);
                 if (snakeScore > snakeHighscore) {
                     snakeHighscore = snakeScore;
-                    document.getElementById('snake-highscore').innerText = snakeHighscore;
+                    document.getElementById('snake-highscore').textContent = snakeHighscore;
                 }
                 return;
             }
 
             snake.unshift(head);
-
             if (head.x === food.x && head.y === food.y) {
                 snakeScore += 10;
-                document.getElementById('snake-score').innerText = snakeScore;
+                document.getElementById('snake-score').textContent = snakeScore;
                 spawnFood();
-            } else {
-                snake.pop();
-            }
+            } else { snake.pop(); }
 
             snakeCtx.fillStyle = '#000000';
             snakeCtx.fillRect(0, 0, snakeCanvas.width, snakeCanvas.height);
-
             snakeCtx.fillStyle = '#B8923B';
             snakeCtx.fillRect(food.x * gridSize, food.y * gridSize, gridSize - 1, gridSize - 1);
-
-            snake.forEach((segment, index) => {
-                snakeCtx.fillStyle = index === 0 ? '#10b981' : '#ffffff';
-                snakeCtx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize - 1, gridSize - 1);
+            snake.forEach((seg, i) => {
+                snakeCtx.fillStyle = i === 0 ? '#10b981' : '#ffffff';
+                snakeCtx.fillRect(seg.x * gridSize, seg.y * gridSize, gridSize - 1, gridSize - 1);
             });
         }
 
@@ -1691,15 +1256,13 @@
 
             try {
                 const response = await msalInstance.handleRedirectPromise();
-                currentUserAccount = response ? response.account : (msalInstance.getAllAccounts()[0] || null);
-
+                currentUserAccount = response ? response.account : getActiveAccount();
                 if (currentUserAccount) {
+                    msalInstance.setActiveAccount(currentUserAccount);
                     updateUserUI(currentUserAccount);
                     await loadGraphData();
                 }
-            } catch (err) {
-                console.warn("MSAL Init Error:", err);
-            }
+            } catch (err) { console.warn("MSAL Init Error:", err); }
         });
     </script>
 </body>
