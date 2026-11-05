@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VANTAGE Intranet V3.8.7</title>
+    <title>VANTAGE Intranet V3.8.8</title>
     <!-- Content Security Policy (CSP) -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://cdn.tailwindcss.com https://unpkg.com https://alcdn.msauth.net https://login.microsoftonline.com https://graph.microsoft.com; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com https://alcdn.msauth.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://login.microsoftonline.com https://graph.microsoft.com; img-src 'self' data: https:;">
     <!-- Tailwind CSS CDN -->
@@ -134,7 +134,7 @@
             <div class="p-2.5 border-b border-[var(--vantage-border)] bg-[var(--vantage-panel)]">
                 <div class="relative">
                     <i data-lucide="search" class="w-3.5 h-3.5 text-[var(--vantage-text-muted)] absolute left-2.5 top-2"></i>
-                    <input type="text" id="employee-search" data-i18n-placeholder="searchPlaceholder" placeholder="Mitarbeiter suchen..." 
+                    <input type="text" id="employee-search" oninput="filterPresenceList()" data-i18n-placeholder="searchPlaceholder" placeholder="Mitarbeiter suchen..." 
                         class="w-full pl-7 pr-2.5 py-1 text-xs bg-[var(--vantage-bg)] border border-[var(--vantage-border)] rounded-sm focus:outline-none focus:border-[var(--vantage-gold)] transition text-[var(--vantage-text-main)] placeholder-[var(--vantage-text-muted)]">
                 </div>
             </div>
@@ -159,7 +159,7 @@
                         <i data-lucide="menu" class="w-5 h-5"></i>
                     </button>
                     <h1 class="font-light text-sm lg:text-base tracking-[2px] uppercase text-white flex items-center gap-3">
-                        VANTAGE <span class="hidden sm:inline-block text-[11px] font-semibold text-[var(--vantage-gold)] bg-transparent border border-[var(--vantage-gold)] px-3 py-0.5 rounded-sm tracking-[1.5px]">Intranet V3.8.7 🚀</span>
+                        VANTAGE <span class="hidden sm:inline-block text-[11px] font-semibold text-[var(--vantage-gold)] bg-transparent border border-[var(--vantage-gold)] px-3 py-0.5 rounded-sm tracking-[1.5px]">Intranet V3.8.8 🚀</span>
                     </h1>
                 </div>
 
@@ -345,7 +345,7 @@
             </div>
 
             <footer class="p-4 lg:p-6 text-center text-xs text-[var(--vantage-text-muted)] border-t border-[var(--vantage-border)] mt-auto no-print uppercase tracking-widest bg-[var(--vantage-panel)]">
-                <p data-i18n="footerText">Vantage Intranet PWA V3.8.7 &bull; MS365 & Teams Integration</p>
+                <p data-i18n="footerText">Vantage Intranet PWA V3.8.8 &bull; MS365 & Teams Integration</p>
             </footer>
 
         </div>
@@ -385,9 +385,15 @@
             cache: { cacheLocation: "sessionStorage", storeAuthStateInCookie: false }
         };
 
-        const loginRequest = { scopes: ["User.Read", "Calendars.Read"] };
+        const loginRequest = { scopes: ["User.Read", "Calendars.Read", "User.ReadBasic.All", "Presence.Read.All"] };
         const msalInstance = new msal.PublicClientApplication(msalConfig);
         let currentUserAccount = null;
+        let fetchedUsersList = [];
+
+        function isSafariOrWebKit() {
+            const ua = navigator.userAgent.toLowerCase();
+            return ua.includes('safari') && !ua.includes('chrome') && !ua.includes('android');
+        }
 
         function getActiveAccount() {
             const accounts = msalInstance.getAllAccounts();
@@ -397,14 +403,21 @@
 
         async function loginM365() {
             try {
-                await msalInstance.loginPopup(loginRequest);
-                currentUserAccount = getActiveAccount();
-                if (currentUserAccount) {
-                    msalInstance.setActiveAccount(currentUserAccount);
-                    updateUserUI(currentUserAccount);
-                    await loadGraphData();
+                if (isSafariOrWebKit()) {
+                    await msalInstance.loginRedirect(loginRequest);
+                } else {
+                    await msalInstance.loginPopup(loginRequest);
+                    currentUserAccount = getActiveAccount();
+                    if (currentUserAccount) {
+                        msalInstance.setActiveAccount(currentUserAccount);
+                        updateUserUI(currentUserAccount);
+                        await loadGraphData();
+                    }
                 }
-            } catch (err) { console.error("Login Error:", err); }
+            } catch (err) {
+                console.warn("Popup blockiert/gefehlt, wechsle zu Redirect-Anmeldung:", err);
+                await msalInstance.loginRedirect(loginRequest);
+            }
         }
 
         async function logoutM365() {
@@ -419,6 +432,7 @@
             const emptyMsg = `<div class="p-2.5 bg-[var(--vantage-panel)] rounded-sm border border-[var(--vantage-border)] text-slate-500 italic">Bitte bei M365 anmelden, um Termine zu laden.</div>`;
             document.getElementById('today-calendar-events').innerHTML = emptyMsg;
             document.getElementById('upcoming-calendar-events').innerHTML = emptyMsg;
+            document.getElementById('sidebar-presence-list').innerHTML = "Bitte bei M365 anmelden, um Mitarbeiter-Präsenzen zu laden.";
         }
 
         function updateUserUI(account) {
@@ -435,8 +449,12 @@
                 const res = await msalInstance.acquireTokenSilent({ scopes: loginRequest.scopes, account: activeAcc });
                 return res.accessToken;
             } catch (err) {
-                const res = await msalInstance.acquireTokenPopup({ scopes: loginRequest.scopes });
-                return res.accessToken;
+                if (isSafariOrWebKit()) {
+                    await msalInstance.acquireTokenRedirect({ scopes: loginRequest.scopes });
+                } else {
+                    const res = await msalInstance.acquireTokenPopup({ scopes: loginRequest.scopes });
+                    return res.accessToken;
+                }
             }
         }
 
@@ -444,6 +462,52 @@
             const token = await getAccessToken();
             if (!token) return;
             await fetchOutlookCalendars(token);
+            await fetchTeamsPresence(token);
+        }
+
+        async function fetchTeamsPresence(token) {
+            const presenceContainer = document.getElementById('sidebar-presence-list');
+            try {
+                const usersRes = await fetch(`https://graph.microsoft.com/v1.0/users?$top=15&$select=id,displayName,jobTitle`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!usersRes.ok) throw new Error(`Users API Fehler: ${usersRes.status}`);
+                const usersData = await usersRes.json();
+
+                if (usersData.value && usersData.value.length > 0) {
+                    fetchedUsersList = usersData.value;
+                    renderPresenceList(fetchedUsersList);
+                } else {
+                    presenceContainer.innerHTML = `<div class="p-2 text-xs text-slate-500">Keine Mitarbeiter gefunden.</div>`;
+                }
+            } catch (err) {
+                console.warn("Teams Presence Fetch Info:", err.message);
+                presenceContainer.innerHTML = `<div class="p-2 text-xs text-slate-500 italic">M365 Angemeldet (${currentUserAccount ? currentUserAccount.name : 'Aktiv'})</div>`;
+            }
+        }
+
+        function renderPresenceList(users) {
+            const presenceContainer = document.getElementById('sidebar-presence-list');
+            presenceContainer.innerHTML = "";
+            users.forEach(u => {
+                const item = document.createElement('div');
+                item.className = "flex items-center justify-between p-2 rounded-sm bg-[var(--vantage-bg)] border border-[var(--vantage-border)] text-xs font-normal not-italic";
+                item.innerHTML = `
+                    <div class="truncate">
+                        <div class="font-semibold text-[var(--vantage-text-main)] truncate">${u.displayName}</div>
+                        <div class="text-[10px] text-[var(--vantage-text-muted)] truncate">${u.jobTitle || 'Vantage Team'}</div>
+                    </div>
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0" title="Online"></span>
+                `;
+                presenceContainer.appendChild(item);
+            });
+        }
+
+        function filterPresenceList() {
+            const query = document.getElementById('employee-search').value.toLowerCase();
+            if (!fetchedUsersList || fetchedUsersList.length === 0) return;
+            const filtered = fetchedUsersList.filter(u => u.displayName && u.displayName.toLowerCase().includes(query));
+            renderPresenceList(filtered);
         }
 
         async function fetchOutlookCalendars(token) {
@@ -496,7 +560,6 @@
                                     <span class="w-2 h-2 rounded-full bg-[var(--vantage-gold)] shrink-0"></span>
                                     <span class="font-medium text-[var(--vantage-text-main)] truncate">${timeStr} - ${evt.subject}</span>
                                 </div>
-                                <span class="text-[10px] bg-[var(--vantage-bg)] text-[var(--vantage-text-muted)] px-2 py-0.5 rounded-sm shrink-0 border border-[var(--vantage-border)]">Leipzig</span>
                             `;
                             todayContainer.appendChild(itemDiv);
                         } else {
@@ -506,7 +569,6 @@
                                     <span class="w-2 h-2 rounded-full bg-[var(--vantage-gold)] shrink-0"></span>
                                     <span class="font-medium text-[var(--vantage-text-main)] truncate">${dateStr}, ${timeStr} - ${evt.subject}</span>
                                 </div>
-                                <span class="text-[10px] bg-[var(--vantage-bg)] text-[var(--vantage-text-muted)] px-2 py-0.5 rounded-sm shrink-0 border border-[var(--vantage-border)]">Leipzig</span>
                             `;
                             upcomingContainer.appendChild(itemDiv);
                         }
@@ -558,7 +620,7 @@
                 chatHeader: "Diskussionsverlauf & Neuigkeiten",
                 chatInputPlaceholder: "Antwort schreiben...",
                 btnSend: "Senden",
-                footerText: "Vantage Intranet PWA V3.8.7 • MS365 & Teams Integration",
+                footerText: "Vantage Intranet PWA V3.8.8 • MS365 & Teams Integration",
                 
                 deptTechRentalTitle: "Technical Departments Rental",
                 deptTechRentalDesc: "Kamera, Mechanik, NLN & Werkstatt-Protokolle.",
@@ -631,7 +693,7 @@
                 chatHeader: "Discussion Feed & Updates",
                 chatInputPlaceholder: "Write a reply...",
                 btnSend: "Send",
-                footerText: "Vantage Intranet PWA V3.8.7 • MS365 & Teams Integration",
+                footerText: "Vantage Intranet PWA V3.8.8 • MS365 & Teams Integration",
 
                 deptTechRentalTitle: "Technical Departments Rental",
                 deptTechRentalDesc: "Camera, mechanics, NLN & workshop protocols.",
@@ -704,7 +766,7 @@
                 chatHeader: "Fil de discussion",
                 chatInputPlaceholder: "Écrire une réponse...",
                 btnSend: "Envoyer",
-                footerText: "Vantage Intranet PWA V3.8.7 • MS365 & Teams Integration",
+                footerText: "Vantage Intranet PWA V3.8.8 • MS365 & Teams Integration",
 
                 deptTechRentalTitle: "Technical Departments Rental",
                 deptTechRentalDesc: "Caméra, mécanique, NLN & protocoles d'atelier.",
@@ -777,7 +839,7 @@
                 chatHeader: "Diskuze & Novinky",
                 chatInputPlaceholder: "Napsat odpověď...",
                 btnSend: "Odeslat",
-                footerText: "Vantage Intranet PWA V3.8.7 • MS365 & Teams Integration",
+                footerText: "Vantage Intranet PWA V3.8.8 • MS365 & Teams Integration",
 
                 deptTechRentalTitle: "Technical Departments Rental",
                 deptTechRentalDesc: "Kamera, mechanika, NLN & dílenské protokoly.",
@@ -819,10 +881,10 @@
 
                 snakeTitle: "Vantage Snake 🕹️",
                 snakeSub: "Použijte šipky pro ovládání!",
-                snakeScore: "Skóre",
-                snakeHighscore: "Nejlepší skóre",
-                snakeNewBtn: "Nová hra",
-                snakeCloseBtn: "Zavřít"
+                snakeScore: "Score",
+                snakeHighscore: "Highscore",
+                snakeNewBtn: "Neues Spiel",
+                snakeCloseBtn: "Schließen"
             }
         };
 
