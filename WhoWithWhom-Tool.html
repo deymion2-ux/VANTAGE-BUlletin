@@ -184,6 +184,17 @@
         .details-row {
             font-size: 0.9rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 6px 0;
+        }
+
+        .details-content {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            align-items: center;
         }
 
         .details-label {
@@ -331,7 +342,6 @@
         }
     };
 
-    // LOKALES FACHWÖRTERBUCH (FÜR SPALTEN, TITEL & KOMMENTARE)
     const glossary = {
         en: {
             "Eintrag": "Entry",
@@ -431,7 +441,7 @@
     });
 
     function processFile(file) {
-        document.getElementById('fileBtnText').innerText = file.name.length > 14 ? file.name.substring(0, 12) + '...' : file.name;
+        document.getElementById('fileBtnText').textContent = file.name.length > 14 ? file.name.substring(0, 12) + '...' : file.name;
 
         const reader = new FileReader();
         reader.onload = function(e) {
@@ -445,7 +455,7 @@
                 rawExcelData = parseSheetWithComments(sheet, 4); 
 
                 const t = toolTranslations[currentToolLang];
-                document.getElementById("statusText").innerText = t.statusLoaded(rawExcelData.length, sheetName);
+                document.getElementById("statusText").textContent = t.statusLoaded(rawExcelData.length, sheetName);
 
                 filterData();
             } catch (err) {
@@ -517,14 +527,20 @@
         const t = toolTranslations[currentToolLang];
 
         if (rawExcelData.length === 0) {
-            grid.innerHTML = `<div class="no-results" data-i18n="noFileLoaded">${t.noFileLoaded}</div>`;
+            grid.innerHTML = `<div class="no-results" data-i18n="noFileLoaded"></div>`;
+            grid.querySelector('.no-results').textContent = t.noFileLoaded;
             return;
         }
 
         const trimmedQuery = rawQuery.trim();
 
         if (trimmedQuery.length === 0) {
-            grid.innerHTML = `<div class="no-results" style="font-style: italic;">${t.typePrompt}</div>`;
+            const emptyDiv = document.createElement("div");
+            emptyDiv.className = "no-results";
+            emptyDiv.style.fontStyle = "italic";
+            emptyDiv.textContent = t.typePrompt;
+            grid.innerHTML = "";
+            grid.appendChild(emptyDiv);
             return;
         }
 
@@ -563,12 +579,17 @@
         });
 
         if (filtered.length === 0) {
-            grid.innerHTML = `<div class="no-results">${t.noResults(rawQuery)}</div>`;
+            const noResDiv = document.createElement("div");
+            noResDiv.className = "no-results";
+            noResDiv.textContent = t.noResults(rawQuery);
+            grid.innerHTML = "";
+            grid.appendChild(noResDiv);
             return;
         }
 
         grid.innerHTML = "";
 
+        // Sicherer DOM-Aufbau zur Vermeidung von XSS
         filtered.forEach(row => {
             const keys = Object.keys(row);
             if (keys.length === 0) return;
@@ -583,7 +604,10 @@
             const card = document.createElement("div");
             card.className = "card";
 
-            let detailsHtml = `<div class="card-title">${titleText}</div>`;
+            const cardTitle = document.createElement("div");
+            cardTitle.className = "card-title";
+            cardTitle.textContent = titleText;
+            card.appendChild(cardTitle);
 
             keys.slice(1).forEach(key => {
                 const item = row[key];
@@ -591,32 +615,48 @@
                 const comment = item.comment;
 
                 const translatedKey = translateTerm(key, currentToolLang);
-                
-                let formattedVal = "";
+
+                const detailsRow = document.createElement("div");
+                detailsRow.className = "details-row";
+
+                const detailsContent = document.createElement("div");
+                detailsContent.className = "details-content";
+
+                const labelSpan = document.createElement("span");
+                labelSpan.className = "details-label";
+                labelSpan.textContent = translatedKey + ":";
+
+                const valueSpan = document.createElement("span");
+                valueSpan.className = "details-value";
+
                 if (val === undefined || val === null || String(val).trim() === "") {
-                    formattedVal = `<span class="not-tested-badge">${t.notTested}</span>`;
+                    const badge = document.createElement("span");
+                    badge.className = "not-tested-badge";
+                    badge.textContent = t.notTested;
+                    valueSpan.appendChild(badge);
                 } else if (typeof val === 'string' && (val.trim() === 'ü' || val.trim() === 'Ü')) {
-                    formattedVal = '<span style="color: #10b981; font-weight: bold; font-size: 1rem;">✔</span>';
+                    valueSpan.innerHTML = '<span style="color: #10b981; font-weight: bold; font-size: 1rem;">✔</span>';
                 } else if (typeof val === 'string' && (val.trim() === 'û' || val.trim() === 'þ')) {
-                    formattedVal = '<span style="color: #ef4444; font-weight: bold; font-size: 1rem;">✖</span>';
+                    valueSpan.innerHTML = '<span style="color: #ef4444; font-weight: bold; font-size: 1rem;">✖</span>';
                 } else {
-                    formattedVal = translateTerm(val, currentToolLang);
+                    valueSpan.textContent = translateTerm(val, currentToolLang);
                 }
 
-                let translatedComment = comment ? translateTerm(comment, currentToolLang) : null;
+                detailsContent.appendChild(labelSpan);
+                detailsContent.appendChild(valueSpan);
+                detailsRow.appendChild(detailsContent);
 
-                detailsHtml += `
-                    <div class="details-row" style="flex-direction: column; align-items: flex-start; padding: 6px 0;">
-                        <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
-                            <span class="details-label">${translatedKey}:</span>
-                            <span class="details-value">${formattedVal}</span>
-                        </div>
-                        ${translatedComment ? `<div class="comment-box">📌 ${translatedComment}</div>` : ''}
-                    </div>
-                `;
+                if (comment) {
+                    let translatedComment = translateTerm(comment, currentToolLang);
+                    const commentBox = document.createElement("div");
+                    commentBox.className = "comment-box";
+                    commentBox.textContent = "📌 " + translatedComment;
+                    detailsRow.appendChild(commentBox);
+                }
+
+                card.appendChild(detailsRow);
             });
 
-            card.innerHTML = detailsHtml;
             grid.appendChild(card);
         });
     }
