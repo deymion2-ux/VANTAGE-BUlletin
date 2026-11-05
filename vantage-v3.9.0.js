@@ -111,6 +111,10 @@ async function fetchOutlookCalendars(token) {
                       window.open(target, '_blank', 'noopener,noreferrer');
                   };
 
+                // Dynamischer Outlook-Standort (falls in evt.location.displayName vorhanden)
+                const locStr = (evt.location && evt.location.displayName) ? evt.location.displayName : '';
+                const locBadge = locStr ? `<span class="text-[10px] bg-[var(--vantage-bg)] text-[var(--vantage-text-muted)] px-2 py-0.5 rounded-sm shrink-0 border border-[var(--vantage-border)] truncate max-w-[120px]">${locStr}</span>` : '';
+
                 if (isToday) {
                     todayCount++;
                     itemDiv.innerHTML = `
@@ -118,7 +122,7 @@ async function fetchOutlookCalendars(token) {
                             <span class="w-2 h-2 rounded-full bg-[var(--vantage-gold)] shrink-0"></span>
                             <span class="font-medium text-[var(--vantage-text-main)] truncate">${timeStr} - ${evt.subject}</span>
                         </div>
-                        <span class="text-[10px] bg-[var(--vantage-bg)] text-[var(--vantage-text-muted)] px-2 py-0.5 rounded-sm shrink-0 border border-[var(--vantage-border)]">Leipzig</span>
+                        ${locBadge}
                     `;
                     todayContainer.appendChild(itemDiv);
                 } else {
@@ -128,7 +132,7 @@ async function fetchOutlookCalendars(token) {
                             <span class="w-2 h-2 rounded-full bg-[var(--vantage-gold)] shrink-0"></span>
                             <span class="font-medium text-[var(--vantage-text-main)] truncate">${dateStr}, ${timeStr} - ${evt.subject}</span>
                         </div>
-                        <span class="text-[10px] bg-[var(--vantage-bg)] text-[var(--vantage-text-muted)] px-2 py-0.5 rounded-sm shrink-0 border border-[var(--vantage-border)]">Leipzig</span>
+                        ${locBadge}
                     `;
                     upcomingContainer.appendChild(itemDiv);
                 }
@@ -887,7 +891,6 @@ window.addEventListener("DOMContentLoaded", async () => {
     } catch (err) { console.warn("MSAL Init Error:", err); }
 });
 
-// Inaktivitäts-Timeout auf 1 Stunde erhöht (60 Minuten * 60 Sekunden * 1000 ms)
 const INACTIVITY_TIMEOUT = 60 * 60 * 1000;
 let inactivityTimer;
 function resetInactivityTimer(){ 
