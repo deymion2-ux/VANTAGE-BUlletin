@@ -3,114 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VANTAGE Intranet V3.9.0</title>
-    <!-- Content Security Policy (CSP) -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://cdn.tailwindcss.com https://unpkg.com https://alcdn.msauth.net https://login.microsoftonline.com https://graph.microsoft.com; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com https://alcdn.msauth.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://login.microsoftonline.com https://graph.microsoft.com; img-src 'self' data: https:;">
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@0.294.0/dist/umd/lucide.min.js"></script>
-    <!-- Microsoft Authentication Library (MSAL.js v2) -->
-    <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        vantage: {
-                            bg: '#FFFFFF',
-                            panel: '#E6E6E6',
-                            border: '#D8D8D8',
-                            main: '#111111',
-                            muted: '#555555',
-                            dark: '#2B2B2B',
-                            gold: '#B8923B',
-                            'gold-dark': '#8D6A1E',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
-        :root {
-            --vantage-bg: #FFFFFF;
-            --vantage-panel: #E6E6E6;
-            --vantage-border: #D8D8D8;
-            --vantage-text-main: #111111;
-            --vantage-text-muted: #555555;
-            --vantage-dark-panel: #2B2B2B;
-            --vantage-gold: #B8923B;
-            --vantage-gold-dark: #8D6A1E;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--vantage-bg);
-            color: var(--vantage-text-main);
-            letter-spacing: 0.2px;
-        }
-
-        @keyframes ticker {
-            0% { transform: translate3d(100%, 0, 0); }
-            100% { transform: translate3d(-100%, 0, 0); }
-        }
-        .marquee-content {
-            display: inline-block;
-            white-space: nowrap;
-            animation: ticker 28s linear infinite;
-        }
-        .marquee-content:hover { animation-play-state: paused; }
-
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
-        ::-webkit-scrollbar-track { background: var(--vantage-panel); }
-        ::-webkit-scrollbar-thumb { background: var(--vantage-border); border-radius: 2px; }
-
-        /* DRUCK-EINSTELLUNGEN DES MATTSCHEIBEN RECHNERS */
-        @media print {
-            @page { size: A4 portrait; margin: 15mm; }
-            body * { visibility: hidden !important; }
-            #tool-view-container, #tool-view-container * { visibility: visible !important; }
-            #tool-view-container {
-                position: absolute !important;
-                left: 0 !important;
-                top: 0 !important;
-                width: 100% !important;
-            }
-            .no-print { display: none !important; }
-            .print-only { display: block !important; }
-            .print-template {
-                width: 160mm !important;
-                max-width: 160mm !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                font-family: Arial, sans-serif;
-                color: #000 !important;
-            }
-            .print-table {
-                width: 160mm !important;
-                border-collapse: collapse;
-                margin-bottom: 0.6cm;
-                font-size: 9pt;
-            }
-            .print-table th, .print-table td {
-                border: 1px solid #000 !important;
-                padding: 5px 8px;
-                text-align: left;
-                color: #000 !important;
-            }
-            .print-table th { background-color: #f0f0f0 !important; }
-        }
-        .print-only { display: none; }
-    </style>
+    <title>VANTAGE Intranet V3.8.9</title>
+    <!-- Defense-in-depth CSP. Production MUST also send the HTTP-header version from the included Nginx sample. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'self'; object-src 'none'; form-action 'self' https://login.microsoftonline.com; script-src 'self' https://alcdn.msauth.net; style-src 'self'; font-src 'self'; connect-src 'self' https://graph.microsoft.com https://login.microsoftonline.com https://*.msauth.net https://*.msftauth.net https://*.microsoftonline.com; img-src 'self' data:; frame-src https://login.microsoftonline.com https://*.microsoftonline.com; upgrade-insecure-requests;">
+    <link rel="stylesheet" href="assets/styles.css">
+    <!-- Compatibility dependency: MSAL.js v2 (Microsoft CDN), see README for upgrade and self-hosting recommendation. -->
+    <script defer src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
+    <script defer src="assets/icons.js"></script>
+    <script defer src="assets/app.js"></script>
 </head>
 <body class="min-h-screen flex flex-col bg-[var(--vantage-bg)] text-[var(--vantage-text-main)] overflow-x-hidden">
 
     <!-- MOBILE SIDEBAR BACKDROP -->
-    <div id="mobile-sidebar-backdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-black/60 z-40 hidden backdrop-blur-xs transition-opacity no-print"></div>
+    <div id="mobile-sidebar-backdrop" data-action="toggle-sidebar" class="fixed inset-0 bg-black/60 z-40 hidden backdrop-blur-xs transition-opacity no-print"></div>
 
     <div class="flex-1 flex min-h-screen relative">
 
@@ -118,15 +23,15 @@
         <aside id="sidebar" class="fixed top-0 left-0 w-56 border-r border-[var(--vantage-border)] bg-[var(--vantage-bg)] flex flex-col h-screen z-50 shadow-xl transition-transform duration-300 -translate-x-full shrink-0 no-print">
             <div class="p-4 border-b border-[var(--vantage-border)] bg-white flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                    <div id="vantage-logo-icon" onclick="triggerEasterEggClick()" class="w-7 h-7 rounded-sm bg-[var(--vantage-dark-panel)] text-[var(--vantage-gold)] flex items-center justify-center font-bold text-sm shadow-sm cursor-pointer select-none" title="Dreifach-Klick für Secret Game!">
+                    <div id="vantage-logo-icon" data-action="easter-egg" class="w-7 h-7 rounded-sm bg-[var(--vantage-dark-panel)] text-[var(--vantage-gold)] flex items-center justify-center font-bold text-sm shadow-sm cursor-pointer select-none" title="Dreifach-Klick für Secret Game!">
                         V
                     </div>
                     <div>
-                        <h2 class="font-bold text-xs text-[var(--vantage-text-main)] leading-tight uppercase tracking-wide" data-i18n="teamsStatus">Teams Status</h2>
-                        <p class="text-[10px] text-[var(--vantage-text-muted)]">M365 Verzeichnis</p>
+                        <h2 class="font-bold text-xs text-[var(--vantage-text-main)] leading-tight uppercase tracking-wide" data-i18n="teamsStatus">M365 Verzeichnis</h2>
+                        <p class="text-[10px] text-[var(--vantage-text-muted)]">Kein Live-Präsenzstatus</p>
                     </div>
                 </div>
-                <button onclick="toggleMobileSidebar()" class="text-[var(--vantage-text-muted)] hover:text-[var(--vantage-text-main)] p-1.5 rounded-sm hover:bg-[var(--vantage-panel)]">
+                <button data-action="toggle-sidebar" class="text-[var(--vantage-text-muted)] hover:text-[var(--vantage-text-main)] p-1.5 rounded-sm hover:bg-[var(--vantage-panel)]">
                     <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
             </div>
@@ -134,7 +39,7 @@
             <div class="p-2.5 border-b border-[var(--vantage-border)] bg-[var(--vantage-panel)]">
                 <div class="relative">
                     <i data-lucide="search" class="w-3.5 h-3.5 text-[var(--vantage-text-muted)] absolute left-2.5 top-2"></i>
-                    <input type="text" id="employee-search" oninput="filterPresenceList()" data-i18n-placeholder="searchPlaceholder" placeholder="Mitarbeiter suchen..." 
+                    <input type="text" id="employee-search" data-input-action="filter-presence" data-i18n-placeholder="searchPlaceholder" placeholder="Mitarbeiter suchen..." 
                         class="w-full pl-7 pr-2.5 py-1 text-xs bg-[var(--vantage-bg)] border border-[var(--vantage-border)] rounded-sm focus:outline-none focus:border-[var(--vantage-gold)] transition text-[var(--vantage-text-main)] placeholder-[var(--vantage-text-muted)]">
                 </div>
             </div>
@@ -143,9 +48,8 @@
                 Bitte bei M365 anmelden, um Mitarbeiter-Präsenzen zu laden.
             </div>
 
-            <div class="p-2.5 border-t border-[var(--vantage-border)] bg-[var(--vantage-panel)] text-[10px] text-[var(--vantage-text-muted)] flex items-center justify-around font-medium uppercase tracking-wider">
-                <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Online</span>
-                <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Busy</span>
+            <div class="p-2.5 border-t border-[var(--vantage-border)] bg-[var(--vantage-panel)] text-[10px] text-[var(--vantage-text-muted)] text-center">
+                Verzeichnisansicht · kein Live-Präsenzstatus
             </div>
         </aside>
 
@@ -155,17 +59,17 @@
             <!-- TOP HEADER BAR -->
             <header class="border-b border-[var(--vantage-border)] bg-[var(--vantage-dark-panel)] px-4 lg:px-8 py-4 flex items-center justify-between shadow-md no-print">
                 <div class="flex items-center gap-3">
-                    <button onclick="toggleMobileSidebar()" id="burger-menu-btn" class="p-2 rounded-sm bg-[var(--vantage-panel)] text-[var(--vantage-text-main)] hover:bg-[var(--vantage-border)] transition" title="Teams Status Leiste ein-/ausblenden">
+                    <button data-action="toggle-sidebar" id="burger-menu-btn" class="p-2 rounded-sm bg-[var(--vantage-panel)] text-[var(--vantage-text-main)] hover:bg-[var(--vantage-border)] transition" title="Mitarbeiterverzeichnis ein-/ausblenden">
                         <i data-lucide="menu" class="w-5 h-5"></i>
                     </button>
                     <h1 class="font-light text-sm lg:text-base tracking-[2px] uppercase text-white flex items-center gap-3">
-                        VANTAGE <span class="hidden sm:inline-block text-[11px] font-semibold text-[var(--vantage-gold)] bg-transparent border border-[var(--vantage-gold)] px-3 py-0.5 rounded-sm tracking-[1.5px]">Intranet V3.9.0 🚀</span>
+                        VANTAGE <span class="hidden sm:inline-block text-[11px] font-semibold text-[var(--vantage-gold)] bg-transparent border border-[var(--vantage-gold)] px-3 py-0.5 rounded-sm tracking-[1.5px]">Intranet V3.8.9 🚀</span>
                     </h1>
                 </div>
 
                 <div class="flex items-center gap-2 lg:gap-3">
                     <!-- SPRACHAUSWAHL DROPDOWN -->
-                    <select id="language-select" onchange="changeLanguage(this.value)" class="text-xs bg-[var(--vantage-panel)] border border-[var(--vantage-border)] rounded-sm px-3 py-1.5 font-medium text-[var(--vantage-text-main)] focus:outline-none focus:border-[var(--vantage-gold)] cursor-pointer uppercase tracking-wide">
+                    <select id="language-select" data-change-action="change-language" class="text-xs bg-[var(--vantage-panel)] border border-[var(--vantage-border)] rounded-sm px-3 py-1.5 font-medium text-[var(--vantage-text-main)] focus:outline-none focus:border-[var(--vantage-gold)] cursor-pointer uppercase tracking-wide">
                         <option value="de">🇩🇪 Deutsch</option>
                         <option value="en">🇬🇧 English</option>
                         <option value="fr">🇫🇷 Français</option>
@@ -174,13 +78,13 @@
 
                     <!-- M365 AUTH -->
                     <div id="auth-container" class="flex items-center gap-2">
-                        <button id="login-btn" onclick="loginM365()" class="bg-[var(--vantage-gold)] hover:bg-[var(--vantage-gold-dark)] text-white px-3 py-1.5 rounded-sm text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-sm transition cursor-pointer">
+                        <button id="login-btn" data-action="login" class="bg-[var(--vantage-gold)] hover:bg-[var(--vantage-gold-dark)] text-white px-3 py-1.5 rounded-sm text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-sm transition cursor-pointer">
                             <i data-lucide="log-in" class="w-3.5 h-3.5 text-white"></i> <span class="hidden sm:inline" data-i18n="login">M365 Anmelden</span>
                         </button>
                         <div id="user-profile-badge" class="hidden flex items-center gap-2 bg-[var(--vantage-panel)] border border-[var(--vantage-border)] px-3 py-1 rounded-sm text-xs">
                             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                             <span id="user-display-name" class="font-medium text-[var(--vantage-text-main)]">Verbinde...</span>
-                            <button onclick="logoutM365()" class="ml-1 text-slate-500 hover:text-rose-600 transition p-0.5" title="Abmelden">
+                            <button data-action="logout" class="ml-1 text-slate-500 hover:text-rose-600 transition p-0.5" title="Abmelden">
                                 <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
                             </button>
                         </div>
@@ -231,7 +135,7 @@
                                     <span class="text-[11px] font-bold text-[var(--vantage-text-muted)] uppercase tracking-wider flex items-center gap-1.5">
                                         <i data-lucide="calendar" class="w-3.5 h-3.5 text-[var(--vantage-gold)]"></i> <span data-i18n="todayCalendar">Heute im Kalender</span>
                                     </span>
-                                    <span class="text-[10px] text-[var(--vantage-gold-dark)] font-semibold bg-[var(--vantage-panel)] px-2 py-0.5 rounded-sm border border-[var(--vantage-border)] uppercase" data-i18n="vantageCalendar">Vantage Kalender</span>
+                                    <span class="text-[10px] text-[var(--vantage-gold-dark)] font-semibold bg-[var(--vantage-panel)] px-2 py-0.5 rounded-sm border border-[var(--vantage-border)] uppercase" data-i18n="vantageCalendar">Persönlicher Kalender</span>
                                 </div>
                                 <div class="space-y-2 text-xs" id="today-calendar-events">
                                     <div class="p-2.5 bg-[var(--vantage-panel)] rounded-sm border border-[var(--vantage-border)] text-slate-500 italic">
@@ -246,7 +150,7 @@
                                     <span class="text-[11px] font-bold text-[var(--vantage-text-muted)] uppercase tracking-wider flex items-center gap-1.5">
                                         <i data-lucide="calendar-days" class="w-3.5 h-3.5 text-[var(--vantage-gold)]"></i> <span data-i18n="upcomingCalendar">Vorschau nächste Tage</span>
                                     </span>
-                                    <span class="text-[10px] text-[var(--vantage-gold-dark)] font-semibold bg-[var(--vantage-panel)] px-2 py-0.5 rounded-sm border border-[var(--vantage-border)] uppercase" data-i18n="vantageCalendar">Vantage Kalender</span>
+                                    <span class="text-[10px] text-[var(--vantage-gold-dark)] font-semibold bg-[var(--vantage-panel)] px-2 py-0.5 rounded-sm border border-[var(--vantage-border)] uppercase" data-i18n="vantageCalendar">Persönlicher Kalender</span>
                                 </div>
                                 <div class="space-y-2 text-xs" id="upcoming-calendar-events">
                                     <div class="p-2.5 bg-[var(--vantage-panel)] rounded-sm border border-[var(--vantage-border)] text-slate-500 italic">
@@ -293,10 +197,10 @@
                     
                     <div class="flex items-center justify-between bg-[var(--vantage-panel)] border border-[var(--vantage-border)] px-4 py-3 rounded-sm shadow-xs no-print">
                         <div class="flex items-center gap-2">
-                            <button onclick="goBack()" class="px-3 py-1.5 bg-[var(--vantage-bg)] hover:bg-[var(--vantage-border)] border border-[var(--vantage-border)] text-[var(--vantage-text-main)] rounded-sm text-xs font-semibold uppercase tracking-wider transition flex items-center gap-1.5 cursor-pointer">
+                            <button data-action="go-back" class="px-3 py-1.5 bg-[var(--vantage-bg)] hover:bg-[var(--vantage-border)] border border-[var(--vantage-border)] text-[var(--vantage-text-main)] rounded-sm text-xs font-semibold uppercase tracking-wider transition flex items-center gap-1.5 cursor-pointer">
                                 <i data-lucide="arrow-left" class="w-3.5 h-3.5 text-[var(--vantage-gold)]"></i> <span data-i18n="btnBack">Schritt zurück</span>
                             </button>
-                            <button onclick="goHome()" class="px-3 py-1.5 bg-[var(--vantage-bg)] hover:bg-[var(--vantage-border)] border border-[var(--vantage-border)] text-[var(--vantage-text-main)] rounded-sm text-xs font-semibold uppercase tracking-wider transition flex items-center gap-1.5 cursor-pointer">
+                            <button data-action="go-home" class="px-3 py-1.5 bg-[var(--vantage-bg)] hover:bg-[var(--vantage-border)] border border-[var(--vantage-border)] text-[var(--vantage-text-main)] rounded-sm text-xs font-semibold uppercase tracking-wider transition flex items-center gap-1.5 cursor-pointer">
                                 <i data-lucide="home" class="w-3.5 h-3.5 text-[var(--vantage-gold)]"></i> <span data-i18n="btnHome">Zum Dashboard</span>
                             </button>
                         </div>
@@ -310,7 +214,7 @@
                             </div>
                             <div>
                                 <h2 class="font-semibold text-base text-[var(--vantage-text-main)] uppercase tracking-[1px]" id="detail-title">Title</h2>
-                                <p class="text-xs text-[var(--vantage-text-muted)]" data-i18n="detailSub">Live Teams-Kommentare & Diskussionsverlauf</p>
+                                <p class="text-xs text-[var(--vantage-text-muted)]" data-i18n="detailSub">Teams-Diskussion (noch nicht angebunden)</p>
                             </div>
                         </div>
                         <div class="flex items-center gap-2.5 w-full sm:w-auto flex-wrap" id="detail-action-buttons"></div>
@@ -328,14 +232,14 @@
 
                     <div id="chat-stream-card" class="bg-[var(--vantage-panel)] border border-[var(--vantage-border)] rounded-sm p-5 shadow-xs flex-1 flex flex-col no-print">
                         <h3 class="font-bold text-xs uppercase tracking-[1.5px] text-[var(--vantage-text-muted)] mb-4 flex items-center gap-1.5">
-                            <i data-lucide="messages-square" class="w-4 h-4 text-[var(--vantage-gold)]"></i> <span data-i18n="chatHeader">Diskussionsverlauf & Neuigkeiten</span>
+                            <i data-lucide="messages-square" class="w-4 h-4 text-[var(--vantage-gold)]"></i> <span data-i18n="chatHeader">Diskussion (noch nicht angebunden)</span>
                         </h3>
                         <div class="space-y-4 flex-1 overflow-y-auto pr-1 max-h-[40vh]" id="detail-chat-stream">
                             <div class="p-3.5 bg-[var(--vantage-bg)] border border-[var(--vantage-border)] text-xs text-slate-500 italic">Keine Diskussionen vorhanden.</div>
                         </div>
                         <div class="mt-4 pt-3 border-t border-[var(--vantage-border)] flex items-center gap-2">
-                            <input type="text" id="detail-chat-input" data-i18n-placeholder="chatInputPlaceholder" placeholder="Antwort schreiben..." class="flex-1 px-3 py-2 text-xs bg-[var(--vantage-bg)] border border-[var(--vantage-border)] rounded-sm focus:outline-none focus:border-[var(--vantage-gold)] text-[var(--vantage-text-main)]">
-                            <button onclick="sendDetailChatMessage()" class="px-3.5 py-2 bg-[var(--vantage-gold)] hover:bg-[var(--vantage-gold-dark)] text-white rounded-sm text-xs font-semibold uppercase tracking-wider transition flex items-center gap-1.5 cursor-pointer">
+                            <input type="text" id="detail-chat-input" disabled title="Nachrichtenversand noch nicht implementiert" data-i18n-placeholder="chatInputPlaceholder" placeholder="Antwort schreiben..." class="flex-1 px-3 py-2 text-xs bg-[var(--vantage-bg)] border border-[var(--vantage-border)] rounded-sm focus:outline-none focus:border-[var(--vantage-gold)] text-[var(--vantage-text-main)]">
+                            <button disabled title="Nachrichtenversand noch nicht implementiert" class="px-3.5 py-2 bg-[var(--vantage-gold)] hover:bg-[var(--vantage-gold-dark)] text-white rounded-sm text-xs font-semibold uppercase tracking-wider transition flex items-center gap-1.5 cursor-pointer">
                                 <i data-lucide="send" class="w-3.5 h-3.5"></i> <span data-i18n="btnSend">Senden</span>
                             </button>
                         </div>
@@ -345,7 +249,7 @@
             </div>
 
             <footer class="p-4 lg:p-6 text-center text-xs text-[var(--vantage-text-muted)] border-t border-[var(--vantage-border)] mt-auto no-print uppercase tracking-widest bg-[var(--vantage-panel)]">
-                <p data-i18n="footerText">Vantage Intranet PWA V3.9.0 • MS365 & Teams Integration</p>
+                <p data-i18n="footerText">Vantage Intranet PWA V3.8.9 &bull; MS365 & Teams Integration</p>
             </footer>
 
         </div>
@@ -354,7 +258,7 @@
     <!-- EASTER EGG MODAL (Vantage Snake) -->
     <div id="easter-egg-modal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-[var(--vantage-dark-panel)] border border-[var(--vantage-gold)] p-6 rounded-sm text-center max-w-md w-full shadow-2xl relative">
-            <button onclick="closeSnakeGame()" class="absolute top-3 right-3 text-slate-400 hover:text-white text-lg font-bold">&times;</button>
+            <button data-action="close-snake" class="absolute top-3 right-3 text-slate-400 hover:text-white text-lg font-bold">&times;</button>
             <div class="flex items-center justify-center gap-2 mb-2">
                 <i data-lucide="gamepad-2" class="w-5 h-5 text-[var(--vantage-gold)]"></i>
                 <h3 class="text-base font-bold text-white uppercase tracking-widest" data-i18n="snakeTitle">Vantage Snake 🕹️</h3>
@@ -368,13 +272,12 @@
                 <canvas id="snakeCanvas" width="300" height="300" class="bg-black"></canvas>
             </div>
             <div class="mt-4 flex gap-2 justify-center">
-                <button onclick="startSnakeGame()" class="px-4 py-2 bg-[var(--vantage-gold)] hover:bg-[var(--vantage-gold-dark)] text-white text-xs font-bold uppercase tracking-wider rounded-sm cursor-pointer" data-i18n="snakeNewBtn">Neues Spiel</button>
-                <button onclick="closeSnakeGame()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold uppercase tracking-wider rounded-sm cursor-pointer" data-i18n="snakeCloseBtn">Schließen</button>
+                <button data-action="start-snake" class="px-4 py-2 bg-[var(--vantage-gold)] hover:bg-[var(--vantage-gold-dark)] text-white text-xs font-bold uppercase tracking-wider rounded-sm cursor-pointer" data-i18n="snakeNewBtn">Neues Spiel</button>
+                <button data-action="close-snake" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold uppercase tracking-wider rounded-sm cursor-pointer" data-i18n="snakeCloseBtn">Schließen</button>
             </div>
         </div>
     </div>
 
-    <!-- EXTERNAL VANTAGE V3.9.0 JAVASCRIPT LOGIC -->
-    <script src="vantage-v3.9.0.js"></script>
+
 </body>
 </html>
