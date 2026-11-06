@@ -2,7 +2,7 @@ const msalConfig = {
     auth: {
         clientId: "cee7a128-4c3e-4a07-b0c8-89b97475a71c",
         authority: "https://login.microsoftonline.com/7dfd912b-740c-430b-ae2b-10a0948f1378",
-        redirectUri: window.location.origin + window.location.pathname
+        redirectUri: new URL("auth-redirect.html", window.location.href).href
     },
     cache: { cacheLocation: "sessionStorage", storeAuthStateInCookie: false }
 };
